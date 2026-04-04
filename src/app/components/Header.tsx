@@ -79,7 +79,13 @@ export function Header({ activePage, onNavigate }: HeaderProps) {
           <div className="hidden md:block text-right">
             <p className="text-slate-700 text-xs leading-tight">{user?.name}</p>
             <p className="text-slate-400 text-xs leading-tight">
-              {user?.role === "manager" ? "مدير" : "مدير المخزن"}
+              {{
+                manager: "المدير",
+                warehouse: "مدير المخزن",
+                warehouseManager: "مدير المخزن",
+                representative: "المندوب",
+                accountant: "المحاسب",
+              }[user?.role as string] || "مستخدم"}
             </p>
           </div>
         </div>

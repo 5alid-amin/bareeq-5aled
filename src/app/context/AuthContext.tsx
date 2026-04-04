@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState } from "react";
 
-export type UserRole = "manager" | "warehouse" | "representative";
+export type UserRole = "manager" | "warehouse" | "representative" | "accountant";
 
 export interface AuthUser {
   id: string;
@@ -42,6 +42,13 @@ const MOCK_USERS: Record<string, AuthUser> = {
     avatar: "أ",
     assignedVanId: "VAN-001",
   },
+  "accountant@bareeq.eg": {
+    id: "USR-009",
+    name: "يوسف أحمد الحكيم",
+    email: "accountant@bareeq.eg",
+    role: "accountant",
+    avatar: "ي",
+  },
 };
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
@@ -60,6 +67,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       } else if (role === "warehouse") {
         defaultName = "فهد عبد العزيز الصاوي";
         defaultAvatar = "ف";
+      } else if (role === "accountant") {
+        defaultName = "يوسف أحمد الحكيم";
+        defaultAvatar = "ي";
       } else {
         defaultName = "أحمد محمد السعيد";
         defaultAvatar = "أ";

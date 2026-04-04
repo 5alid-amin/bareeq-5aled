@@ -12,8 +12,13 @@ import {
   ShoppingCart,
   List,
   Clock,
-  DollarSign,
   RefreshCw,
+  BookOpen,
+  ArrowDownToLine,
+  ArrowUpFromLine,
+  Wallet,
+  RotateCcw,
+  ClipboardList
 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 
@@ -29,14 +34,15 @@ const managerNav: NavItem[] = [
   { id: "tracking", label: "تتبع المركبات", icon: <MapPin size={18} /> },
   { id: "users", label: "إدارة المستخدمين", icon: <Users size={18} /> },
   { id: "attendance", label: "نظام تسجيل الحضور", icon: <Clock size={18} /> },
-  { id: "payroll", label: "إدارة الرواتب", icon: <DollarSign size={18} /> },
   { id: "reports", label: "التقارير والتحليلات", icon: <BarChart3 size={18} /> },
 ];
 
 const warehouseNav: NavItem[] = [
   { id: "wh-dashboard", label: "لوحة التحكم", icon: <LayoutDashboard size={18} /> },
   { id: "inventory", label: "المخزون", icon: <Package size={18} /> },
-  { id: "transfers", label: "تحويلات البضاعة", icon: <ArrowLeftRight size={18} /> },
+  { id: "discrepancy", label: "فروقات جرد السيارات", icon: <ClipboardList size={18} /> },
+  { id: "transfers", label: "تحميل السيارات", icon: <Truck size={18} /> },
+  { id: "returns", label: "مرتجع", icon: <RotateCcw size={18} /> },
   { id: "reorder", label: "تنبيهات إعادة الطلب", icon: <AlertTriangle size={18} /> },
   { id: "wh-restock", label: "طلبات التعبئة", icon: <RefreshCw size={18} /> },
 ];
@@ -47,6 +53,13 @@ const repNav: NavItem[] = [
   { id: "rep-sale", label: "تسجيل فاتورة بيع", icon: <ShoppingCart size={18} /> },
   { id: "rep-history", label: "سجل المبيعات", icon: <List size={18} /> },
   { id: "rep-restock", label: "طلبات إعادة التعبئة", icon: <RefreshCw size={18} /> },
+];
+
+const accountantNav: NavItem[] = [
+  { id: "acc-ledger", label: "دفتر الأستاذ العام", icon: <BookOpen size={18} /> },
+  { id: "acc-receivable", label: "المدينون", icon: <ArrowDownToLine size={18} /> },
+  { id: "acc-payable", label: "الدائنون", icon: <ArrowUpFromLine size={18} /> },
+  { id: "acc-payroll", label: "الرواتب والأجور", icon: <Wallet size={18} /> },
 ];
 
 interface SidebarProps {
@@ -60,10 +73,12 @@ export function Sidebar({ activePage, onNavigate }: SidebarProps) {
     ? managerNav
     : user?.role === "warehouse"
       ? warehouseNav
-      : repNav;
+      : user?.role === "accountant"
+        ? accountantNav
+        : repNav;
 
-  const roleLabel = user?.role === "manager" ? "مدير" : user?.role === "warehouse" ? "مدير المخزن" : "المندوب";
-  const roleBadgeColor = user?.role === "manager" ? "bg-blue-500" : user?.role === "warehouse" ? "bg-emerald-500" : "bg-cyan-500";
+  const roleLabel = user?.role === "manager" ? "المدير" : user?.role === "warehouse" ? "مدير المخزن" : user?.role === "accountant" ? "المحاسب" : "المندوب";
+  const roleBadgeColor = user?.role === "manager" ? "bg-blue-500" : user?.role === "warehouse" ? "bg-emerald-500" : user?.role === "accountant" ? "bg-amber-500" : "bg-cyan-500";
 
   return (
     <aside className="w-64 bg-slate-900 flex flex-col h-full shadow-xl flex-shrink-0">
@@ -123,6 +138,27 @@ export function Sidebar({ activePage, onNavigate }: SidebarProps) {
             <p className="text-slate-500 text-xs px-2 mb-2 mt-6 uppercase tracking-wider">إدارة المخزن</p>
             <ul className="space-y-1">
               {warehouseNav.map((item) => {
+                const isActive = activePage === item.id;
+                return (
+                  <li key={item.id}>
+                    <button
+                      onClick={() => onNavigate(item.id)}
+                      className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all duration-150 text-right ${isActive
+                        ? "bg-blue-600 text-white shadow-sm"
+                        : "text-slate-400 hover:bg-slate-800 hover:text-slate-200"
+                        }`}
+                    >
+                      <span className={isActive ? "text-white" : "text-slate-500"}>{item.icon}</span>
+                      <span>{item.label}</span>
+                    </button>
+                  </li>
+                );
+              })}
+            </ul>
+
+            <p className="text-slate-500 text-xs px-2 mb-2 mt-6 uppercase tracking-wider">الإدارة المالية</p>
+            <ul className="space-y-1">
+              {accountantNav.map((item) => {
                 const isActive = activePage === item.id;
                 return (
                   <li key={item.id}>

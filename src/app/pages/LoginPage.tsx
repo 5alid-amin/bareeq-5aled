@@ -64,6 +64,7 @@ export function LoginPage() {
                       setRole(r);
                       if (r === "manager") setEmail("manager@bareeq.eg");
                       else if (r === "warehouse") setEmail("warehouse@bareeq.eg");
+                      else if (r === "accountant") setEmail("accountant@bareeq.eg");
                       else setEmail("van1@bareeq.eg");
                     }}
                     className="w-full appearance-none bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -71,6 +72,7 @@ export function LoginPage() {
                     <option value="manager">المدير</option>
                     <option value="warehouse">مدير المخزن</option>
                     <option value="representative">المندوب</option>
+                    <option value="accountant">المحاسب</option>
                   </select>
                   <ChevronDown size={16} className="absolute top-1/2 -translate-y-1/2 left-3 text-slate-400 pointer-events-none" />
                 </div>
@@ -137,24 +139,30 @@ export function LoginPage() {
             {/* Quick access hint */}
             <div className="mt-5 pt-4 border-t border-slate-100">
               <p className="text-slate-400 text-xs text-center mb-2">حسابات تجريبية</p>
-              <div className="grid grid-cols-3 gap-2">
+              <div className="grid grid-cols-4 gap-2">
                 <button
-                  onClick={() => { setRole("manager"); setEmail("manager@detergents.eg"); setPassword("123456"); }}
+                  onClick={() => { setRole("manager"); setEmail("manager@bareeq.eg"); setPassword("123456"); }}
                   className="text-xs bg-blue-50 text-blue-600 border border-blue-100 rounded-lg py-2 px-3 hover:bg-blue-100 transition-colors"
                 >
                   🧑‍💼 المدير
                 </button>
                 <button
-                  onClick={() => { setRole("warehouse"); setEmail("warehouse@detergents.eg"); setPassword("123456"); }}
+                  onClick={() => { setRole("warehouse"); setEmail("warehouse@bareeq.eg"); setPassword("123456"); }}
                   className="text-xs bg-emerald-50 text-emerald-600 border border-emerald-100 rounded-lg py-2 px-3 hover:bg-emerald-100 transition-colors"
                 >
                   📦 مدير المخزن
                 </button>
                 <button
-                  onClick={() => { setRole("representative"); setEmail("van1@detergents.eg"); setPassword("123456"); }}
+                  onClick={() => { setRole("representative"); setEmail("van1@bareeq.eg"); setPassword("123456"); }}
                   className="text-xs bg-cyan-50 text-cyan-600 border border-cyan-100 rounded-lg py-2 px-3 hover:bg-cyan-100 transition-colors"
                 >
                   🚚 المندوب
+                </button>
+                <button
+                  onClick={() => { setRole("accountant"); setEmail("accountant@bareeq.eg"); setPassword("123456"); }}
+                  className="text-xs bg-amber-50 text-amber-600 border border-amber-100 rounded-lg py-2 px-3 hover:bg-amber-100 transition-colors"
+                >
+                  📊 المحاسب
                 </button>
               </div>
             </div>

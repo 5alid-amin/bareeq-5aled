@@ -39,11 +39,45 @@ export interface Transfer {
   status: "مكتمل" | "معلق";
 }
 
+export interface LoadingOrderItem {
+  productId: string;
+  productName: string;
+  quantity: number;
+  unitPrice: number;
+  totalPrice: number;
+}
+
+export interface LoadingOrder {
+  id: string;
+  date: string;
+  vanId: string;
+  vanName: string;
+  items: LoadingOrderItem[];
+  totalValue: number;
+  status: "مكتمل" | "معلق";
+}
+
+export interface ReturnOrderItem {
+  productId: string;
+  productName: string;
+  quantity: number;
+  reason?: string;
+}
+
+export interface ReturnOrder {
+  id: string;
+  date: string;
+  vanId: string;
+  vanName: string;
+  items: ReturnOrderItem[];
+  status: "مكتمل" | "معلق";
+}
+
 export interface User {
   id: string;
   name: string;
   email: string;
-  role: "مدير" | "مدير مخزن" | "مندوب";
+  role: "مدير" | "مدير مخزن" | "مندوب" | "محاسب";
   status: "نشط" | "غير نشط";
   joinDate: string;
 }
@@ -263,6 +297,36 @@ export const transfers: Transfer[] = [
   { id: "TRF-006", date: "2026-03-01", vanId: "VAN-002", vanName: "VAN-002 - محمد البحيري", productName: "منظف الزجاج والمرايا", quantity: 35, status: "مكتمل" },
 ];
 
+// ─── Loading Orders ─────────────────────────────────────────────────────────────
+export let loadingOrders: LoadingOrder[] = [
+  {
+    id: "LO-001",
+    date: "2026-03-03T08:30:00Z",
+    vanId: "VAN-001",
+    vanName: "VAN-001 - أحمد السعيد",
+    items: [
+      { productId: "PRD-001", productName: "منظف الأطباق سائل ليمون", quantity: 48, unitPrice: 14.0, totalPrice: 672.0 },
+      { productId: "PRD-005", productName: "منظف الحمام والمرحاض", quantity: 20, unitPrice: 16.0, totalPrice: 320.0 }
+    ],
+    totalValue: 992.0,
+    status: "مكتمل"
+  }
+];
+
+// ─── Return Orders ──────────────────────────────────────────────────────────────
+export let returnOrders: ReturnOrder[] = [
+  {
+    id: "RO-001",
+    date: "2026-03-02T16:00:00Z",
+    vanId: "VAN-002",
+    vanName: "VAN-002 - محمد البحيري",
+    items: [
+      { productId: "PRD-007", productName: "منظف الزجاج والمرايا", quantity: 5, reason: "تالف" }
+    ],
+    status: "مكتمل"
+  }
+];
+
 // ─── Users ────────────────────────────────────────────────────────────────────
 export const users: User[] = [
   { id: "USR-001", name: "عبدالله فؤاد الشافعي", email: "manager@bareeq.eg", role: "مدير", status: "نشط", joinDate: "2024-01-15" },
@@ -273,6 +337,7 @@ export const users: User[] = [
   { id: "USR-006", name: "عمر حسن الشاذلي", email: "van4@bareeq.eg", role: "مندوب", status: "غير نشط", joinDate: "2024-04-05" },
   { id: "USR-007", name: "سعد عبدالله الشربيني", email: "van5@bareeq.eg", role: "مندوب", status: "غير نشط", joinDate: "2024-05-20" },
   { id: "USR-008", name: "فيصل محمد الجمال", email: "van6@bareeq.eg", role: "مندوب", status: "نشط", joinDate: "2024-06-01" },
+  { id: "USR-009", name: "يوسف أحمد الحكيم", email: "accountant@bareeq.eg", role: "محاسب", status: "نشط", joinDate: "2024-07-01" },
 ];
 
 // ─── Sales Chart Data ─────────────────────────────────────────────────────────
@@ -438,4 +503,52 @@ export let stockMovements: StockMovement[] = [
     toVanId: "VAN-003",
     date: "2026-03-01T16:00:00Z",
   },
+];
+
+// ─── Accountant Models & Data ──────────────────────────────────────────────────
+export interface JournalEntry {
+  id: string;
+  date: string;
+  description: string;
+  accountType: "إيرادات" | "مصروفات" | "أصول" | "خصوم" | "حقوق ملكية";
+  debit: number;
+  credit: number;
+}
+
+export let journalEntries: JournalEntry[] = [
+  { id: "JE-001", date: "2026-03-03", description: "تحصيل نقدية من المندوب أحمد السعيد", accountType: "إيرادات", debit: 4850, credit: 0 },
+  { id: "JE-002", date: "2026-03-03", description: "مصروف صيانة سيارة (VAN-005)", accountType: "مصروفات", debit: 0, credit: 1500 },
+  { id: "JE-003", date: "2026-03-02", description: "فاتورة شراء بضاعة نقدية", accountType: "أصول", debit: 12000, credit: 0 },
+  { id: "JE-004", date: "2026-03-02", description: "مصروفات بنزين", accountType: "مصروفات", debit: 0, credit: 350 },
+];
+
+export interface CashReceipt {
+  id: string;
+  date: string;
+  representativeName: string;
+  amount: number;
+  notes: string;
+  status: "مكتمل" | "معلق";
+}
+
+export let cashReceipts: CashReceipt[] = [
+  { id: "CR-001", date: "2026-03-03", representativeName: "أحمد محمد السعيد", amount: 4850, notes: "توريد مبيعات اليوم", status: "مكتمل" },
+  { id: "CR-002", date: "2026-03-03", representativeName: "محمد علي البحيري", amount: 3620, notes: "توريد مبيعات اليوم", status: "مكتمل" },
+  { id: "CR-003", date: "2026-03-02", representativeName: "فيصل محمد الجمال", amount: 5200, notes: "توريد مبيعات اليوم", status: "مكتمل" },
+];
+
+export interface ExpenseRecord {
+  id: string;
+  date: string;
+  category: "بنزين" | "تالف" | "مستلزمات سيارات" | "سلف";
+  amount: number;
+  notes: string;
+  status: "مدفوع" | "معلق";
+}
+
+export let expenseRecords: ExpenseRecord[] = [
+  { id: "EXP-001", date: "2026-03-03", category: "مستلزمات سيارات", amount: 1500, notes: "صيانة وتغيير زيت VAN-005", status: "مدفوع" },
+  { id: "EXP-002", date: "2026-03-03", category: "بنزين", amount: 350, notes: "بنزين VAN-001 و VAN-002", status: "مدفوع" },
+  { id: "EXP-003", date: "2026-03-02", category: "تالف", amount: 120, notes: "تالف منظف زجاج (2 حبة)", status: "مدفوع" },
+  { id: "EXP-004", date: "2026-03-01", category: "سلف", amount: 500, notes: "سلفة للمندوب خالد إبراهيم", status: "مدفوع" },
 ];

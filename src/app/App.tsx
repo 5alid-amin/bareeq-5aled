@@ -10,7 +10,9 @@ import { UserManagement } from "./pages/manager/UserManagement";
 import { Reports } from "./pages/manager/Reports";
 import { WarehouseDashboard } from "./pages/warehouse/WarehouseDashboard";
 import { InventoryPage } from "./pages/warehouse/InventoryPage";
-import { TransfersPage } from "./pages/warehouse/TransfersPage";
+import { VehicleLoadingPage } from "./pages/warehouse/VehicleLoadingPage";
+import { ReturnsPage } from "./pages/warehouse/ReturnsPage";
+import { VehicleDiscrepancyPage } from "./pages/warehouse/VehicleDiscrepancyPage";
 import { ReorderAlertsPage } from "./pages/warehouse/ReorderAlertsPage";
 
 // New Pages
@@ -22,6 +24,10 @@ import { AttendancePage } from "./pages/manager/AttendancePage";
 import { PayrollPage } from "./pages/manager/PayrollPage";
 import { RestockRequestPage } from "./pages/representative/RestockRequestPage";
 import { RestockManagementPage } from "./pages/warehouse/RestockManagementPage";
+import { GeneralLedgerPage } from "./pages/accountant/GeneralLedgerPage";
+import { AccountsReceivablePage } from "./pages/accountant/AccountsReceivablePage";
+import { AccountsPayablePage } from "./pages/accountant/AccountsPayablePage";
+import { AccountantPayrollPage } from "./pages/accountant/AccountantPayrollPage";
 
 function AppContent() {
   const { user } = useAuth();
@@ -38,7 +44,9 @@ function AppContent() {
     ? "dashboard"
     : user?.role === "warehouse"
       ? "wh-dashboard"
-      : "rep-dashboard";
+      : user?.role === "accountant"
+        ? "acc-ledger"
+        : "rep-dashboard";
   const currentPage = activePage || defaultPage;
 
   if (!user) {
@@ -75,8 +83,12 @@ function AppContent() {
         return <WarehouseDashboard onNavigate={handleNavigate} />;
       case "inventory":
         return <InventoryPage />;
+      case "discrepancy":
+        return <VehicleDiscrepancyPage />;
       case "transfers":
-        return <TransfersPage />;
+        return <VehicleLoadingPage />;
+      case "returns":
+        return <ReturnsPage />;
       case "reorder":
         return <ReorderAlertsPage />;
       case "wh-restock":
@@ -94,12 +106,24 @@ function AppContent() {
       case "rep-history":
         return <SalesHistory />;
 
+      // Accountant pages
+      case "acc-ledger":
+        return <GeneralLedgerPage />;
+      case "acc-receivable":
+        return <AccountsReceivablePage />;
+      case "acc-payable":
+        return <AccountsPayablePage />;
+      case "acc-payroll":
+        return <AccountantPayrollPage />;
+
       default:
         return user.role === "manager"
           ? <ManagerDashboard onNavigate={handleNavigate} />
           : user.role === "warehouse"
             ? <WarehouseDashboard onNavigate={handleNavigate} />
-            : <RepresentativeDashboard onNavigate={handleNavigate} />;
+            : user.role === "accountant"
+              ? <GeneralLedgerPage />
+              : <RepresentativeDashboard onNavigate={handleNavigate} />;
     }
   };
 
