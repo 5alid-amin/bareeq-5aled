@@ -1,3 +1,9 @@
+// ─── Location Constants ──────────────────────────────────────────────────────
+export const MAIN_WAREHOUSE = "المستودع الرئيسي";
+export const MAIN_GARAGE = "الجراج الرئيسي";
+
+export type PaymentMethod = "كاش" | "فيزا" | "فودافون كاش" | "إنستاباي";
+
 export interface Van {
   id: string;
   driverName: string;
@@ -8,6 +14,21 @@ export interface Van {
   plate: string;
   openingBalance: number;
   expenses: number;
+  workshopName?: string;
+}
+
+export function getVanDisplayLocation(van: Van): string {
+  switch (van.status) {
+    case "نشطة":
+      return van.location;
+    case "تحميل":
+      return MAIN_WAREHOUSE;
+    case "متوقفة":
+    case "صيانة":
+      return MAIN_GARAGE;
+    default:
+      return van.location;
+  }
 }
 
 export interface Product {
@@ -373,15 +394,22 @@ export const topVans = [
 // ─── Low Stock Products ───────────────────────────────────────────────────────
 export const lowStockProducts = products.filter((p) => p.quantity < p.minQuantity);
 
-export interface Sale {
-  id: string;
-  date: string;
-  vanId: string;
-  representativeId: string;
+export interface InvoiceItem {
   productId: string;
   productName: string;
   quantity: number;
   unitPrice: number;
+  total: number;
+}
+
+export interface Invoice {
+  id: string;
+  date: string;
+  vanId: string;
+  representativeId: string;
+  items: InvoiceItem[];
+  paymentMethod: PaymentMethod;
+  transferImage?: string;
   total: number;
 }
 
@@ -408,10 +436,44 @@ export interface PayrollRecord {
   status: "مدفوع" | "معلق";
 }
 
-// ─── Rep Sales ───────────────────────────────────────────────────────────
-export let sales: Sale[] = [
-  { id: "SAL-001", date: "2026-03-03T10:30:00Z", vanId: "VAN-001", representativeId: "USR-003", productId: "PRD-001", productName: "منظف الأطباق سائل ليمون", quantity: 5, unitPrice: 14.0, total: 70.0 },
-  { id: "SAL-002", date: "2026-03-03T11:45:00Z", vanId: "VAN-001", representativeId: "USR-003", productId: "PRD-003", productName: "منظف الأرضيات بالصنوبر", quantity: 2, unitPrice: 20.0, total: 40.0 },
+// ─── Invoices ────────────────────────────────────────────────────────────
+export let invoices: Invoice[] = [
+  {
+    id: "INV-001",
+    date: "2026-03-03T10:30:00Z",
+    vanId: "VAN-001",
+    representativeId: "USR-003",
+    items: [
+      { productId: "PRD-001", productName: "منظف الأطباق سائل ليمون", quantity: 5, unitPrice: 14.0, total: 70.0 },
+      { productId: "PRD-003", productName: "منظف الأرضيات بالصنوبر", quantity: 2, unitPrice: 20.0, total: 40.0 },
+    ],
+    paymentMethod: "كاش",
+    total: 110.0,
+  },
+  {
+    id: "INV-002",
+    date: "2026-03-03T14:15:00Z",
+    vanId: "VAN-001",
+    representativeId: "USR-003",
+    items: [
+      { productId: "PRD-005", productName: "منظف الحمام والمرحاض", quantity: 3, unitPrice: 16.0, total: 48.0 },
+    ],
+    paymentMethod: "فودافون كاش",
+    transferImage: "",
+    total: 48.0,
+  },
+  {
+    id: "INV-003",
+    date: "2026-03-02T09:00:00Z",
+    vanId: "VAN-002",
+    representativeId: "USR-004",
+    items: [
+      { productId: "PRD-002", productName: "مسحوق غسيل الملابس برايت", quantity: 4, unitPrice: 35.0, total: 140.0 },
+      { productId: "PRD-010", productName: "منظف المطبخ متعدد الأغراض", quantity: 6, unitPrice: 22.0, total: 132.0 },
+    ],
+    paymentMethod: "فيزا",
+    total: 272.0,
+  },
 ];
 
 // ─── Attendance ─────────────────────────────────────────────────────────

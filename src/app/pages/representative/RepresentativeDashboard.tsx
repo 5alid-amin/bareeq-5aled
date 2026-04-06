@@ -2,7 +2,7 @@ import React from "react";
 import { Package, Truck, DollarSign, Activity, ShoppingCart, List, RefreshCw, AlertTriangle } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import { KPICard } from "../../components/KPICard";
-import { vans, vanInventory, sales } from "../../data/mockData";
+import { vans, vanInventory, invoices } from "../../data/mockData";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 
 interface Props {
@@ -20,7 +20,7 @@ export function RepresentativeDashboard({ onNavigate }: Props) {
     // Calculate KPIs
     const totalItemsInVan = myInventory.reduce((sum, item) => sum + item.quantity, 0);
     const lowStockItems = myInventory.filter((item) => item.quantity <= item.minQuantity);
-    const mySales = sales.filter((s) => s.vanId === assignedVanId);
+    const myInvoices = invoices.filter((inv) => inv.vanId === assignedVanId);
 
     // Calculate today's sales for this van (based on mock sales data or van.totalSalesToday)
     const todaySalesValue = myVan ? myVan.totalSalesToday : 0;
@@ -116,7 +116,7 @@ export function RepresentativeDashboard({ onNavigate }: Props) {
                 />
                 <KPICard
                     title="عمليات البيع اليوم"
-                    value={mySales.length.toString()}
+                    value={myInvoices.length.toString()}
                     icon={<Activity size={20} />}
                     color="purple"
                 />
