@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate, useLocation, Routes, Route, Navigate, useParams } from "react-router-dom";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import { LoginPage } from "./pages/LoginPage";
 import { Layout } from "./components/Layout";
@@ -28,108 +29,86 @@ import { GeneralLedgerPage } from "./pages/accountant/GeneralLedgerPage";
 import { AccountsReceivablePage } from "./pages/accountant/AccountsReceivablePage";
 import { AccountsPayablePage } from "./pages/accountant/AccountsPayablePage";
 import { AccountantPayrollPage } from "./pages/accountant/AccountantPayrollPage";
+import EmployeesPage from "./pages/accountant/employees";
 
 function AppContent() {
   const { user } = useAuth();
-  const [activePage, setActivePage] = useState<string>("");
-  const [activeVanId, setActiveVanId] = useState<string>("VAN-001");
-
-  // Reset page when user/role changes
-  useEffect(() => {
-    setActivePage("");
-  }, [user?.role]);
+  const location = useLocation();
+  const navigate = useNavigate();
 
   // Set default page based on role
   const defaultPage = user?.role === "manager"
-    ? "dashboard"
+    ? "manager/dashboard"
     : user?.role === "warehouse"
-      ? "wh-dashboard"
+      ? "warehouse/dashboard"
       : user?.role === "accountant"
-        ? "acc-ledger"
-        : "rep-dashboard";
-  const currentPage = activePage || defaultPage;
+        ? "accountant/ledger"
+        : "representative/dashboard";
+  const currentPage = location.pathname.slice(1) || defaultPage;
+
+  // Navigate to default page if at root
+  useEffect(() => {
+    if (location.pathname === "/" && user) {
+      navigate(`/${defaultPage}`, { replace: true });
+    }
+  }, [user?.role, navigate, location.pathname, defaultPage]);
 
   if (!user) {
     return <LoginPage />;
   }
 
   const handleNavigate = (page: string, vanId?: string) => {
-    setActivePage(page);
-    if (vanId) setActiveVanId(vanId);
+    if (vanId) {
+      navigate(`/${page}/${vanId}`);
+    } else {
+      navigate(`/${page}`);
+    }
   };
 
-  const renderPage = () => {
-    switch (currentPage) {
-      // Manager pages
-      case "dashboard":
-        return <ManagerDashboard onNavigate={handleNavigate} />;
-      case "fleet":
-        return <FleetManagement onNavigate={handleNavigate} />;
-      case "van-details":
-        return <VanDetails vanId={activeVanId} onNavigate={handleNavigate} />;
-      case "tracking":
-        return <VehicleTracking />;
-      case "users":
-        return <UserManagement />;
-      case "reports":
-        return <Reports />;
-      case "attendance":
-        return <AttendancePage />;
-      case "payroll":
-        return <PayrollPage />;
-
-      // Warehouse pages
-      case "wh-dashboard":
-        return <WarehouseDashboard onNavigate={handleNavigate} />;
-      case "inventory":
-        return <InventoryPage />;
-      case "discrepancy":
-        return <VehicleDiscrepancyPage />;
-      case "transfers":
-        return <VehicleLoadingPage />;
-      case "returns":
-        return <ReturnsPage />;
-      case "reorder":
-        return <ReorderAlertsPage />;
-      case "wh-restock":
-        return <RestockManagementPage />;
-
-      // Representative pages
-      case "rep-dashboard":
-        return <RepresentativeDashboard onNavigate={handleNavigate} />;
-      case "rep-inventory":
-        return <VehicleInventory onNavigate={handleNavigate} />;
-      case "rep-restock":
-        return <RestockRequestPage />;
-      case "rep-sale":
-        return <RecordSale />;
-      case "rep-history":
-        return <SalesHistory />;
-
-      // Accountant pages
-      case "acc-ledger":
-        return <GeneralLedgerPage />;
-      case "acc-receivable":
-        return <AccountsReceivablePage />;
-      case "acc-payable":
-        return <AccountsPayablePage />;
-      case "acc-payroll":
-        return <AccountantPayrollPage />;
-
-      default:
-        return user.role === "manager"
-          ? <ManagerDashboard onNavigate={handleNavigate} />
-          : user.role === "warehouse"
-            ? <WarehouseDashboard onNavigate={handleNavigate} />
-            : user.role === "accountant"
-              ? <GeneralLedgerPage />
-              : <RepresentativeDashboard onNavigate={handleNavigate} />;
-    }
+  const VanDetailsWrapper = () => {
+    const params = useParams();
+    return <VanDetails vanId={params.vanId || "VAN-001"} onNavigate={handleNavigate} />;
   };
 
   return (
     <Layout activePage={currentPage} onNavigate={handleNavigate}>
-      {renderPage()}
+      <Routes>
+        {/* Manager pages */}
+        <Route path="/manager/dashboard" element={<ManagerDashboard onNavigate={handleNavigate} />} />
+        <Route path="/manager/fleet" element={<FleetManagement onNavigate={handleNavigate} />} />
+        <Route path="/manager/van-details/:vanId" element={<VanDetailsWrapper />} />
+        <Route path="/manager/tracking" element={<VehicleTracking />} />
+        <Route path="/manager/users" element={<UserManagement />} />
+        <Route path="/manager/attendance" element={<AttendancePage />} />
+        <Route path="/manager/payroll" element={<PayrollPage />} />
+        <Route path="/manager/reports" element={<Reports />} />
+
+        {/* Warehouse pages */}
+        <Route path="/warehouse/dashboard" element={<WarehouseDashboard onNavigate={handleNavigate} />} />
+        <Route path="/warehouse/inventory" element={<InventoryPage />} />
+        <Route path="/warehouse/discrepancy" element={<VehicleDiscrepancyPage />} />
+        <Route path="/warehouse/transfers" element={<VehicleLoadingPage />} />
+        <Route path="/warehouse/returns" element={<ReturnsPage />} />
+        <Route path="/warehouse/reorder" element={<ReorderAlertsPage />} />
+        <Route path="/warehouse/restock" element={<RestockManagementPage />} />
+
+        {/* Representative pages */}
+        <Route path="/representative/dashboard" element={<RepresentativeDashboard onNavigate={handleNavigate} />} />
+        <Route path="/representative/inventory" element={<VehicleInventory onNavigate={handleNavigate} />} />
+        <Route path="/representative/sale" element={<RecordSale />} />
+        <Route path="/representative/history" element={<SalesHistory />} />
+        <Route path="/representative/restock" element={<RestockRequestPage />} />
+
+        {/* Accountant pages */}
+        <Route path="/accountant/ledger" element={<GeneralLedgerPage />} />
+        <Route path="/accountant/receivable" element={<AccountsReceivablePage />} />
+        <Route path="/accountant/payable" element={<AccountsPayablePage />} />
+        <Route path="/accountant/payroll" element={<AccountantPayrollPage />} />
+        <Route path="/accountant/employees" element={<EmployeesPage />} />
+
+        {/* Default redirect */}
+        <Route path="/" element={<Navigate to={`/${defaultPage}`} replace />} />
+      </Routes>
     </Layout>
   );
 }

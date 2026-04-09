@@ -1,143 +1,186 @@
 import React, { useState } from "react";
-import { BookOpen, TrendingUp, TrendingDown, DollarSign, PieChart, Activity } from "lucide-react";
-import {
-  AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, Legend, PieChart as RechartsPieChart, Pie, Cell
-} from "recharts";
+import { BookOpen, TrendingUp, TrendingDown, DollarSign, PieChart, Car, ArrowUpRight, Crown, Wallet, Timer } from "lucide-react";
+import { PieChart as RechartsPieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
 import { KPICard } from "../../components/KPICard";
 import { journalEntries } from "../../data/mockData";
 
 export function GeneralLedgerPage() {
-  const totalRevenues = journalEntries.filter(e => e.accountType === "إيرادات").reduce((sum, e) => sum + e.debit + e.credit, 0);
-  const totalExpenses = journalEntries.filter(e => e.accountType === "مصروفات").reduce((sum, e) => sum + e.debit + e.credit, 0);
-  const totalAssets = journalEntries.filter(e => e.accountType === "أصول").reduce((sum, e) => sum + e.debit, 0);
-  const totalLiabilities = journalEntries.filter(e => e.accountType === "خصوم").reduce((sum, e) => sum + e.credit, 0);
+  // حالة الفلتر الحالي
+  const [filter, setFilter] = useState<'day' | 'week' | 'month' | 'year'>('week');
 
-  // Mock data for charts
-  const monthlyData = [
-    { month: "يناير", revenues: 120000, expenses: 85000 },
-    { month: "فبراير", revenues: 135000, expenses: 90000 },
-    { month: "مارس", revenues: 110000, expenses: 75000 },
-  ];
+  // حسابات الحسابات الأساسية
+  const entries = journalEntries || [];
+  const totalRevenues = entries.filter(e => e.accountType === "إيرادات").reduce((sum, e) => sum + (e.debit || 0) + (e.credit || 0), 0);
+  const totalExpenses = entries.filter(e => e.accountType === "مصروفات").reduce((sum, e) => sum + (e.debit || 0) + (e.credit || 0), 0);
+  const netProfit = totalRevenues - totalExpenses;
 
   const expenseBreakdown = [
     { name: "رواتب", value: 45000 },
     { name: "صيانة أسطول", value: 15000 },
     { name: "بنزين", value: 10000 },
-    { name: "أخرى", value: 5000 },
+    { name: "نثريات", value: 5000 },
   ];
 
-  const COLORS = ['#3b82f6', '#f59e0b', '#10b981', '#ef4444'];
+  const COLORS = ['#6366f1', '#f59e0b', '#10b981', '#f43f5e'];
+  const totalExp = expenseBreakdown.reduce((sum, item) => sum + item.value, 0) || 1;
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center gap-3 mb-2">
-        <div className="w-10 h-10 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center">
-          <BookOpen size={24} />
+    <div className="space-y-8 pb-10 select-none" dir="rtl">
+      {/* Header - Glassmorphism Effect */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-white/50 backdrop-blur-md p-6 rounded-[2.5rem] border border-white shadow-xl shadow-slate-200/50">
+        <div className="flex items-center gap-5">
+          <div className="w-16 h-16 rounded-3xl bg-gradient-to-br from-indigo-600 to-blue-700 text-white flex items-center justify-center shadow-2xl shadow-indigo-200 rotate-3 hover:rotate-0 transition-transform duration-500">
+            <BookOpen size={32} />
+          </div>
+          <div>
+            <h2 className="text-3xl font-black text-slate-800 tracking-tight">دفتر الأستاذ</h2>
+            <div className="flex items-center gap-2 mt-1">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+              <p className="text-sm font-medium text-slate-500">متابعة الأداء المالي المباشر</p>
+            </div>
+          </div>
         </div>
-        <div>
-          <h2 className="text-xl font-bold text-slate-800">دفتر الأستاذ العام</h2>
-          <p className="text-sm text-slate-500">نظرة عامة على الإيرادات والمصروفات والأصول</p>
+
+        {/* أزرار الفلترة التفاعلية */}
+        <div className="flex bg-slate-100/80 p-1.5 rounded-2xl border border-slate-200/50">
+          {[
+            { id: 'day', label: 'يوم' },
+            { id: 'week', label: 'أسبوع' },
+            { id: 'month', label: 'شهر' },
+            { id: 'year', label: 'سنة' }
+          ].map((btn) => (
+            <button 
+              key={btn.id}
+              onClick={() => setFilter(btn.id as any)}
+              className={`px-8 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 ${
+                filter === btn.id 
+                  ? 'bg-white text-indigo-600 shadow-sm scale-105' 
+                  : 'text-slate-500 hover:text-slate-800'
+              }`}
+            >
+              {btn.label}
+            </button>
+          ))}
         </div>
       </div>
 
-      {/* KPI Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+      {/* Main KPIs - Three Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <KPICard title="إجمالي الإيرادات" value={`${totalRevenues.toLocaleString()} ج.م`} icon={<TrendingUp size={24} />} color="green" />
         <KPICard title="إجمالي المصروفات" value={`${totalExpenses.toLocaleString()} ج.م`} icon={<TrendingDown size={24} />} color="red" />
-        <KPICard title="إجمالي الأصول" value={`${totalAssets.toLocaleString()} ج.م`} icon={<DollarSign size={24} />} color="blue" />
-        <KPICard title="إجمالي الخصوم" value={`${totalLiabilities.toLocaleString()} ج.م`} icon={<Activity size={24} />} color="orange" />
+        <div className="relative overflow-hidden group">
+            <div className="absolute inset-0 bg-gradient-to-r from-indigo-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
+            <KPICard title="صافي الربح" value={`${netProfit.toLocaleString()} ج.م`} icon={<DollarSign size={24} />} color="blue" />
+        </div>
       </div>
 
-      {/* Charts */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-        <div className="lg:col-span-2 bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
-          <h3 className="text-sm font-semibold text-slate-700 mb-4">الإيرادات مقابل المصروفات</h3>
-          <ResponsiveContainer width="100%" height={250}>
-            <BarChart data={monthlyData} margin={{ top: 10, right: 0, left: 0, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
-              <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#64748b' }} />
-              <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#64748b' }} tickFormatter={(v) => `${v / 1000}k`} />
-              <Tooltip cursor={{ fill: '#f1f5f9' }} contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }} />
-              <Legend wrapperStyle={{ fontSize: '12px' }} />
-              <Bar dataKey="revenues" name="الإيرادات" fill="#10b981" radius={[4, 4, 0, 0]} />
-              <Bar dataKey="expenses" name="المصروفات" fill="#ef4444" radius={[4, 4, 0, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
-        <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col">
-          <h3 className="text-sm font-semibold text-slate-700 mb-4 flex items-center gap-2">
-            <PieChart size={16} /> توزيع المصروفات
-          </h3>
-          <div className="flex-1 flex items-center justify-center">
-            <ResponsiveContainer width="100%" height={200}>
+      {/* The "Power Three" Row */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        
+        {/* 1. Donut Chart - "The Radial Insight" */}
+        <div className="bg-white p-8 rounded-[3rem] border border-slate-100 shadow-2xl shadow-slate-200/40 flex flex-col items-center group relative">
+          {/*<div className="absolute top-6 right-8 text-slate-300 group-hover:text-indigo-500 transition-colors"><PieChart size={24}/></div>*/}
+          <h3 className="w-full text-right font-black text-slate-800 text-lg mb-2">توزيع المصروفات</h3>
+          
+          <div className="relative w-full h-64">
+            <ResponsiveContainer width="100%" height="100%">
               <RechartsPieChart>
-                <Pie
-                  data={expenseBreakdown}
-                  cx="50%"
-                  cy="50%"
-                  innerRadius={60}
-                  outerRadius={80}
-                  paddingAngle={5}
-                  dataKey="value"
-                >
-                  {expenseBreakdown.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                <Pie data={expenseBreakdown} cx="50%" cy="50%" innerRadius={70} outerRadius={95} paddingAngle={10} dataKey="value" stroke="none">
+                  {expenseBreakdown.map((_, index) => (
+                    <Cell key={index} fill={COLORS[index % COLORS.length]} className="hover:opacity-80 transition-opacity cursor-pointer" />
                   ))}
                 </Pie>
-                <Tooltip formatter={(value: number) => `${value.toLocaleString()} ج.م`} contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }} />
+                <Tooltip contentStyle={{borderRadius: '20px', border: 'none', boxShadow: '0 20px 25px -5px rgb(0 0 0 / 0.1)'}} />
               </RechartsPieChart>
             </ResponsiveContainer>
+            <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+              <span className="text-slate-400 text-xs font-bold uppercase tracking-widest">إجمالي</span>
+              <span className="text-2xl font-black text-slate-800">{totalExp.toLocaleString()}</span>
+            </div>
           </div>
-          <div className="grid grid-cols-2 gap-2 mt-4">
+
+          <div className="w-full space-y-3 mt-4">
             {expenseBreakdown.map((item, i) => (
-              <div key={item.name} className="flex items-center gap-2 text-xs text-slate-600">
-                <div className="w-3 h-3 rounded-full" style={{ backgroundColor: COLORS[i % COLORS.length] }}></div>
-                {item.name}
+              <div key={i} className="flex items-center justify-between p-3 rounded-2xl hover:bg-slate-50 transition-colors group/item">
+                <div className="flex items-center gap-3">
+                  <div className="w-3 h-3 rounded-full shadow-[0_0_10px_rgba(0,0,0,0.1)]" style={{ backgroundColor: COLORS[i] }}></div>
+                  <span className="text-sm font-bold text-slate-600 group-hover/item:text-slate-900 transition-colors">{item.name}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                   <span className="text-xs font-black text-slate-400">{((item.value/totalExp)*100).toFixed(0)}%</span>
+                   <div className="w-12 h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                      <div className="h-full rounded-full transition-all duration-1000" style={{ backgroundColor: COLORS[i], width: `${(item.value/totalExp)*100}%` }}></div>
+                   </div>
+                </div>
               </div>
             ))}
           </div>
         </div>
-      </div>
 
-      {/* Journal Entries Table */}
-      <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-        <div className="p-4 border-b border-slate-100">
-          <h3 className="font-semibold text-slate-800">أحدث القيود اليومية</h3>
-        </div>
-        <div className="overflow-x-auto">
-          <table className="w-full text-right">
-            <thead>
-              <tr className="bg-slate-50 text-slate-500 text-xs text-right">
-                <th className="px-5 py-3 font-medium">رقم القيد</th>
-                <th className="px-5 py-3 font-medium">التاريخ</th>
-                <th className="px-5 py-3 font-medium">البيان</th>
-                <th className="px-5 py-3 font-medium">النوع</th>
-                <th className="px-5 py-3 font-medium text-emerald-600">مدين (Debit)</th>
-                <th className="px-5 py-3 font-medium text-red-500">دائن (Credit)</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100">
-              {journalEntries.map((entry) => (
-                <tr key={entry.id} className="hover:bg-slate-50/50 text-sm">
-                  <td className="px-5 py-3 text-slate-600 font-mono text-xs">{entry.id}</td>
-                  <td className="px-5 py-3 text-slate-600">{entry.date}</td>
-                  <td className="px-5 py-3 text-slate-800">{entry.description}</td>
-                  <td className="px-5 py-3">
-                    <span className="bg-slate-100 text-slate-600 px-2 py-1 rounded-md text-xs">
-                      {entry.accountType}
-                    </span>
-                  </td>
-                  <td className="px-5 py-3 text-emerald-600 font-medium">
-                    {entry.debit > 0 ? entry.debit.toLocaleString() : "-"}
-                  </td>
-                  <td className="px-5 py-3 text-red-500 font-medium">
-                    {entry.credit > 0 ? entry.credit.toLocaleString() : "-"}
-                  </td>
-                </tr>
+        {/* 2. Top Expenses - "The Dark Mode List" */}
+        <div className="bg-slate-900 rounded-[3rem] p-8 shadow-2xl shadow-indigo-900/20 flex flex-col justify-between group overflow-hidden relative">
+          <div className="absolute -left-10 -top-10 w-40 h-40 bg-indigo-500/10 rounded-full blur-3xl group-hover:bg-indigo-500/20 transition-all duration-700"></div>
+          
+          <div>
+            <div className="flex items-center justify-between mb-8">
+              <h3 className="text-xl font-black text-white">الأكثر إنفاقاً</h3>
+              <Wallet className="text-indigo-400" size={24} />
+            </div>
+            
+            <div className="space-y-6 relative z-10">
+              {expenseBreakdown.slice(0, 3).map((item, i) => (
+                <div key={i} className="relative group/line">
+                  <div className="flex justify-between items-end mb-2">
+                    <span className="text-slate-400 text-sm font-medium">{item.name}</span>
+                    <span className="text-white font-black text-lg">{item.value.toLocaleString()} <small className="text-[10px] text-slate-500 font-normal">ج.م</small></span>
+                  </div>
+                  <div className="h-2 bg-slate-800 rounded-full overflow-hidden">
+                    <div className="h-full bg-gradient-to-r from-indigo-500 to-blue-400 rounded-full transition-all duration-1000 ease-out" style={{ width: i === 0 ? '85%' : i === 1 ? '60%' : '40%' }}></div>
+                  </div>
+                </div>
               ))}
-            </tbody>
-          </table>
+            </div>
+          </div>
+
+          <div className="mt-12 flex items-center gap-3 bg-white/5 p-4 rounded-2xl border border-white/5 backdrop-blur-sm">
+             <Timer size={18} className="text-indigo-400 animate-spin-slow" />
+             <p className="text-xs text-slate-400 font-medium italic">يتم التحديث بناءً على فلتر: {filter === 'day' ? 'اليوم' : filter === 'week' ? 'الأسبوع' : filter === 'month' ? 'الشهر' : 'السنة'}</p>
+          </div>
         </div>
+
+        {/* 3. Top Vehicle - "The Trophy Card" */}
+        <div className="bg-gradient-to-br from-emerald-500 to-teal-700 rounded-[3rem] p-8 text-white shadow-2xl shadow-emerald-200/50 flex flex-col justify-between relative overflow-hidden group">
+          <Car className="absolute -right-8 -bottom-8 w-48 h-48 opacity-10 group-hover:scale-110 group-hover:rotate-6 transition-transform duration-700" />
+          <div className="absolute top-0 left-0 w-full h-full bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-10"></div>
+          
+          <div className="relative z-10">
+            <div className="flex items-center justify-between mb-2">
+              <div className="bg-white/20 backdrop-blur-md p-3 rounded-2xl">
+                <Crown size={28} className="text-yellow-300 drop-shadow-md" />
+              </div>
+              <div className="flex flex-col items-end">
+                <span className="bg-emerald-400/30 px-3 py-1 rounded-full text-[10px] font-black tracking-widest uppercase">الملك للأسبوع</span>
+              </div>
+            </div>
+            
+            <h4 className="text-sm font-bold text-emerald-100 mt-6 uppercase tracking-wider">المركبة الأعلى أداءً</h4>
+            <h2 className="text-3xl font-black mt-1 leading-tight">عربة جامبو <br/> <span className="text-yellow-300">(أ - ١٠٥)</span></h2>
+          </div>
+
+          <div className="relative z-10 mt-10">
+            <div className="text-xs font-bold text-emerald-100/80 mb-1">إجمالي الإيرادات المحققة</div>
+            <div className="flex items-end gap-2">
+              <span className="text-5xl font-black tracking-tighter">٤٥,٥٠٠</span>
+              <span className="text-lg font-bold mb-1 opacity-80">ج.م</span>
+            </div>
+            
+            <div className="mt-6 flex items-center gap-2 text-xs font-bold bg-black/10 w-fit px-4 py-2 rounded-xl border border-white/10">
+              <ArrowUpRight size={14} className="text-yellow-300" />
+              <span>أداء أعلى بنسبة ٢٢٪</span>
+            </div>
+          </div>
+        </div>
+
       </div>
     </div>
   );

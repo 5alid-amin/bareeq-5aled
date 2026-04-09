@@ -29,37 +29,38 @@ interface NavItem {
 }
 
 const managerNav: NavItem[] = [
-  { id: "dashboard", label: "لوحة التحكم", icon: <LayoutDashboard size={18} /> },
-  { id: "fleet", label: "إدارة الأسطول", icon: <Truck size={18} /> },
-  { id: "tracking", label: "تتبع المركبات", icon: <MapPin size={18} /> },
-  { id: "users", label: "إدارة المستخدمين", icon: <Users size={18} /> },
-  { id: "attendance", label: "نظام تسجيل الحضور", icon: <Clock size={18} /> },
-  { id: "reports", label: "التقارير والتحليلات", icon: <BarChart3 size={18} /> },
+  { id: "manager/dashboard", label: "لوحة التحكم", icon: <LayoutDashboard size={18} /> },
+  { id: "manager/fleet", label: "إدارة الأسطول", icon: <Truck size={18} /> },
+  { id: "manager/tracking", label: "تتبع المركبات", icon: <MapPin size={18} /> },
+  { id: "manager/users", label: "إدارة المستخدمين", icon: <Users size={18} /> },
+  { id: "manager/attendance", label: "نظام تسجيل الحضور", icon: <Clock size={18} /> },
+  { id: "manager/reports", label: "التقارير والتحليلات", icon: <BarChart3 size={18} /> },
 ];
 
 const warehouseNav: NavItem[] = [
-  { id: "wh-dashboard", label: "لوحة التحكم", icon: <LayoutDashboard size={18} /> },
-  { id: "inventory", label: "المخزون", icon: <Package size={18} /> },
-  { id: "discrepancy", label: "فروقات جرد السيارات", icon: <ClipboardList size={18} /> },
-  { id: "transfers", label: "تحميل السيارات", icon: <Truck size={18} /> },
-  { id: "returns", label: "مرتجع", icon: <RotateCcw size={18} /> },
-  { id: "reorder", label: "تنبيهات إعادة الطلب", icon: <AlertTriangle size={18} /> },
-  { id: "wh-restock", label: "طلبات التعبئة", icon: <RefreshCw size={18} /> },
+  { id: "warehouse/dashboard", label: "لوحة التحكم", icon: <LayoutDashboard size={18} /> },
+  { id: "warehouse/inventory", label: "المخزون", icon: <Package size={18} /> },
+  { id: "warehouse/discrepancy", label: "فروقات جرد السيارات", icon: <ClipboardList size={18} /> },
+  { id: "warehouse/transfers", label: "تحميل السيارات", icon: <Truck size={18} /> },
+  { id: "warehouse/returns", label: "مرتجع", icon: <RotateCcw size={18} /> },
+  { id: "warehouse/reorder", label: "تنبيهات إعادة الطلب", icon: <AlertTriangle size={18} /> },
+  { id: "warehouse/restock", label: "طلبات التعبئة", icon: <RefreshCw size={18} /> },
 ];
 
 const repNav: NavItem[] = [
-  { id: "rep-dashboard", label: "لوحة تحكم المندوب", icon: <LayoutDashboard size={18} /> },
-  { id: "rep-inventory", label: "مخزون المركبة", icon: <Package size={18} /> },
-  { id: "rep-sale", label: "تسجيل فاتورة بيع", icon: <ShoppingCart size={18} /> },
-  { id: "rep-history", label: "سجل المبيعات", icon: <List size={18} /> },
-  { id: "rep-restock", label: "طلبات إعادة التعبئة", icon: <RefreshCw size={18} /> },
+  { id: "representative/dashboard", label: "لوحة تحكم المندوب", icon: <LayoutDashboard size={18} /> },
+  { id: "representative/inventory", label: "مخزون المركبة", icon: <Package size={18} /> },
+  { id: "representative/sale", label: "تسجيل فاتورة بيع", icon: <ShoppingCart size={18} /> },
+  { id: "representative/history", label: "سجل المبيعات", icon: <List size={18} /> },
+  { id: "representative/restock", label: "طلبات إعادة التعبئة", icon: <RefreshCw size={18} /> },
 ];
 
 const accountantNav: NavItem[] = [
-  { id: "acc-ledger", label: "دفتر الأستاذ العام", icon: <BookOpen size={18} /> },
-  { id: "acc-receivable", label: "المدينون", icon: <ArrowDownToLine size={18} /> },
-  { id: "acc-payable", label: "الدائنون", icon: <ArrowUpFromLine size={18} /> },
-  { id: "acc-payroll", label: "الرواتب والأجور", icon: <Wallet size={18} /> },
+  { id: "accountant/ledger", label: "الرئيسيه", icon: <BookOpen size={18} /> },
+  { id: "accountant/receivable", label: "الواردات", icon: <ArrowDownToLine size={18} /> },
+  { id: "accountant/payable", label: "الصادرات", icon: <ArrowUpFromLine size={18} /> },
+  { id: "accountant/payroll", label: "المرتبات", icon: <Wallet size={18} /> },
+  { id: "accountant/employees", label: "العاملين  ", icon: <Users size={18} /> },
 ];
 
 interface SidebarProps {

@@ -101,6 +101,7 @@ export interface User {
   role: "مدير" | "مدير مخزن" | "مندوب" | "محاسب";
   status: "نشط" | "غير نشط";
   joinDate: string;
+  phone?: string;
 }
 
 export interface SalesDataPoint {
@@ -350,15 +351,15 @@ export let returnOrders: ReturnOrder[] = [
 
 // ─── Users ────────────────────────────────────────────────────────────────────
 export const users: User[] = [
-  { id: "USR-001", name: "عبدالله فؤاد الشافعي", email: "manager@bareeq.eg", role: "مدير", status: "نشط", joinDate: "2024-01-15" },
-  { id: "USR-002", name: "فهد عبد العزيز الصاوي", email: "warehouse@bareeq.eg", role: "مدير مخزن", status: "نشط", joinDate: "2024-02-01" },
-  { id: "USR-003", name: "أحمد محمد السعيد", email: "van1@bareeq.eg", role: "مندوب", status: "نشط", joinDate: "2024-03-10" },
-  { id: "USR-004", name: "محمد علي البحيري", email: "van2@bareeq.eg", role: "مندوب", status: "نشط", joinDate: "2024-03-10" },
-  { id: "USR-005", name: "خالد إبراهيم سلامة", email: "van3@bareeq.eg", role: "مندوب", status: "نشط", joinDate: "2024-04-05" },
-  { id: "USR-006", name: "عمر حسن الشاذلي", email: "van4@bareeq.eg", role: "مندوب", status: "غير نشط", joinDate: "2024-04-05" },
-  { id: "USR-007", name: "سعد عبدالله الشربيني", email: "van5@bareeq.eg", role: "مندوب", status: "غير نشط", joinDate: "2024-05-20" },
-  { id: "USR-008", name: "فيصل محمد الجمال", email: "van6@bareeq.eg", role: "مندوب", status: "نشط", joinDate: "2024-06-01" },
-  { id: "USR-009", name: "يوسف أحمد الحكيم", email: "accountant@bareeq.eg", role: "محاسب", status: "نشط", joinDate: "2024-07-01" },
+  { id: "USR-001", name: "عبدالله فؤاد الشافعي", email: "manager@bareeq.eg", role: "مدير", status: "نشط", joinDate: "2024-01-15", phone: "0501234560" },
+  { id: "USR-002", name: "فهد عبد العزيز الصاوي", email: "warehouse@bareeq.eg", role: "مدير مخزن", status: "نشط", joinDate: "2024-02-01", phone: "0509876540" },
+  { id: "USR-003", name: "أحمد محمد السعيد", email: "van1@bareeq.eg", role: "مندوب", status: "نشط", joinDate: "2024-03-10", phone: "0501234567" },
+  { id: "USR-004", name: "محمد علي البحيري", email: "van2@bareeq.eg", role: "مندوب", status: "نشط", joinDate: "2024-03-10", phone: "0509876543" },
+  { id: "USR-005", name: "خالد إبراهيم سلامة", email: "van3@bareeq.eg", role: "مندوب", status: "نشط", joinDate: "2024-04-05", phone: "0555554444" },
+  { id: "USR-006", name: "عمر حسن الشاذلي", email: "van4@bareeq.eg", role: "مندوب", status: "غير نشط", joinDate: "2024-04-05", phone: "0555555555" },
+  { id: "USR-007", name: "سعد عبدالله الشربيني", email: "van5@bareeq.eg", role: "مندوب", status: "غير نشط", joinDate: "2024-05-20", phone: "0556666666" },
+  { id: "USR-008", name: "فيصل محمد الجمال", email: "van6@bareeq.eg", role: "مندوب", status: "نشط", joinDate: "2024-06-01", phone: "0557777777" },
+  { id: "USR-009", name: "يوسف أحمد الحكيم", email: "accountant@bareeq.eg", role: "محاسب", status: "نشط", joinDate: "2024-07-01", phone: "0558888888" },
 ];
 
 // ─── Sales Chart Data ─────────────────────────────────────────────────────────
