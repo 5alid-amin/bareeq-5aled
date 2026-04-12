@@ -513,14 +513,7 @@ export function InventoryPage() {
                     </td>
                     
                     <td className="px-4 py-4 align-top">
-                      <div className="flex items-center justify-center gap-2">
-                          <button
-                            onClick={() => openDamageModal(p.id)}
-                            className="bg-white border border-slate-200 text-rose-500 px-2 py-1.5 rounded-lg hover:bg-rose-50 hover:border-rose-200 transition-colors shadow-sm"
-                            title="تسجيل هالك"
-                          >
-                            <AlertTriangle size={14} />
-                          </button>
+                      <div className="flex items-center justify-center">
                           <button
                             onClick={() => setEditProduct(p)}
                             className="flex items-center gap-1.5 bg-slate-100 border border-slate-200 text-slate-600 px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-slate-200 transition-colors shadow-sm"
