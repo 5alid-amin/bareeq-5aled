@@ -53,7 +53,8 @@ function ViewInvoiceModal({ invoice, onClose }: { invoice: Invoice; onClose: () 
                             <span className="font-semibold">{invoice.paymentMethod}</span>
                         </div>
                         <div className="bg-slate-50 p-3 rounded-xl border border-slate-100">
-                            <span className="block text-xs text-slate-400 mb-1">السائق</span>
+                            {/* التعديل الثاني: تغيير "السائق" إلى "المندوب" */}
+                            <span className="block text-xs text-slate-400 mb-1">المندوب</span>
                             <span className="font-semibold">محمد أحمد (تجريبي)</span>
                         </div>
                     </div>
@@ -263,18 +264,30 @@ export function SalesHistory() {
             </div>
 
             {/* Statistics Cards */}
+            {/* التعديل الأول: تغيير استايل الكروت لتكون بيضاء بـ Outline ملون */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div className="bg-gradient-to-br from-purple-500 to-purple-700 rounded-2xl p-5 text-white shadow-lg">
-                    <div className="flex justify-between mb-2 text-purple-200 text-xs font-medium"><span>إجمالي المبيعات</span><DollarSign size={18}/></div>
-                    <div className="text-2xl font-black">ج.م {totalSales.toFixed(2)}</div>
+                <div className="bg-white border-2 border-purple-500 rounded-2xl p-5 shadow-sm group">
+                    <div className="flex justify-between mb-2 text-purple-600 text-xs font-bold uppercase tracking-wider">
+                        <span>إجمالي المبيعات</span>
+                        <DollarSign size={18}/>
+                    </div>
+                    <div className="text-2xl font-black text-purple-700">ج.م {totalSales.toFixed(2)}</div>
                 </div>
-                <div className="bg-gradient-to-br from-blue-500 to-blue-700 rounded-2xl p-5 text-white shadow-lg">
-                    <div className="flex justify-between mb-2 text-blue-200 text-xs font-medium"><span>عدد الفواتير</span><FileText size={18}/></div>
-                    <div className="text-2xl font-black">{totalInvoiceCount}</div>
+
+                <div className="bg-white border-2 border-blue-500 rounded-2xl p-5 shadow-sm group">
+                    <div className="flex justify-between mb-2 text-blue-600 text-xs font-bold uppercase tracking-wider">
+                        <span>عدد الفواتير</span>
+                        <FileText size={18}/>
+                    </div>
+                    <div className="text-2xl font-black text-blue-700">{totalInvoiceCount}</div>
                 </div>
-                <div className="bg-gradient-to-br from-emerald-500 to-emerald-700 rounded-2xl p-5 text-white shadow-lg">
-                    <div className="flex justify-between mb-2 text-emerald-200 text-xs font-medium"><span>إجمالي القطع</span><TrendingUp size={18}/></div>
-                    <div className="text-2xl font-black">{totalItems}</div>
+
+                <div className="bg-white border-2 border-emerald-500 rounded-2xl p-5 shadow-sm group">
+                    <div className="flex justify-between mb-2 text-emerald-600 text-xs font-bold uppercase tracking-wider">
+                        <span>إجمالي القطع</span>
+                        <TrendingUp size={18}/>
+                    </div>
+                    <div className="text-2xl font-black text-emerald-700">{totalItems}</div>
                 </div>
             </div>
 

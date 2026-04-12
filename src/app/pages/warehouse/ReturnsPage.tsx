@@ -19,7 +19,6 @@ export function ReturnsPage() {
   const [orderList, setOrderList] = useState<ReturnOrder[]>(returnOrders);
   const [selectedVan, setSelectedVan] = useState("");
   const [returnDate, setReturnDate] = useState(new Date().toISOString().split("T")[0]);
-  const [generalNotes, setGeneralNotes] = useState("");
   const [items, setItems] = useState<{ product: string; quantity: string; reason: string; notes: string }>([
     { product: "", quantity: "", reason: "تالف", notes: "" }
   ]);
@@ -66,7 +65,7 @@ export function ReturnsPage() {
     // Auto-adjust quantity if changed product
     if (field === "product" && selectedVan) {
         const productVal = parseInt(newItems[index].quantity);
-        const maxQuantity = availableProducts.find(p => p.productId === value)?.quantity || 0;
+        const maxQuantity = availableProducts.find(p => p.productId === value)?.quantity || 5;
         if(productVal > maxQuantity) {
             newItems[index].quantity = maxQuantity.toString();
         }
@@ -80,7 +79,7 @@ export function ReturnsPage() {
     setError("");
 
     if (!selectedVan) {
-      setError("يرجى اختيار الفان / السيارة");
+      setError("يرجى اختيار المندوب");
       return;
     }
 
@@ -96,9 +95,7 @@ export function ReturnsPage() {
     setLoading(true);
     setTimeout(() => {
       const orderItems: ReturnOrderItem[] = validItems.map(item => {
-        // If from van inventory
         let productName = availableProducts.find(p => p.productId === item.product)?.productName;
-        // Fallback to all products
         if (!productName) {
            productName = products.find(p => p.id === item.product)?.name || "—";
         }
@@ -113,7 +110,7 @@ export function ReturnsPage() {
 
       const newOrder: ReturnOrder = {
         id: `RO-${String(orderList.length + 1).padStart(3, "0")}`,
-        date: returnDate + "T" + new Date().toISOString().split("T")[1], // Keeps current time
+        date: returnDate + "T" + new Date().toISOString().split("T")[1],
         vanId: van.id,
         vanName: `${van.id} - ${van.driverName}`,
         items: orderItems,
@@ -125,11 +122,9 @@ export function ReturnsPage() {
         if (prod) {
           const beforeQty = prod.quantity;
           const isDamaged = item.reason === "تالف" || item.reason === "منتهي الصلاحية";
-          
           if (!isDamaged) {
-             prod.quantity += item.quantity;
+              prod.quantity += item.quantity;
           }
-          
           const afterQty = prod.quantity;
 
           stockMovements.push({
@@ -156,7 +151,6 @@ export function ReturnsPage() {
       setTimeout(() => {
         setSubmitted(false);
         setSelectedVan("");
-        setGeneralNotes("");
         setItems([{ product: "", quantity: "", reason: "تالف", notes: "" }]);
       }, 3000);
     }, 1200);
@@ -167,13 +161,10 @@ export function ReturnsPage() {
   const validItemsCount = validItems.length;
   const totalUnitsCount = validItems.reduce((acc, item) => acc + parseInt(item.quantity || "0"), 0);
 
-  const vanStockCount = availableProducts.length;
   const vanStockUnits = availableProducts.reduce((acc, item) => acc + item.quantity, 0);
 
-  // Filter history
   const filteredOrders = useMemo(() => {
      let filtered = orderList;
-
      if (filterVan !== "الكل") {
        filtered = filtered.filter(order => order.vanId === filterVan);
      }
@@ -195,16 +186,6 @@ export function ReturnsPage() {
      }
      return filtered;
   }, [orderList, filterVan, filterReason, filterFrom, filterTo, searchQuery]);
-
-  const hasActiveFilters = filterVan !== "الكل" || filterReason !== "الكل" || filterFrom || filterTo || searchQuery;
-
-  const clearFilters = () => {
-    setFilterVan("الكل");
-    setFilterReason("الكل");
-    setFilterFrom("");
-    setFilterTo("");
-    setSearchQuery("");
-  };
 
   return (
     <div className="space-y-8 pb-10">
@@ -251,19 +232,19 @@ export function ReturnsPage() {
                   <div className="lg:col-span-8 space-y-6">
                     <h3 className="text-sm font-bold text-slate-700 flex items-center gap-2 border-b border-slate-100 pb-3">
                       <span className="w-5 h-5 rounded-full bg-orange-100 flex items-center justify-center text-orange-600 text-[10px]">1</span>
-                      بيانات السيارة والمرجع
+                      بيانات المندوب والمرجع
                     </h3>
                     
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                       <div>
-                        <label className="block text-slate-700 text-sm font-medium mb-2">الفان / المندوب</label>
+                        <label className="block text-slate-700 text-sm font-medium mb-2">المندوب</label>
                         <div className="relative">
                           <select
                             value={selectedVan}
                             onChange={(e) => setSelectedVan(e.target.value)}
                             className="w-full appearance-none bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 min-h-[46px] text-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
                           >
-                            <option value="">-- اختر السيارة المرتجع منها --</option>
+                            <option value="">-- اختر المندوب المرتجع منه --</option>
                             {vans.map((v) => (
                               <option key={v.id} value={v.id}>
                                 {v.id} — {v.driverName}
@@ -287,49 +268,30 @@ export function ReturnsPage() {
                            <Calendar size={16} className="absolute top-1/2 -translate-y-1/2 right-4 text-slate-400 pointer-events-none" />
                         </div>
                       </div>
-
-                      <div className="sm:col-span-2">
-                        <label className="block text-slate-700 text-sm font-medium mb-2">ملاحظات عامة (اختياري)</label>
-                        <div className="relative">
-                           <input
-                             type="text"
-                             value={generalNotes}
-                             onChange={(e) => setGeneralNotes(e.target.value)}
-                             placeholder="أي ملاحظات إضافية حول هذا المرتجع..."
-                             className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 min-h-[46px] pr-10 text-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
-                           />
-                           <FileText size={16} className="absolute top-1/2 -translate-y-1/2 right-4 text-slate-400 pointer-events-none" />
-                        </div>
-                      </div>
                     </div>
                   </div>
 
-                  {/* Side Info Card */}
+                  {/* Side Info Card (Modified) */}
                   <div className="lg:col-span-4">
                      <div className="h-full">
                         {selectedVanData ? (
                           <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl p-5 text-white shadow-md h-full flex flex-col justify-center relative overflow-hidden">
-                             {/* Accents */}
                              <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full blur-2xl -mr-10 -mt-10"></div>
                              
                              <h4 className="text-slate-300 text-xs font-semibold mb-4 uppercase tracking-wider flex items-center gap-2">
                                 <Truck size={14} className="text-orange-400" />
-                                معلومات السيارة الحالية
+                                معلومات المندوب الحالية
                              </h4>
                              
                              <div className="space-y-4 relative z-10">
                                 <div>
-                                   <div className="text-slate-400 text-xs mb-1">المندوب / السائق</div>
-                                   <div className="font-bold text-base">{selectedVanData.driverName} <span className="text-slate-400 text-sm font-normal">({selectedVanData.id})</span></div>
+                                   <div className="text-slate-400 text-xs mb-1 text-center">المندوب / السائق</div>
+                                   <div className="font-bold text-base text-center">{selectedVanData.driverName} <span className="text-slate-400 text-sm font-normal">({selectedVanData.id})</span></div>
                                 </div>
-                                <div className="grid grid-cols-2 gap-4">
-                                   <div className="bg-white/10 rounded-lg p-3 border border-white/5">
-                                      <div className="text-slate-400 text-[10px] mb-1">سعة الأصناف</div>
-                                      <div className="font-bold text-lg">{vanStockCount} <span className="text-xs font-normal text-slate-400">صنف</span></div>
-                                   </div>
-                                   <div className="bg-white/10 rounded-lg p-3 border border-white/5">
-                                      <div className="text-slate-400 text-[10px] mb-1">الكمية الإجمالية</div>
-                                      <div className="font-bold text-lg">{vanStockUnits} <span className="text-xs font-normal text-slate-400">وحدة</span></div>
+                                <div className="grid grid-cols-1 mt-4">
+                                   <div className="bg-white/10 rounded-lg p-4 border border-white/5 flex flex-col items-center">
+                                      <div className="text-slate-400 text-xs mb-1">الكمية الإجمالية</div>
+                                      <div className="font-bold text-2xl">{vanStockUnits} <span className="text-sm font-normal text-slate-400">وحدة</span></div>
                                    </div>
                                 </div>
                              </div>
@@ -340,8 +302,8 @@ export function ReturnsPage() {
                                <Package size={20} className="text-slate-300" />
                             </div>
                             <div>
-                               <p className="text-sm font-medium text-slate-600 mb-1">لا توجد سيارة محددة</p>
-                               <p className="text-xs text-slate-400">اختر سيارة لعرض معلومات المخزون الأصلي</p>
+                               <p className="text-sm font-medium text-slate-600 mb-1">لا يوجد مندوب محدد</p>
+                               <p className="text-xs text-slate-400">اختر مندوباً لعرض معلومات المخزون الأصلي</p>
                             </div>
                           </div>
                         )}
@@ -389,12 +351,9 @@ export function ReturnsPage() {
                                        </select>
                                        <ChevronDown size={14} className="absolute top-1/2 -translate-y-1/2 left-3 text-slate-400 pointer-events-none" />
                                      </div>
-                                     {selectedVan && !availableProducts.length && (
-                                        <p className="text-[10px] text-red-500 mt-1 pl-1">لا يوجد مخزون مسجل على هذه السيارة</p>
-                                     )}
-                                     {!selectedVan && (
-                                        <p className="text-[10px] text-slate-400 mt-1 pl-1">الرجاء اختيار سيارة أولاً</p>
-                                     )}
+                                      {!selectedVan && (
+                                          <p className="text-[10px] text-slate-400 mt-1 pl-1">الرجاء اختيار مندوب أولاً</p>
+                                      )}
                                   </td>
                                   
                                   <td className="px-4 py-3 align-top">
@@ -526,175 +485,6 @@ export function ReturnsPage() {
             )}
           </div>
       </div>
-
-      {/* 3) Returns History Table */}
-      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col mt-8">
-        <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
-          <h2 className="text-base font-bold text-slate-800 flex items-center gap-2">
-            سجل المرتجعات السابقة
-            <span className="bg-slate-100 text-slate-600 text-xs px-2 py-0.5 rounded-full font-medium">{filteredOrders.length}</span>
-          </h2>
-          {hasActiveFilters && (
-            <button onClick={clearFilters} className="text-xs text-orange-600 hover:text-orange-700 bg-orange-50 hover:bg-orange-100 px-3 py-1.5 rounded-lg transition-colors font-medium">
-              مسح الفلاتر ✕
-            </button>
-          )}
-        </div>
-
-        {/* Filters Bar */}
-        <div className="px-6 py-4 border-b border-slate-100 bg-slate-50/50 flex flex-wrap gap-4 items-center">
-          <div className="flex-1 min-w-[200px] relative">
-             <Search size={16} className="absolute top-1/2 -translate-y-1/2 right-3 text-slate-400" />
-             <input 
-                type="text"
-                placeholder="بحث برقم العملية، الصنف..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full bg-white border border-slate-200 rounded-lg pr-9 pl-4 py-2 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-orange-400 transition-colors"
-             />
-          </div>
-          
-          <div className="w-px h-8 bg-slate-200 hidden sm:block"></div>
-
-          <div className="flex flex-wrap items-center gap-3">
-              <div className="relative">
-                <select
-                  value={filterVan}
-                  onChange={(e) => setFilterVan(e.target.value)}
-                  className="appearance-none bg-white border border-slate-200 rounded-lg px-4 py-2 pr-9 text-sm text-slate-600 focus:outline-none focus:ring-2 focus:ring-orange-400 min-w-[140px] pl-8"
-                >
-                  <option value="الكل">كل السيارات</option>
-                  {vans.map(v => (
-                    <option key={v.id} value={v.id}>{v.id}</option>
-                  ))}
-                </select>
-                <ChevronDown size={14} className="absolute top-1/2 -translate-y-1/2 left-3 text-slate-400 pointer-events-none" />
-                <Truck size={14} className="absolute top-1/2 -translate-y-1/2 right-3 text-slate-400" />
-              </div>
-
-              <div className="relative">
-                <select
-                  value={filterReason}
-                  onChange={(e) => setFilterReason(e.target.value)}
-                  className="appearance-none bg-white border border-slate-200 rounded-lg px-4 py-2 pr-9 text-sm text-slate-600 focus:outline-none focus:ring-2 focus:ring-orange-400 min-w-[140px] pl-8"
-                >
-                  <option value="الكل">كل الأسباب</option>
-                  {REASONS.map(r => <option key={r} value={r}>{r}</option>)}
-                </select>
-                <ChevronDown size={14} className="absolute top-1/2 -translate-y-1/2 left-3 text-slate-400 pointer-events-none" />
-                <Filter size={14} className="absolute top-1/2 -translate-y-1/2 right-3 text-slate-400" />
-              </div>
-
-              <div className="flex items-center gap-2 bg-white border border-slate-200 rounded-lg p-1.5 focus-within:ring-2 focus-within:ring-orange-400 transition-shadow pl-3">
-                <span className="text-xs text-slate-400 pr-2">من</span>
-                <input
-                  type="date"
-                  value={filterFrom}
-                  onChange={(e) => setFilterFrom(e.target.value)}
-                  className="text-sm text-slate-600 outline-none w-[110px] bg-transparent border-none p-0"
-                />
-              </div>
-
-              <div className="flex items-center gap-2 bg-white border border-slate-200 rounded-lg p-1.5 focus-within:ring-2 focus-within:ring-orange-400 transition-shadow pl-3">
-                <span className="text-xs text-slate-400 pr-2">إلى</span>
-                <input
-                  type="date"
-                  value={filterTo}
-                  onChange={(e) => setFilterTo(e.target.value)}
-                  className="text-sm text-slate-600 outline-none w-[110px] bg-transparent border-none p-0"
-                />
-              </div>
-          </div>
-        </div>
-
-        {/* Table View */}
-        <div className="overflow-x-auto min-h-[300px]">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="bg-slate-50 border-b border-slate-200">
-                <th className="text-right text-slate-500 font-semibold px-6 py-4 w-[12%]">رقم العملية</th>
-                <th className="text-right text-slate-500 font-semibold px-6 py-4 w-[18%]">المركبة والمندوب</th>
-                <th className="text-right text-slate-500 font-semibold px-6 py-4 w-[15%]">التاريخ</th>
-                <th className="text-right text-slate-500 font-semibold px-6 py-4 w-[40%]">تفاصيل المرتجع</th>
-                <th className="text-right text-slate-500 font-semibold px-6 py-4 w-[15%]">الحالة</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100">
-              {filteredOrders.length === 0 ? (
-                <tr>
-                  <td colSpan={5} className="px-6 py-20 text-center">
-                    <div className="flex flex-col items-center justify-center text-slate-400">
-                      < RotateCcw size={40} className="text-slate-200 mb-3" />
-                      <p className="text-base font-medium text-slate-600 mb-1">لا توجد سجلات مطابقة</p>
-                      <p className="text-sm">لم يتم العثور على مرتجعات تطابق معايير البحث الحالية</p>
-                    </div>
-                  </td>
-                </tr>
-              ) : (
-                filteredOrders.map((order) => (
-                  <tr key={order.id} className="hover:bg-slate-50/80 transition-colors group">
-                    <td className="px-6 py-5 align-top">
-                      <span className="inline-flex items-center justify-center font-bold text-orange-600 bg-orange-50 px-2.5 py-1 rounded-md text-xs border border-orange-100">
-                         {order.id}
-                      </span>
-                    </td>
-                    <td className="px-6 py-5 align-top">
-                      <div className="flex flex-col">
-                         <span className="text-sm text-slate-800 font-bold mb-1">{order.vanId}</span>
-                         <span className="text-xs text-slate-500 truncate">{order.vanName.split(' - ')[1] || order.vanName}</span>
-                      </div>
-                    </td>
-                    <td className="px-6 py-5 align-top">
-                      <div className="flex flex-col">
-                         <span className="text-sm text-slate-700 mb-0.5">
-                           {new Date(order.date).toLocaleDateString("ar-EG", { year: "numeric", month: "short", day: "numeric" })}
-                         </span>
-                         <span className="text-xs text-slate-400">
-                           {new Date(order.date).toLocaleTimeString("ar-EG", { hour: '2-digit', minute:'2-digit' })}
-                         </span>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="space-y-2.5">
-                        {order.items.map((item, idx) => (
-                          <div key={idx} className="flex items-center gap-3 bg-white p-2.5 rounded-lg border border-slate-200 shadow-[0_1px_2px_rgba(0,0,0,0.02)] group-hover:border-slate-300 transition-colors">
-                            <div className="flex-1 min-w-0">
-                               <p className="text-sm font-semibold text-slate-700 truncate" title={item.productName}>{item.productName}</p>
-                               <div className="flex items-center gap-2 mt-1.5 flex-wrap">
-                                 {item.reason && (
-                                   <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full border ${getReasonStyle(item.reason)}`}>
-                                     {item.reason}
-                                   </span>
-                                 )}
-                                 {item.notes && (
-                                    <span className="text-[10px] text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full truncate max-w-[120px]" title={item.notes}>
-                                       {item.notes}
-                                    </span>
-                                 )}
-                               </div>
-                            </div>
-                            <div className="flex-shrink-0 bg-slate-50 border border-slate-100 px-3 py-1.5 rounded-md flex flex-col items-center justify-center min-w-[50px]">
-                               <span className="font-bold text-slate-800 text-sm">{item.quantity}</span>
-                               <span className="text-[9px] text-slate-400 font-medium">وحدة</span>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </td>
-                    <td className="px-6 py-5 align-top">
-                      <span className="inline-flex items-center gap-1.5 bg-emerald-50 text-emerald-600 text-xs px-3 py-1.5 rounded-lg font-bold border border-emerald-100">
-                        <CheckCircle size={14} />
-                        {order.status}
-                      </span>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
-      
     </div>
   );
 }
