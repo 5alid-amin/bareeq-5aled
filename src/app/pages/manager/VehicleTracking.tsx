@@ -4,16 +4,12 @@ import { vans, Van } from "../../data/mockData";
 
 const STATUS_COLORS: Record<string, string> = {
   "نشطة": "bg-emerald-100 text-emerald-700 border-emerald-200",
-  "تحميل": "bg-yellow-100 text-yellow-700 border-yellow-200",
-  "متوقفة": "bg-red-100 text-red-700 border-red-200",
-  "صيانة": "bg-slate-100 text-slate-600 border-slate-200",
+  "متوقفة": "bg-slate-100 text-slate-600 border-slate-200",
 };
 
 const STATUS_DOT: Record<string, string> = {
   "نشطة": "bg-emerald-500 animate-pulse",
-  "تحميل": "bg-yellow-400 animate-pulse",
-  "متوقفة": "bg-red-500",
-  "صيانة": "bg-slate-400",
+  "متوقفة": "bg-slate-400",
 };
 
 const MAP_POSITIONS: Record<string, { x: number; y: number }> = {
@@ -27,9 +23,7 @@ const MAP_POSITIONS: Record<string, { x: number; y: number }> = {
 
 const MAP_DOT_COLORS: Record<string, string> = {
   "نشطة": "#10b981",
-  "تحميل": "#facc15",
-  "متوقفة": "#ef4444",
-  "صيانة": "#94a3b8",
+  "متوقفة": "#94a3b8",
 };
 
 const LAST_UPDATE: Record<string, string> = {
@@ -45,14 +39,23 @@ export function VehicleTracking() {
   const [selectedVan, setSelectedVan] = useState<Van>(vans[0]);
 
   return (
-    <div className="space-y-4">
+    <div className="relative isolate min-h-[800px]">
+      {/* Blurred Overlay for "Coming Soon" */}
+      <div className="absolute inset-0 z-50 flex items-center justify-center backdrop-blur-md bg-white/30 rounded-2xl">
+        <div className="bg-white/90 px-12 py-8 rounded-3xl shadow-2xl border border-white/50 animate-pulse flex flex-col items-center gap-4">
+          <Navigation size={48} className="text-blue-500" />
+          <h2 className="text-4xl font-black text-slate-800 tracking-wider">قريباً</h2>
+          <p className="text-slate-500 font-medium">جاري العمل على ميزة تتبع المركبات المباشر...</p>
+        </div>
+      </div>
+
+      <div className="space-y-4 opacity-50 pointer-events-none select-none filter blur-[2px]">
       {/* Stats row */}
       <div className="grid grid-cols-4 gap-3">
         {[
           { label: "إجمالي الفانات", value: vans.length, color: "text-blue-600", bg: "bg-blue-50" },
           { label: "نشطة الآن", value: vans.filter(v => v.status === "نشطة").length, color: "text-emerald-600", bg: "bg-emerald-50" },
-          { label: "في التحميل", value: vans.filter(v => v.status === "تحميل").length, color: "text-yellow-600", bg: "bg-yellow-50" },
-          { label: "غير نشطة", value: vans.filter(v => v.status === "متوقفة" || v.status === "صيانة").length, color: "text-red-500", bg: "bg-red-50" },
+          { label: "متوقفة", value: vans.filter(v => v.status === "متوقفة").length, color: "text-slate-500", bg: "bg-slate-50" },
         ].map((s) => (
           <div key={s.label} className={`${s.bg} rounded-xl p-3.5 border border-white shadow-sm`}>
             <p className={`text-2xl ${s.color}`}>{s.value}</p>
@@ -223,9 +226,7 @@ export function VehicleTracking() {
           <span className="text-slate-500 text-xs">مفتاح الخريطة:</span>
           {[
             { label: "نشطة", color: "bg-emerald-500" },
-            { label: "في التحميل", color: "bg-yellow-400" },
-            { label: "متوقفة", color: "bg-red-500" },
-            { label: "صيانة", color: "bg-slate-400" },
+            { label: "متوقفة", color: "bg-slate-400" },
           ].map((l) => (
             <div key={l.label} className="flex items-center gap-1.5">
               <div className={`w-3 h-3 rounded-full ${l.color}`}></div>
@@ -233,6 +234,7 @@ export function VehicleTracking() {
             </div>
           ))}
         </div>
+      </div>
       </div>
     </div>
   );

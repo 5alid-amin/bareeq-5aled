@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Truck, TrendingUp, DollarSign, Activity, Star } from "lucide-react";
+import { Truck, TrendingUp, DollarSign, Activity, Star, Calendar } from "lucide-react";
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, Legend,
 } from "recharts";
@@ -11,10 +11,28 @@ const totalSales = vans.reduce((sum, v) => sum + v.totalSalesToday, 0);
 
 export function ManagerDashboard({ onNavigate }: { onNavigate: (page: string) => void }) {
   const [chartMode, setChartMode] = useState<"daily" | "monthly">("daily");
+  const [timeFilter, setTimeFilter] = useState("اليوم");
   const chartData = chartMode === "daily" ? dailySalesData : monthlySalesData;
 
   return (
     <div className="space-y-6">
+      {/* Top Bar with Time Filter */}
+      <div className="flex justify-between items-center bg-white p-4 rounded-xl border border-slate-100 shadow-sm">
+        <h1 className="text-xl font-bold text-slate-800">نظرة عامة</h1>
+        <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-lg p-1">
+          <Calendar size={16} className="text-slate-400 ml-2" />
+          {["اليوم", "الأسبوع", "الشهر", "السنة"].map((filter) => (
+            <button
+              key={filter}
+              onClick={() => setTimeFilter(filter)}
+              className={`px-4 py-1.5 rounded-md text-sm transition-all ${timeFilter === filter ? "bg-white text-blue-600 shadow-sm font-medium" : "text-slate-500 hover:text-slate-700"}`}
+            >
+              {filter}
+            </button>
+          ))}
+        </div>
+      </div>
+
       {/* KPI Cards */}
       <div className="grid grid-cols-2 xl:grid-cols-4 gap-4">
         <KPICard
@@ -34,7 +52,7 @@ export function ManagerDashboard({ onNavigate }: { onNavigate: (page: string) =>
           trend={{ value: "2 زيادة", positive: true }}
         />
         <KPICard
-          title="إجمالي المبيعات اليوم"
+          title="إجمالي المبيعات"
           value={`${totalSales.toLocaleString("ar-EG")} ج.م`}
           subtitle="من جميع الفانات"
           icon={<TrendingUp size={22} />}
@@ -119,9 +137,7 @@ export function ManagerDashboard({ onNavigate }: { onNavigate: (page: string) =>
           <div className="space-y-3">
             {[
               { label: "نشطة", count: vans.filter(v => v.status === "نشطة").length, color: "bg-emerald-500", textColor: "text-emerald-700", barColor: "bg-emerald-100" },
-              { label: "تحميل", count: vans.filter(v => v.status === "تحميل").length, color: "bg-yellow-400", textColor: "text-yellow-700", barColor: "bg-yellow-50" },
               { label: "متوقفة", count: vans.filter(v => v.status === "متوقفة").length, color: "bg-red-500", textColor: "text-red-700", barColor: "bg-red-50" },
-              { label: "صيانة", count: vans.filter(v => v.status === "صيانة").length, color: "bg-slate-400", textColor: "text-slate-600", barColor: "bg-slate-100" },
             ].map((item) => (
               <div key={item.label} className={`flex items-center gap-3 ${item.barColor} rounded-lg p-3`}>
                 <div className={`w-2.5 h-2.5 rounded-full ${item.color} flex-shrink-0`}></div>
@@ -166,7 +182,7 @@ export function ManagerDashboard({ onNavigate }: { onNavigate: (page: string) =>
               <tr className="bg-slate-50">
                 <th className="text-right text-slate-500 text-xs px-5 py-3">رقم الفان</th>
                 <th className="text-right text-slate-500 text-xs px-5 py-3">السائق</th>
-                <th className="text-right text-slate-500 text-xs px-5 py-3">المبيعات اليوم</th>
+                <th className="text-right text-slate-500 text-xs px-5 py-3">المبيعات</th>
                 <th className="text-right text-slate-500 text-xs px-5 py-3">عدد الرحلات</th>
                 <th className="text-right text-slate-500 text-xs px-5 py-3">الكفاءة</th>
                 <th className="text-right text-slate-500 text-xs px-5 py-3">التقييم</th>

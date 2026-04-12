@@ -21,7 +21,6 @@ import { RepresentativeDashboard } from "./pages/representative/RepresentativeDa
 import { VehicleInventory } from "./pages/representative/VehicleInventory";
 import { RecordSale } from "./pages/representative/RecordSale";
 import { SalesHistory } from "./pages/representative/SalesHistory";
-import { AttendancePage } from "./pages/manager/AttendancePage";
 import { PayrollPage } from "./pages/manager/PayrollPage";
 import { RestockRequestPage } from "./pages/representative/RestockRequestPage";
 import { RestockManagementPage } from "./pages/warehouse/RestockManagementPage";
@@ -80,7 +79,6 @@ function AppContent() {
         <Route path="/manager/van-details/:vanId" element={<VanDetailsWrapper />} />
         <Route path="/manager/tracking" element={<VehicleTracking />} />
         <Route path="/manager/users" element={<UserManagement />} />
-        <Route path="/manager/attendance" element={<AttendancePage />} />
         <Route path="/manager/payroll" element={<PayrollPage />} />
         <Route path="/manager/reports" element={<Reports />} />
 

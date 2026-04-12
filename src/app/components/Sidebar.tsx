@@ -33,7 +33,6 @@ const managerNav: NavItem[] = [
   { id: "manager/fleet", label: "إدارة المركبات", icon: <Truck size={18} /> },
   { id: "manager/tracking", label: "تتبع المركبات", icon: <MapPin size={18} /> },
   { id: "manager/users", label: "إدارة المستخدمين", icon: <Users size={18} /> },
-  { id: "manager/attendance", label: "نظام تسجيل الحضور", icon: <Clock size={18} /> },
   { id: "manager/reports", label: "التقارير والتحليلات", icon: <BarChart3 size={18} /> },
 ];
 
