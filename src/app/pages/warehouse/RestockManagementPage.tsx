@@ -77,17 +77,27 @@ export function RestockManagementPage() {
                     }
 
                     // Records
+                    const productForBalance = products.find(p => p.id === item.productId);
+                    // note: product.quantity was already reduced by requestedQty above
+                    const beforeQty = productForBalance ? productForBalance.quantity + item.requestedQty : 0;
+                    const afterQty = productForBalance ? productForBalance.quantity : 0;
+                    const van = vans.find(v => v.id === req.vanId);
+                    
                     stockMovements.push({
                         id: `MOV-${String(stockMovements.length + 1).padStart(3, "0")}`,
-                        restockRequestId: req.id,
+                        date: new Date().toISOString(),
+                        type: "صرف لسيارة",
                         productId: item.productId,
                         productName: item.productName,
                         quantity: item.requestedQty,
-                        toVanId: req.vanId,
-                        date: new Date().toISOString()
+                        balanceBefore: beforeQty,
+                        balanceAfter: afterQty,
+                        referenceId: req.id,
+                        vanId: req.vanId,
+                        vanName: van ? `${req.vanId} - ${van.driverName}` : req.vanId,
+                        notes: "طلب استعاضة معتمد رقم " + req.id
                     });
 
-                    const van = vans.find(v => v.id === req.vanId);
                     transfers.push({
                         id: `TRF-${String(transfers.length + 1).padStart(3, "0")}`,
                         date: new Date().toISOString().split('T')[0],

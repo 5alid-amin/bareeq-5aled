@@ -25,6 +25,7 @@ import { AttendancePage } from "./pages/manager/AttendancePage";
 import { PayrollPage } from "./pages/manager/PayrollPage";
 import { RestockRequestPage } from "./pages/representative/RestockRequestPage";
 import { RestockManagementPage } from "./pages/warehouse/RestockManagementPage";
+import { StockMovementsPage } from "./pages/warehouse/StockMovementsPage";
 import { GeneralLedgerPage } from "./pages/accountant/GeneralLedgerPage";
 import { AccountsReceivablePage } from "./pages/accountant/AccountsReceivablePage";
 import { AccountsPayablePage } from "./pages/accountant/AccountsPayablePage";
@@ -91,6 +92,7 @@ function AppContent() {
         <Route path="/warehouse/returns" element={<ReturnsPage />} />
         <Route path="/warehouse/reorder" element={<ReorderAlertsPage />} />
         <Route path="/warehouse/restock" element={<RestockManagementPage />} />
+        <Route path="/warehouse/movements" element={<StockMovementsPage />} />
 
         {/* Representative pages */}
         <Route path="/representative/dashboard" element={<RepresentativeDashboard onNavigate={handleNavigate} />} />

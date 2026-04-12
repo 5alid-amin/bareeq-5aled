@@ -40,6 +40,7 @@ const managerNav: NavItem[] = [
 const warehouseNav: NavItem[] = [
   { id: "warehouse/dashboard", label: "لوحة التحكم", icon: <LayoutDashboard size={18} /> },
   { id: "warehouse/inventory", label: "المخزون الرئيسي", icon: <Package size={18} /> },
+  { id: "warehouse/movements", label: "حركات المخزون", icon: <ArrowLeftRight size={18} /> },
   { id: "warehouse/discrepancy", label: "مراجعة مخزون المركبات", icon: <ClipboardList size={18} /> },
   { id: "warehouse/transfers", label: "مخزون السيارات", icon: <Truck size={18} /> },
   { id: "warehouse/returns", label: "مرتجع", icon: <RotateCcw size={18} /> },

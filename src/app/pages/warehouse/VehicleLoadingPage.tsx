@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Truck, CheckCircle, ChevronDown, Trash2, Package, AlertTriangle, TrendingDown, TrendingUp, ArrowRight, X } from "lucide-react";
-import { vans, products, loadingOrders, LoadingOrder, LoadingOrderItem, vanInventory, VanInventoryItem } from "../../data/mockData";
+import { vans, products, loadingOrders, LoadingOrder, LoadingOrderItem, vanInventory, VanInventoryItem, stockMovements } from "../../data/mockData";
 
 // ─── Vehicle Loading Modal / Drawer ──────────────────────────────────────────
 function VehicleLoadingForm({ selectedVan, onClose }: { selectedVan: string, onClose: () => void }) {
@@ -53,6 +53,43 @@ function VehicleLoadingForm({ selectedVan, onClose }: { selectedVan: string, onC
         const qty = parseInt(item.quantity);
         const itemTotal = prod.sellingPrice * qty;
         totalValue += itemTotal;
+        
+        // update inventory & push to movements
+        const beforeQty = prod.quantity;
+        prod.quantity -= qty;
+        const afterQty = prod.quantity;
+        
+        stockMovements.push({
+            id: `MOV-${String(stockMovements.length + 1).padStart(3, "0")}`,
+            date: new Date().toISOString(),
+            type: "صرف لسيارة",
+            productId: prod.id,
+            productName: prod.name,
+            quantity: qty,
+            balanceBefore: beforeQty,
+            balanceAfter: afterQty,
+            vanId: van.id,
+            vanName: `${van.id} - ${van.driverName}`,
+            notes: "أمر تحميل يدوي للإدارة"
+        });
+        
+        // Also update van inventory
+        const vanInv = vanInventory[van.id];
+        if (vanInv) {
+            const invItemIndex = vanInv.findIndex(i => i.productId === prod.id);
+            if (invItemIndex > -1) {
+                vanInv[invItemIndex].quantity += qty;
+            } else {
+                vanInv.push({
+                    productId: prod.id,
+                    productName: prod.name,
+                    quantity: qty,
+                    sellingPrice: prod.sellingPrice,
+                    minQuantity: 10
+                });
+            }
+        }
+
         return {
           productId: prod.id,
           productName: prod.name,

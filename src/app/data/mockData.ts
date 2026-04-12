@@ -83,6 +83,7 @@ export interface ReturnOrderItem {
   productName: string;
   quantity: number;
   reason?: string;
+  notes?: string;
 }
 
 export interface ReturnOrder {
@@ -773,14 +774,22 @@ export interface RestockRequest {
   status: "معلق" | "موافق" | "مرفوض" | "تم التسليم";
 }
 
+export type StockMovementType = "تزويد" | "صرف لسيارة" | "مرتجع" | "هالك";
+
 export interface StockMovement {
   id: string;
-  restockRequestId: string;
+  date: string;
+  type: StockMovementType;
   productId: string;
   productName: string;
   quantity: number;
-  toVanId: string;
-  date: string;
+  balanceBefore: number;
+  balanceAfter: number;
+  referenceId?: string;
+  vanId?: string;
+  vanName?: string;
+  notes?: string;
+  createdBy?: string;
 }
 
 // ─── Restock Requests ─────────────────────────────────────────────────────────
@@ -825,13 +834,54 @@ export let restockRequests: RestockRequest[] = [
 export let stockMovements: StockMovement[] = [
   {
     id: "MOV-001",
-    restockRequestId: "REQ-003",
+    date: "2026-03-01T16:00:00Z",
+    type: "صرف لسيارة",
     productId: "PRD-006",
     productName: "معطر الجو روز",
     quantity: 20,
-    toVanId: "VAN-003",
-    date: "2026-03-01T16:00:00Z",
+    balanceBefore: 28,
+    balanceAfter: 8,
+    referenceId: "REQ-003",
+    vanId: "VAN-003",
+    vanName: "VAN-003 - خالد سلامة",
+    notes: "طلب استعاضة رقم REQ-003"
   },
+  {
+    id: "MOV-002",
+    date: "2026-03-02T10:00:00Z",
+    type: "تزويد",
+    productId: "PRD-001",
+    productName: "منظف الأطباق سائل ليمون",
+    quantity: 100,
+    balanceBefore: 350,
+    balanceAfter: 450,
+    notes: "تزويد من المورد - إذن إضافة رقم 402"
+  },
+  {
+    id: "MOV-003",
+    date: "2026-03-03T14:30:00Z",
+    type: "مرتجع",
+    productId: "PRD-007",
+    productName: "منظف الزجاج والمرايا",
+    quantity: 5,
+    balanceBefore: 185,
+    balanceAfter: 190,
+    referenceId: "RO-001",
+    vanId: "VAN-002",
+    vanName: "VAN-002 - محمد البحيري",
+    notes: "مرتجع بسبب عيب تعبئة"
+  },
+  {
+    id: "MOV-004",
+    date: "2026-03-04T09:15:00Z",
+    type: "هالك",
+    productId: "PRD-002",
+    productName: "مسحوق غسيل الملابس برايت",
+    quantity: 2,
+    balanceBefore: 32,
+    balanceAfter: 30,
+    notes: "تطاير المسحوق بسبب تمزق الكيس في المخزن"
+  }
 ];
 
 // ─── Accountant Models & Data ──────────────────────────────────────────────────
