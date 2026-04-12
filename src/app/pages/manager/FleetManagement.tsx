@@ -42,7 +42,7 @@ function AddVanModal({ onClose, onAdd }: AddVanModalProps) {
               <span className="text-3xl">✅</span>
             </div>
             <h3 className="text-slate-700 text-lg mb-1">تمت الإضافة بنجاح!</h3>
-            <p className="text-slate-400 text-sm">تمت إضافة الفان الجديدة إلى الأسطول</p>
+            <p className="text-slate-400 text-sm">تمت إضافة الفان الجديدة إلى المركبات</p>
           </div>
         ) : (
           <>

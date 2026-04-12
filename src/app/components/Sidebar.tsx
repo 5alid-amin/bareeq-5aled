@@ -30,7 +30,7 @@ interface NavItem {
 
 const managerNav: NavItem[] = [
   { id: "manager/dashboard", label: "لوحة التحكم", icon: <LayoutDashboard size={18} /> },
-  { id: "manager/fleet", label: "إدارة الأسطول", icon: <Truck size={18} /> },
+  { id: "manager/fleet", label: "إدارة المركبات", icon: <Truck size={18} /> },
   { id: "manager/tracking", label: "تتبع المركبات", icon: <MapPin size={18} /> },
   { id: "manager/users", label: "إدارة المستخدمين", icon: <Users size={18} /> },
   { id: "manager/attendance", label: "نظام تسجيل الحضور", icon: <Clock size={18} /> },
@@ -39,11 +39,11 @@ const managerNav: NavItem[] = [
 
 const warehouseNav: NavItem[] = [
   { id: "warehouse/dashboard", label: "لوحة التحكم", icon: <LayoutDashboard size={18} /> },
-  { id: "warehouse/inventory", label: "المخزون", icon: <Package size={18} /> },
-  { id: "warehouse/discrepancy", label: "فروقات جرد السيارات", icon: <ClipboardList size={18} /> },
-  { id: "warehouse/transfers", label: "تحميل السيارات", icon: <Truck size={18} /> },
+  { id: "warehouse/inventory", label: "المخزون الرئيسي", icon: <Package size={18} /> },
+  { id: "warehouse/discrepancy", label: "مراجعة مخزون المركبات", icon: <ClipboardList size={18} /> },
+  { id: "warehouse/transfers", label: "مخزون السيارات", icon: <Truck size={18} /> },
   { id: "warehouse/returns", label: "مرتجع", icon: <RotateCcw size={18} /> },
-  { id: "warehouse/reorder", label: "تنبيهات إعادة الطلب", icon: <AlertTriangle size={18} /> },
+  { id: "warehouse/reorder", label: "تزويد المخزن", icon: <AlertTriangle size={18} /> },
   { id: "warehouse/restock", label: "طلبات التعبئة", icon: <RefreshCw size={18} /> },
 ];
 

@@ -1,10 +1,10 @@
 import React from "react";
-import { Bell, Search, ChevronLeft } from "lucide-react";
+import { Bell, Search, ChevronLeft, Moon, Sun } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 
 const PAGE_TITLES: Record<string, string> = {
   dashboard: "لوحة تحكم المدير",
-  fleet: "إدارة الأسطول",
+  fleet: "إدارة المركبات",
   tracking: "تتبع المركبات",
   users: "إدارة المستخدمين",
   reports: "التقارير والتحليلات",
@@ -35,6 +35,20 @@ export function Header({ activePage, onNavigate }: HeaderProps) {
     day: "numeric",
   });
 
+  const [isDark, setIsDark] = React.useState(() => {
+    return document.documentElement.classList.contains("dark");
+  });
+
+  const toggleDarkMode = () => {
+    if (isDark) {
+      document.documentElement.classList.remove("dark");
+      setIsDark(false);
+    } else {
+      document.documentElement.classList.add("dark");
+      setIsDark(true);
+    }
+  };
+
   const showBack = activePage === "van-details";
 
   return (
@@ -56,16 +70,14 @@ export function Header({ activePage, onNavigate }: HeaderProps) {
         </div>
       </div>
 
-      {/* Right side: search + notifications + avatar */}
+      {/* Right side: notifications + avatar */}
       <div className="flex items-center gap-3">
-        <div className="relative hidden md:block">
-          <Search size={15} className="absolute top-1/2 -translate-y-1/2 right-3 text-slate-400" />
-          <input
-            type="text"
-            placeholder="بحث..."
-            className="bg-slate-50 border border-slate-200 rounded-lg pr-9 pl-4 py-2 text-sm text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 w-48"
-          />
-        </div>
+        <button 
+          onClick={toggleDarkMode}
+          className="relative w-9 h-9 rounded-lg bg-slate-50 border border-slate-200 flex items-center justify-center text-slate-500 hover:bg-slate-100 transition-colors"
+        >
+          {isDark ? <Sun size={16} /> : <Moon size={16} />}
+        </button>
 
         <button className="relative w-9 h-9 rounded-lg bg-slate-50 border border-slate-200 flex items-center justify-center text-slate-500 hover:bg-slate-100 transition-colors">
           <Bell size={16} />

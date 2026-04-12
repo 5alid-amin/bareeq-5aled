@@ -18,6 +18,7 @@ function ProductModal({ product, onClose, onSave }: ProductModalProps) {
     sellingPrice: product?.sellingPrice?.toString() ?? "",
     barcode: product?.barcode ?? "",
     quantity: product?.quantity?.toString() ?? "",
+    minQuantity: product?.minQuantity?.toString() ?? "20",
   });
   const [saved, setSaved] = useState(false);
 
@@ -30,6 +31,7 @@ function ProductModal({ product, onClose, onSave }: ProductModalProps) {
       sellingPrice: parseFloat(form.sellingPrice),
       barcode: form.barcode,
       quantity: parseInt(form.quantity),
+      minQuantity: parseInt(form.minQuantity) || 20,
     });
     setSaved(true);
     setTimeout(() => onClose(), 1300);
@@ -73,7 +75,7 @@ function ProductModal({ product, onClose, onSave }: ProductModalProps) {
                 </div>
               </div>
               <div>
-                <label className="block text-slate-600 text-sm mb-1.5">سعر التكلفة (ج.م)</label>
+                <label className="block text-slate-600 text-sm mb-1.5">سعر الشراء (ج.م)</label>
                 <input
                   type="number"
                   value={form.costPrice}
@@ -115,6 +117,21 @@ function ProductModal({ product, onClose, onSave }: ProductModalProps) {
                   dir="ltr"
                 />
               </div>
+              <div className="col-span-2">
+                <label className="block text-slate-600 text-sm mb-1.5">
+                  الحد الأدنى للمخزون
+                  <span className="text-slate-400 text-xs mr-2">— عند النزول تحته يُصبح المنتج "منخفض"</span>
+                </label>
+                <input
+                  type="number"
+                  value={form.minQuantity}
+                  onChange={(e) => setForm({ ...form, minQuantity: e.target.value })}
+                  placeholder="20"
+                  min="1"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  dir="ltr"
+                />
+              </div>
               <div className="col-span-2 flex gap-3 pt-2">
                 <button type="button" onClick={onClose} className="flex-1 border border-slate-200 text-slate-600 py-2.5 rounded-xl text-sm hover:bg-slate-50">إلغاء</button>
                 <button type="submit" className="flex-1 bg-blue-600 text-white py-2.5 rounded-xl text-sm hover:bg-blue-700">حفظ المنتج</button>
@@ -127,19 +144,30 @@ function ProductModal({ product, onClose, onSave }: ProductModalProps) {
   );
 }
 
+type FilterMode = "all" | "good" | "low";
+
 export function InventoryPage() {
   const [productList, setProductList] = useState<Product[]>(initialProducts);
   const [showModal, setShowModal] = useState(false);
   const [editProduct, setEditProduct] = useState<Product | null>(null);
   const [search, setSearch] = useState("");
   const [filterCat, setFilterCat] = useState("الكل");
+  const [filterMode, setFilterMode] = useState<FilterMode>("all");
 
   const categories = ["الكل", ...Array.from(new Set(productList.map((p) => p.category)))];
+
+  const totalCount = productList.length;
+  const goodCount = productList.filter(p => p.quantity >= p.minQuantity).length;
+  const lowCount = productList.filter(p => p.quantity < p.minQuantity).length;
 
   const filtered = productList.filter((p) => {
     const matchSearch = p.name.includes(search) || p.id.includes(search) || p.barcode.includes(search);
     const matchCat = filterCat === "الكل" || p.category === filterCat;
-    return matchSearch && matchCat;
+    const matchMode =
+      filterMode === "all" ? true :
+      filterMode === "good" ? p.quantity >= p.minQuantity :
+      p.quantity < p.minQuantity;
+    return matchSearch && matchCat && matchMode;
   });
 
   const handleSave = (data: Partial<Product>) => {
@@ -154,11 +182,35 @@ export function InventoryPage() {
         sellingPrice: data.sellingPrice ?? 0,
         barcode: data.barcode ?? "",
         quantity: data.quantity ?? 0,
-        minQuantity: 20,
+        minQuantity: data.minQuantity ?? 20,
       };
       setProductList([...productList, newProd]);
     }
   };
+
+  const summaryCards = [
+    {
+      label: "إجمالي الأصناف",
+      value: totalCount,
+      color: "text-blue-600",
+      bg: filterMode === "all" ? "bg-blue-100 ring-2 ring-blue-400" : "bg-blue-50 hover:bg-blue-100",
+      mode: "all" as FilterMode,
+    },
+    {
+      label: "مخزون جيد",
+      value: goodCount,
+      color: "text-emerald-600",
+      bg: filterMode === "good" ? "bg-emerald-100 ring-2 ring-emerald-400" : "bg-emerald-50 hover:bg-emerald-100",
+      mode: "good" as FilterMode,
+    },
+    {
+      label: "مخزون منخفض",
+      value: lowCount,
+      color: "text-red-600",
+      bg: filterMode === "low" ? "bg-red-100 ring-2 ring-red-400" : "bg-red-50 hover:bg-red-100",
+      mode: "low" as FilterMode,
+    },
+  ];
 
   return (
     <div className="space-y-5">
@@ -202,25 +254,35 @@ export function InventoryPage() {
         </button>
       </div>
 
-      {/* Summary */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        {[
-          { label: "إجمالي الأصناف", value: productList.length, color: "text-blue-600", bg: "bg-blue-50" },
-          { label: "مخزون جيد", value: productList.filter(p => p.quantity >= p.minQuantity * 2).length, color: "text-emerald-600", bg: "bg-emerald-50" },
-          { label: "مخزون منخفض", value: productList.filter(p => p.quantity < p.minQuantity).length, color: "text-red-600", bg: "bg-red-50" },
-          { label: "قيمة المخزون", value: `${productList.reduce((s, p) => s + p.quantity * p.costPrice, 0).toLocaleString("ar-EG")} ج.م`, color: "text-purple-600", bg: "bg-purple-50" },
-        ].map((s) => (
-          <div key={s.label} className={`${s.bg} rounded-xl p-3.5 border border-white shadow-sm`}>
+      {/* Summary Filter Buttons */}
+      <div className="grid grid-cols-3 gap-3">
+        {summaryCards.map((s) => (
+          <button
+            key={s.label}
+            onClick={() => setFilterMode(s.mode)}
+            className={`${s.bg} rounded-xl p-3.5 border border-white shadow-sm text-right transition-all duration-150 cursor-pointer`}
+          >
             <p className={`text-lg ${s.color} truncate`}>{s.value}</p>
             <p className="text-slate-500 text-xs mt-0.5">{s.label}</p>
-          </div>
+            {filterMode === s.mode && (
+              <p className={`text-xs mt-1 ${s.color} opacity-70`}>● معروض الآن</p>
+            )}
+          </button>
         ))}
       </div>
 
       {/* Table */}
       <div className="bg-white rounded-xl border border-slate-100 shadow-sm overflow-hidden">
-        <div className="px-5 py-4 border-b border-slate-100">
+        <div className="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
           <h2 className="text-slate-700 text-base">المخزون الرئيسي ({filtered.length} صنف)</h2>
+          {filterMode !== "all" && (
+            <button
+              onClick={() => setFilterMode("all")}
+              className="text-xs text-slate-400 hover:text-slate-600 bg-slate-100 hover:bg-slate-200 px-2.5 py-1 rounded-lg transition-colors"
+            >
+              عرض الكل ✕
+            </button>
+          )}
         </div>
         <div className="overflow-x-auto">
           <table className="w-full">
@@ -229,10 +291,11 @@ export function InventoryPage() {
                 <th className="text-right text-slate-500 text-xs px-4 py-3">رقم المنتج</th>
                 <th className="text-right text-slate-500 text-xs px-4 py-3">اسم المنتج</th>
                 <th className="text-right text-slate-500 text-xs px-4 py-3">الفئة</th>
-                <th className="text-right text-slate-500 text-xs px-4 py-3">سعر التكلفة</th>
+                <th className="text-right text-slate-500 text-xs px-4 py-3">سعر الشراء</th>
                 <th className="text-right text-slate-500 text-xs px-4 py-3">سعر البيع</th>
                 <th className="text-right text-slate-500 text-xs px-4 py-3">الباركود</th>
                 <th className="text-right text-slate-500 text-xs px-4 py-3">الكمية</th>
+                <th className="text-right text-slate-500 text-xs px-4 py-3">الحد الأدنى</th>
                 <th className="text-right text-slate-500 text-xs px-4 py-3">الحالة</th>
                 <th className="text-right text-slate-500 text-xs px-4 py-3">تعديل</th>
               </tr>
@@ -265,6 +328,7 @@ export function InventoryPage() {
                         {p.quantity}
                       </span>
                     </td>
+                    <td className="px-4 py-3.5 text-slate-500 text-sm">{p.minQuantity}</td>
                     <td className="px-4 py-3.5">
                       <span className={`text-xs px-2 py-1 rounded-full ${isLow ? "bg-red-100 text-red-600" : isMid ? "bg-yellow-100 text-yellow-600" : "bg-emerald-100 text-emerald-600"}`}>
                         {isLow ? "منخفض" : isMid ? "متوسط" : "جيد"}

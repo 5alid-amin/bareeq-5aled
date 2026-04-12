@@ -1,0 +1,74 @@
+/* Dark Mode Overrides for Hardcoded Tailwind Light Classes */
+.dark body {
+    background-color: #0f172a !important;
+    color: #f8fafc !important;
+}
+.dark .bg-white {
+    background-color: #1e293b !important;
+}
+.dark .bg-slate-50 {
+    background-color: #0f172a !important;
+}
+.dark .bg-slate-100 {
+    background-color: #334155 !important;
+}
+.dark .text-slate-800 {
+    color: #f8fafc !important;
+}
+.dark .text-slate-700 {
+    color: #e2e8f0 !important;
+}
+.dark .text-slate-600 {
+    color: #cbd5e1 !important;
+}
+.dark .text-slate-500 {
+    color: #94a3b8 !important;
+}
+.dark .text-slate-400 {
+    color: #64748b !important;
+}
+.dark .border-slate-200 {
+    border-color: #334155 !important;
+}
+.dark .border-slate-100 {
+    border-color: #1e293b !important;
+}
+
+/* Modals and Overlays */
+.dark .bg-black\/40 {
+    background-color: rgba(0, 0, 0, 0.7) !important;
+}
+
+/* Inputs and Forms */
+.dark input, .dark select, .dark textarea {
+    background-color: #1e293b !important;
+    color: #f8fafc !important;
+    border-color: #334155 !important;
+}
+.dark input:focus, .dark select:focus, .dark textarea:focus {
+    border-color: #8b5cf6 !important;
+    --tw-ring-color: #8b5cf6 !important;
+}
+
+/* Specific component tweaks */
+.dark .hover\:bg-slate-50:hover {
+    background-color: #334155 !important;
+}
+.dark .divide-slate-100 > :not([hidden]) ~ :not([hidden]) {
+    border-color: #334155 !important;
+}
+.dark .divide-slate-50 > :not([hidden]) ~ :not([hidden]) {
+    border-color: #1e293b !important;
+}
+.dark .from-purple-50 {
+    --tw-gradient-from: #1e293b !important;
+}
+.dark .to-slate-50 {
+    --tw-gradient-to: #0f172a !important;
+}
+.dark .from-emerald-50 {
+    --tw-gradient-from: #064e3b !important;
+}
+.dark .hover\:bg-slate-100:hover {
+    background-color: #475569 !important;
+}

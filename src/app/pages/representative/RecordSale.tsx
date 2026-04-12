@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import { Check, AlertCircle, ShoppingCart, Loader2, Plus, Trash2, Upload, CreditCard, Banknote, Smartphone, X } from "lucide-react";
+import { Check, AlertCircle, ShoppingCart, Loader2, Plus, Trash2, Upload, CreditCard, Banknote, Smartphone, X, Printer } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
-import { vanInventory, invoices, PaymentMethod, InvoiceItem } from "../../data/mockData";
+import { vanInventory, invoices, PaymentMethod, InvoiceItem, Invoice } from "../../data/mockData";
 
 interface CartItem {
     productId: string;
@@ -18,6 +18,101 @@ const PAYMENT_METHODS: { value: PaymentMethod; label: string; icon: React.ReactN
     { value: "إنستاباي", label: "إنستاباي", icon: <Smartphone size={18} />, color: "purple" },
 ];
 
+// ─── Print Invoice Helper ────────────────────────────────────────────────
+function printInvoice(invoice: Invoice) {
+    const printWindow = window.open("", "_blank", "width=800,height=600");
+    if (!printWindow) return;
+
+    const itemsRows = invoice.items
+        .map(
+            (item) => `
+        <tr>
+            <td style="padding:10px 14px;border-bottom:1px solid #e2e8f0;font-size:14px;color:#334155">${item.productName}</td>
+            <td style="padding:10px 14px;border-bottom:1px solid #e2e8f0;font-size:14px;color:#334155;text-align:center">${item.quantity}</td>
+            <td style="padding:10px 14px;border-bottom:1px solid #e2e8f0;font-size:14px;color:#334155;text-align:center">ج.م ${item.unitPrice.toFixed(2)}</td>
+            <td style="padding:10px 14px;border-bottom:1px solid #e2e8f0;font-size:14px;font-weight:700;color:#0f172a;text-align:center">ج.م ${item.total.toFixed(2)}</td>
+        </tr>`
+        )
+        .join("");
+
+    printWindow.document.write(`
+    <!DOCTYPE html>
+    <html lang="ar" dir="rtl">
+    <head>
+        <meta charset="UTF-8">
+        <title>فاتورة ${invoice.id}</title>
+        <style>
+            * { margin:0; padding:0; box-sizing:border-box; }
+            body { font-family: 'Segoe UI', Tahoma, sans-serif; background:#fff; padding:40px; color:#1e293b; direction:rtl; }
+            .header { display:flex; justify-content:space-between; align-items:center; margin-bottom:32px; padding-bottom:20px; border-bottom:3px solid #10b981; }
+            .logo { font-size:28px; font-weight:800; color:#10b981; }
+            .logo span { color:#0f172a; }
+            .invoice-id { font-size:14px; color:#64748b; margin-top:4px; }
+            .info-grid { display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-bottom:28px; }
+            .info-card { background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:16px; }
+            .info-label { font-size:12px; color:#94a3b8; margin-bottom:4px; }
+            .info-value { font-size:15px; font-weight:600; color:#1e293b; }
+            table { width:100%; border-collapse:collapse; border-radius:12px; overflow:hidden; border:1px solid #e2e8f0; margin-bottom:24px; }
+            thead { background:linear-gradient(135deg, #10b981, #059669); }
+            th { padding:12px 14px; font-size:13px; font-weight:600; color:#fff; text-align:right; }
+            th:not(:first-child) { text-align:center; }
+            .total-row { background:#f1f5f9; }
+            .total-row td { padding:14px; font-size:16px; font-weight:800; color:#10b981; }
+            .footer { text-align:center; color:#94a3b8; font-size:12px; margin-top:40px; padding-top:16px; border-top:1px solid #e2e8f0; }
+            @media print { body { padding:20px; } }
+        </style>
+    </head>
+    <body>
+        <div class="header">
+            <div>
+                <div class="logo">بريق <span>للتوزيع</span></div>
+                <div class="invoice-id">فاتورة رقم: ${invoice.id}</div>
+            </div>
+            <div style="text-align:left">
+                <div style="font-size:13px;color:#64748b">التاريخ</div>
+                <div style="font-size:15px;font-weight:600;color:#1e293b">${new Date(invoice.date).toLocaleDateString("ar-EG", { year: "numeric", month: "long", day: "numeric" })}</div>
+                <div style="font-size:13px;color:#64748b;margin-top:2px">${new Date(invoice.date).toLocaleTimeString("ar-EG", { hour: "2-digit", minute: "2-digit" })}</div>
+            </div>
+        </div>
+        <div class="info-grid">
+            <div class="info-card">
+                <div class="info-label">طريقة الدفع</div>
+                <div class="info-value">${invoice.paymentMethod}</div>
+            </div>
+            <div class="info-card">
+                <div class="info-label">السيارة</div>
+                <div class="info-value">${invoice.vanId}</div>
+            </div>
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>الصنف</th>
+                    <th>الكمية</th>
+                    <th>سعر الوحدة</th>
+                    <th>الإجمالي</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${itemsRows}
+                <tr class="total-row">
+                    <td colspan="3" style="padding:14px;font-size:16px;font-weight:800;color:#1e293b">الإجمالي الكلي</td>
+                    <td style="text-align:center">ج.م ${invoice.total.toFixed(2)}</td>
+                </tr>
+            </tbody>
+        </table>
+        <div class="footer">
+            مطبوع من نظام بريق لإدارة التوزيع — ${new Date().toLocaleDateString("ar-EG")}
+        </div>
+    </body>
+    </html>`);
+
+    printWindow.document.close();
+    setTimeout(() => {
+        printWindow.print();
+    }, 300);
+}
+
 export function RecordSale() {
     const { user } = useAuth();
     const assignedVanId = user?.assignedVanId || "VAN-001";
@@ -31,6 +126,7 @@ export function RecordSale() {
     const [transferImage, setTransferImage] = useState<string>("");
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
+    const [lastInvoice, setLastInvoice] = useState<Invoice | null>(null);
 
     const productItem = myInventory.find(i => i.productId === selectedProduct);
 
@@ -131,6 +227,7 @@ export function RecordSale() {
             };
 
             invoices.unshift(newInvoice);
+            setLastInvoice(newInvoice);
 
             // Deduct inventory
             cart.forEach(c => {
@@ -161,7 +258,18 @@ export function RecordSale() {
                         : "bg-red-50 text-red-700 border-red-200"
                     }`}>
                     {message.type === "success" ? <Check size={20} className="mt-0.5" /> : <AlertCircle size={20} className="mt-0.5" />}
-                    <p className="text-sm font-medium leading-relaxed">{message.text}</p>
+                    <div className="flex-1 flex items-center justify-between">
+                        <p className="text-sm font-medium leading-relaxed">{message.text}</p>
+                        {message.type === "success" && lastInvoice && (
+                            <button
+                                onClick={() => printInvoice(lastInvoice)}
+                                className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-medium transition-colors shadow-sm mr-3"
+                            >
+                                <Printer size={14} />
+                                طباعة الفاتورة
+                            </button>
+                        )}
+                    </div>
                 </div>
             )}
 

@@ -439,8 +439,165 @@ export interface PayrollRecord {
 
 // ─── Invoices ────────────────────────────────────────────────────────────
 export let invoices: Invoice[] = [
+  // ── April 2026 ──
   {
     id: "INV-001",
+    date: "2026-04-11T10:30:00Z",
+    vanId: "VAN-001",
+    representativeId: "USR-003",
+    items: [
+      { productId: "PRD-001", productName: "منظف الأطباق سائل ليمون", quantity: 10, unitPrice: 14.0, total: 140.0 },
+      { productId: "PRD-003", productName: "منظف الأرضيات بالصنوبر", quantity: 5, unitPrice: 20.0, total: 100.0 },
+    ],
+    paymentMethod: "كاش",
+    total: 240.0,
+  },
+  {
+    id: "INV-002",
+    date: "2026-04-11T14:15:00Z",
+    vanId: "VAN-001",
+    representativeId: "USR-003",
+    items: [
+      { productId: "PRD-005", productName: "منظف الحمام والمرحاض", quantity: 8, unitPrice: 16.0, total: 128.0 },
+      { productId: "PRD-008", productName: "مبيض الملابس كلور", quantity: 6, unitPrice: 11.0, total: 66.0 },
+    ],
+    paymentMethod: "فودافون كاش",
+    transferImage: "",
+    total: 194.0,
+  },
+  {
+    id: "INV-003",
+    date: "2026-04-10T09:00:00Z",
+    vanId: "VAN-001",
+    representativeId: "USR-003",
+    items: [
+      { productId: "PRD-003", productName: "منظف الأرضيات بالصنوبر", quantity: 4, unitPrice: 20.0, total: 80.0 },
+    ],
+    paymentMethod: "كاش",
+    total: 80.0,
+  },
+  {
+    id: "INV-004",
+    date: "2026-04-10T15:30:00Z",
+    vanId: "VAN-002",
+    representativeId: "USR-004",
+    items: [
+      { productId: "PRD-002", productName: "مسحوق غسيل الملابس برايت", quantity: 4, unitPrice: 35.0, total: 140.0 },
+      { productId: "PRD-010", productName: "منظف المطبخ متعدد الأغراض", quantity: 6, unitPrice: 22.0, total: 132.0 },
+    ],
+    paymentMethod: "فيزا",
+    total: 272.0,
+  },
+  {
+    id: "INV-005",
+    date: "2026-04-09T11:00:00Z",
+    vanId: "VAN-001",
+    representativeId: "USR-003",
+    items: [
+      { productId: "PRD-001", productName: "منظف الأطباق سائل ليمون", quantity: 12, unitPrice: 14.0, total: 168.0 },
+    ],
+    paymentMethod: "إنستاباي",
+    transferImage: "",
+    total: 168.0,
+  },
+  {
+    id: "INV-006",
+    date: "2026-04-08T08:45:00Z",
+    vanId: "VAN-001",
+    representativeId: "USR-003",
+    items: [
+      { productId: "PRD-005", productName: "منظف الحمام والمرحاض", quantity: 10, unitPrice: 16.0, total: 160.0 },
+      { productId: "PRD-001", productName: "منظف الأطباق سائل ليمون", quantity: 5, unitPrice: 14.0, total: 70.0 },
+      { productId: "PRD-008", productName: "مبيض الملابس كلور", quantity: 15, unitPrice: 11.0, total: 165.0 },
+    ],
+    paymentMethod: "كاش",
+    total: 395.0,
+  },
+  {
+    id: "INV-007",
+    date: "2026-04-05T16:20:00Z",
+    vanId: "VAN-001",
+    representativeId: "USR-003",
+    items: [
+      { productId: "PRD-003", productName: "منظف الأرضيات بالصنوبر", quantity: 7, unitPrice: 20.0, total: 140.0 },
+    ],
+    paymentMethod: "فيزا",
+    total: 140.0,
+  },
+  {
+    id: "INV-008",
+    date: "2026-04-01T10:00:00Z",
+    vanId: "VAN-002",
+    representativeId: "USR-004",
+    items: [
+      { productId: "PRD-007", productName: "منظف الزجاج والمرايا", quantity: 10, unitPrice: 13.0, total: 130.0 },
+      { productId: "PRD-010", productName: "منظف المطبخ متعدد الأغراض", quantity: 3, unitPrice: 22.0, total: 66.0 },
+    ],
+    paymentMethod: "كاش",
+    total: 196.0,
+  },
+  // ── March 2026 ──
+  {
+    id: "INV-009",
+    date: "2026-03-28T10:30:00Z",
+    vanId: "VAN-001",
+    representativeId: "USR-003",
+    items: [
+      { productId: "PRD-001", productName: "منظف الأطباق سائل ليمون", quantity: 20, unitPrice: 14.0, total: 280.0 },
+      { productId: "PRD-005", productName: "منظف الحمام والمرحاض", quantity: 10, unitPrice: 16.0, total: 160.0 },
+    ],
+    paymentMethod: "كاش",
+    total: 440.0,
+  },
+  {
+    id: "INV-010",
+    date: "2026-03-25T14:00:00Z",
+    vanId: "VAN-001",
+    representativeId: "USR-003",
+    items: [
+      { productId: "PRD-008", productName: "مبيض الملابس كلور", quantity: 25, unitPrice: 11.0, total: 275.0 },
+    ],
+    paymentMethod: "فودافون كاش",
+    transferImage: "",
+    total: 275.0,
+  },
+  {
+    id: "INV-011",
+    date: "2026-03-20T09:15:00Z",
+    vanId: "VAN-001",
+    representativeId: "USR-003",
+    items: [
+      { productId: "PRD-003", productName: "منظف الأرضيات بالصنوبر", quantity: 8, unitPrice: 20.0, total: 160.0 },
+      { productId: "PRD-001", productName: "منظف الأطباق سائل ليمون", quantity: 6, unitPrice: 14.0, total: 84.0 },
+    ],
+    paymentMethod: "كاش",
+    total: 244.0,
+  },
+  {
+    id: "INV-012",
+    date: "2026-03-15T11:30:00Z",
+    vanId: "VAN-002",
+    representativeId: "USR-004",
+    items: [
+      { productId: "PRD-002", productName: "مسحوق غسيل الملابس برايت", quantity: 8, unitPrice: 35.0, total: 280.0 },
+    ],
+    paymentMethod: "فيزا",
+    total: 280.0,
+  },
+  {
+    id: "INV-013",
+    date: "2026-03-10T13:45:00Z",
+    vanId: "VAN-001",
+    representativeId: "USR-003",
+    items: [
+      { productId: "PRD-005", productName: "منظف الحمام والمرحاض", quantity: 15, unitPrice: 16.0, total: 240.0 },
+    ],
+    paymentMethod: "إنستاباي",
+    transferImage: "",
+    total: 240.0,
+  },
+  {
+    id: "INV-014",
     date: "2026-03-03T10:30:00Z",
     vanId: "VAN-001",
     representativeId: "USR-003",
@@ -452,7 +609,7 @@ export let invoices: Invoice[] = [
     total: 110.0,
   },
   {
-    id: "INV-002",
+    id: "INV-015",
     date: "2026-03-03T14:15:00Z",
     vanId: "VAN-001",
     representativeId: "USR-003",
@@ -464,7 +621,7 @@ export let invoices: Invoice[] = [
     total: 48.0,
   },
   {
-    id: "INV-003",
+    id: "INV-016",
     date: "2026-03-02T09:00:00Z",
     vanId: "VAN-002",
     representativeId: "USR-004",
@@ -474,6 +631,115 @@ export let invoices: Invoice[] = [
     ],
     paymentMethod: "فيزا",
     total: 272.0,
+  },
+  // ── February 2026 ──
+  {
+    id: "INV-017",
+    date: "2026-02-25T10:00:00Z",
+    vanId: "VAN-001",
+    representativeId: "USR-003",
+    items: [
+      { productId: "PRD-008", productName: "مبيض الملابس كلور", quantity: 30, unitPrice: 11.0, total: 330.0 },
+      { productId: "PRD-001", productName: "منظف الأطباق سائل ليمون", quantity: 15, unitPrice: 14.0, total: 210.0 },
+    ],
+    paymentMethod: "كاش",
+    total: 540.0,
+  },
+  {
+    id: "INV-018",
+    date: "2026-02-18T14:30:00Z",
+    vanId: "VAN-001",
+    representativeId: "USR-003",
+    items: [
+      { productId: "PRD-003", productName: "منظف الأرضيات بالصنوبر", quantity: 12, unitPrice: 20.0, total: 240.0 },
+    ],
+    paymentMethod: "فيزا",
+    total: 240.0,
+  },
+  {
+    id: "INV-019",
+    date: "2026-02-10T09:30:00Z",
+    vanId: "VAN-002",
+    representativeId: "USR-004",
+    items: [
+      { productId: "PRD-007", productName: "منظف الزجاج والمرايا", quantity: 20, unitPrice: 13.0, total: 260.0 },
+    ],
+    paymentMethod: "إنستاباي",
+    transferImage: "",
+    total: 260.0,
+  },
+  {
+    id: "INV-020",
+    date: "2026-02-05T16:00:00Z",
+    vanId: "VAN-001",
+    representativeId: "USR-003",
+    items: [
+      { productId: "PRD-005", productName: "منظف الحمام والمرحاض", quantity: 20, unitPrice: 16.0, total: 320.0 },
+      { productId: "PRD-008", productName: "مبيض الملابس كلور", quantity: 10, unitPrice: 11.0, total: 110.0 },
+    ],
+    paymentMethod: "كاش",
+    total: 430.0,
+  },
+  // ── January 2026 ──
+  {
+    id: "INV-021",
+    date: "2026-01-20T11:00:00Z",
+    vanId: "VAN-001",
+    representativeId: "USR-003",
+    items: [
+      { productId: "PRD-001", productName: "منظف الأطباق سائل ليمون", quantity: 25, unitPrice: 14.0, total: 350.0 },
+    ],
+    paymentMethod: "كاش",
+    total: 350.0,
+  },
+  {
+    id: "INV-022",
+    date: "2026-01-15T10:15:00Z",
+    vanId: "VAN-001",
+    representativeId: "USR-003",
+    items: [
+      { productId: "PRD-003", productName: "منظف الأرضيات بالصنوبر", quantity: 10, unitPrice: 20.0, total: 200.0 },
+      { productId: "PRD-005", productName: "منظف الحمام والمرحاض", quantity: 5, unitPrice: 16.0, total: 80.0 },
+    ],
+    paymentMethod: "فودافون كاش",
+    transferImage: "",
+    total: 280.0,
+  },
+  // ── December 2025 ──
+  {
+    id: "INV-023",
+    date: "2025-12-20T09:00:00Z",
+    vanId: "VAN-001",
+    representativeId: "USR-003",
+    items: [
+      { productId: "PRD-008", productName: "مبيض الملابس كلور", quantity: 40, unitPrice: 11.0, total: 440.0 },
+    ],
+    paymentMethod: "كاش",
+    total: 440.0,
+  },
+  {
+    id: "INV-024",
+    date: "2025-12-15T14:00:00Z",
+    vanId: "VAN-002",
+    representativeId: "USR-004",
+    items: [
+      { productId: "PRD-002", productName: "مسحوق غسيل الملابس برايت", quantity: 10, unitPrice: 35.0, total: 350.0 },
+      { productId: "PRD-010", productName: "منظف المطبخ متعدد الأغراض", quantity: 8, unitPrice: 22.0, total: 176.0 },
+    ],
+    paymentMethod: "فيزا",
+    total: 526.0,
+  },
+  {
+    id: "INV-025",
+    date: "2025-12-10T10:30:00Z",
+    vanId: "VAN-001",
+    representativeId: "USR-003",
+    items: [
+      { productId: "PRD-001", productName: "منظف الأطباق سائل ليمون", quantity: 18, unitPrice: 14.0, total: 252.0 },
+      { productId: "PRD-005", productName: "منظف الحمام والمرحاض", quantity: 12, unitPrice: 16.0, total: 192.0 },
+    ],
+    paymentMethod: "كاش",
+    total: 444.0,
   },
 ];
 
@@ -615,3 +881,67 @@ export let expenseRecords: ExpenseRecord[] = [
   { id: "EXP-003", date: "2026-03-02", category: "تالف", amount: 120, notes: "تالف منظف زجاج (2 حبة)", status: "مدفوع" },
   { id: "EXP-004", date: "2026-03-01", category: "سلف", amount: 500, notes: "سلفة للمندوب خالد إبراهيم", status: "مدفوع" },
 ];
+
+// ─── Fake API Data for Accountant Pages ────────────────────────────────────────
+
+export const fakeExpensesData = [
+  { id: 1, date: "2026-03-03T10:00:00", categoryName: "بنزين", categoryId: 1, vehiclePlate: "أ ب ج 1234", vehicleId: 1, statement: "تموين سيارة ١", amount: 350 },
+  { id: 2, date: "2026-03-03T12:00:00", categoryName: "صيانة", categoryId: 2, vehiclePlate: "د ه و 5678", vehicleId: 2, statement: "تغيير زيت", amount: 1500 },
+  { id: 3, date: "2026-03-02T09:00:00", categoryName: "نثريات", categoryId: 3, vehiclePlate: "بدون عربية", vehicleId: null, statement: "شراء أدوات مكتبية", amount: 200 },
+  { id: 4, date: "2026-03-04T15:30:00", categoryName: "رواتب", categoryId: 4, vehiclePlate: "بدون عربية", vehicleId: null, statement: "سلفة مندوب", amount: 1000 },
+  { id: 5, date: "2026-03-05T11:00:00", categoryName: "بنزين", categoryId: 1, vehiclePlate: "م ن س 7890", vehicleId: 5, statement: "تموين سيارة ٥", amount: 450 },
+  { id: 6, date: "2026-03-06T14:15:00", categoryName: "مخالفات", categoryId: 5, vehiclePlate: "ع غ ف 2345", vehicleId: 6, statement: "مخالفة سرعة", amount: 800 },
+  { id: 7, date: "2026-03-07T08:45:00", categoryName: "تالف", categoryId: 6, vehiclePlate: "بدون عربية", vehicleId: null, statement: "تالف بضاعة مستودع", amount: 1200 },
+  { id: 8, date: "2026-03-08T16:20:00", categoryName: "كهرباء", categoryId: 7, vehiclePlate: "بدون عربية", vehicleId: null, statement: "فاتورة كهرباء فرع الرئيسي", amount: 3500 },
+  { id: 9, date: "2026-03-09T10:10:00", categoryName: "صيانة", categoryId: 2, vehiclePlate: "أ ب ج 1234", vehicleId: 1, statement: "صيانة دورية", amount: 2500 }
+];
+
+export const fakeExpensesLookups = {
+  employees: [
+    { categoryId: 1, categoryName: "بنزين" },
+    { categoryId: 2, categoryName: "صيانة" },
+    { categoryId: 3, categoryName: "نثريات" },
+    { categoryId: 4, categoryName: "رواتب" },
+    { categoryId: 5, categoryName: "مخالفات" },
+    { categoryId: 6, categoryName: "تالف" },
+    { categoryId: 7, categoryName: "كهرباء" },
+  ],
+  vehicles: [
+    { vehicleId: 1, plateNumber: "أ ب ج 1234" },
+    { vehicleId: 2, plateNumber: "د ه و 5678" },
+    { vehicleId: 3, plateNumber: "ز ح ط 9012" },
+    { vehicleId: 4, plateNumber: "ي ك ل 3456" },
+    { vehicleId: 5, plateNumber: "م ن س 7890" },
+    { vehicleId: 6, plateNumber: "ع غ ف 2345" },
+  ]
+};
+
+export const fakeReceiptsData = [
+  { receiptId: 1, date: "2026-03-03T16:00:00", amount: 4850, statement: "توريد مبيعات اليوم", employeeName: "أحمد محمد السعيد", employeeId: 3, vehiclePlate: "أ ب ج 1234", vehicleId: 1 },
+  { receiptId: 2, date: "2026-03-03T16:15:00", amount: 3620, statement: "توريد مبيعات اليوم", employeeName: "محمد علي البحيري", employeeId: 4, vehiclePlate: "د ه و 5678", vehicleId: 2 },
+  { receiptId: 3, date: "2026-03-02T15:30:00", amount: 5200, statement: "توريد مبيعات مسائية", employeeName: "فيصل محمد الجمال", employeeId: 8, vehiclePlate: "ع غ ف 2345", vehicleId: 6 },
+  { receiptId: 4, date: "2026-03-04T14:20:00", amount: 1500, statement: "سداد مديونية عميل", employeeName: "أحمد محمد السعيد", employeeId: 3, vehiclePlate: "أ ب ج 1234", vehicleId: 1 },
+  { receiptId: 5, date: "2026-03-05T17:00:00", amount: 7400, statement: "توريد مبيعات الجملة", employeeName: "محمد علي البحيري", employeeId: 4, vehiclePlate: "د ه و 5678", vehicleId: 2 },
+  { receiptId: 6, date: "2026-03-06T15:45:00", amount: 6300, statement: "مبيعات نقدية إضافية", employeeName: "خالد إبراهيم سلامة", employeeId: 5, vehiclePlate: "ز ح ط 9012", vehicleId: 3 },
+  { receiptId: 7, date: "2026-03-07T16:30:00", amount: 9200, statement: "توريد المبيعات", employeeName: "فيصل محمد الجمال", employeeId: 8, vehiclePlate: "ع غ ف 2345", vehicleId: 6 },
+  { receiptId: 8, date: "2026-04-10T15:00:00", amount: 12500, statement: "مبيعات أسبوعية", employeeName: "أحمد محمد السعيد", employeeId: 3, vehiclePlate: "أ ب ج 1234", vehicleId: 1 },
+  { receiptId: 9, date: "2026-04-11T13:20:00", amount: 3400, statement: "تحصيل فوري", employeeName: "خالد إبراهيم سلامة", employeeId: 5, vehiclePlate: "ز ح ط 9012", vehicleId: 3 },
+  { receiptId: 10, date: "2026-04-11T16:00:00", amount: 8800, statement: "توريد اليوم", employeeName: "فيصل محمد الجمال", employeeId: 8, vehiclePlate: "ع غ ف 2345", vehicleId: 6 }
+];
+
+export const fakeReceiptsLookups = {
+  employees: [
+    { employeeId: 3, fullName: "أحمد محمد السعيد" },
+    { employeeId: 4, fullName: "محمد علي البحيري" },
+    { employeeId: 5, fullName: "خالد إبراهيم سلامة" },
+    { employeeId: 8, fullName: "فيصل محمد الجمال" }
+  ],
+  vehicles: [
+    { vehicleId: 1, plateNumber: "أ ب ج 1234" },
+    { vehicleId: 2, plateNumber: "د ه و 5678" },
+    { vehicleId: 3, plateNumber: "ز ح ط 9012" },
+    { vehicleId: 4, plateNumber: "ي ك ل 3456" },
+    { vehicleId: 5, plateNumber: "م ن س 7890" },
+    { vehicleId: 6, plateNumber: "ع غ ف 2345" },
+  ]
+};

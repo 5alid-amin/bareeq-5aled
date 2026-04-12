@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { ArrowUpFromLine, Search, Plus, CheckCircle, X, Edit2, Trash2, Loader2, ChevronRight, ChevronLeft } from "lucide-react"; 
 import axios from "axios";
+import { fakeExpensesData, fakeExpensesLookups } from "../../data/mockData";
 
 export function AccountsPayablePage() {
   const [expenses, setExpenses] = useState<any[]>([]);
@@ -37,33 +38,38 @@ export function AccountsPayablePage() {
   const fetchExpenses = async () => {
     setLoading(true);
     try {
-      const response = await axios.get(`https://localhost:7280/api/Expense/GetAll`, {
-        params: {
-          search: searchTerm,
-          day: filterDay || null,
-          month: filterMonth || null,
-          year: filterYear || null,
-          pageNumber: pageNumber, 
-          pageSize: pageSize      
+      // Fake API request
+      setTimeout(() => {
+        let filteredData = fakeExpensesData;
+        if (searchTerm) {
+          filteredData = filteredData.filter(d => 
+            d.categoryName.includes(searchTerm) || d.statement.includes(searchTerm)
+          );
         }
-      });
-      setExpenses(response.data.data);
-      setTotalAmount(response.data.totalAmount);
-      setTotalRecords(response.data.totalRecords);
+        
+        const total = filteredData.reduce((acc, curr) => acc + curr.amount, 0);
+        
+        // Basic pagination logic
+        const start = (pageNumber - 1) * pageSize;
+        const pagedData = filteredData.slice(start, start + pageSize);
+
+        setExpenses(pagedData);
+        setTotalAmount(total);
+        setTotalRecords(filteredData.length);
+        setLoading(false);
+      }, 500);
     } catch (error) {
       console.error("Error fetching data:", error);
-    } finally {
       setLoading(false);
     }
   };
 
   const fetchLookups = async () => {
     try {
-      const response = await axios.get(`https://localhost:7280/api/Expense/GetLookupData`);
-      if (response.data) {
-        setCategories(response.data.employees || []); 
-        setVehicles(response.data.vehicles || []);
-      }
+      setTimeout(() => {
+        setCategories(fakeExpensesLookups.employees || []); 
+        setVehicles(fakeExpensesLookups.vehicles || []);
+      }, 500);
     } catch (error) {
       console.error("Error fetching lookup data:", error);
     }
@@ -82,7 +88,8 @@ export function AccountsPayablePage() {
   const handleDelete = async (id: number) => {
     if (window.confirm("هل أنت متأكد من حذف هذا المصروف نهائياً؟")) {
       try {
-        await axios.delete(`https://localhost:7280/api/Expense/Delete?id=${id}`);
+        // Fake delete
+        alert("تم الحذف بنجاح (وهمي)");
         fetchExpenses(); 
       } catch (error) {
         alert("حدث خطأ أثناء الحذف");
@@ -93,9 +100,8 @@ export function AccountsPayablePage() {
   const handleAddCategory = async () => {
     if (newCategoryName.trim()) {
       try {
-        await axios.post(`https://localhost:7280/api/Expense/CreateCategory`, {
-          categoryName: newCategoryName.trim()
-        });
+        // Fake add category
+        alert("تم إضافة الفئة بنجاح (وهمي)");
         await fetchLookups(); 
         setNewCategoryName("");
         setShowCategoryModal(false);
@@ -109,25 +115,12 @@ export function AccountsPayablePage() {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
     
-    const payload = {
-      categoryId: parseInt(formData.get("categoryId") as string),
-      vehicleId: isVehicleLinked ? parseInt(formData.get("vehicleId") as string) : null,
-      amount: parseFloat(formData.get("amount") as string),
-      date: formData.get("date"),
-      statement: formData.get("statement")
-    };
-
-    try {
-      if (editingExpense) {
-        await axios.put(`https://localhost:7280/api/Expense/Update?id=${editingExpense.id}`, payload);
-      } else {
-        await axios.post(`https://localhost:7280/api/Expense/Create`, payload);
-      }
-      setShowModal(false);
-      fetchExpenses();
-    } catch (error) {
-      alert("حدث خطأ أثناء حفظ البيانات");
-    }
+    // Fake save
+    setTimeout(() => {
+        alert(editingExpense ? "تم التحديث بنجاح (وهمي)" : "تم الحفظ بنجاح (وهمي)");
+        setShowModal(false);
+        fetchExpenses();
+    }, 500);
   };
 
   const handleEdit = (expense: any) => {

@@ -20,7 +20,7 @@ export function ManagerDashboard({ onNavigate }: { onNavigate: (page: string) =>
         <KPICard
           title="إجمالي الفانات"
           value={vans.length}
-          subtitle="في الأسطول"
+          subtitle="في"
           icon={<Truck size={22} />}
           color="blue"
           trend={{ value: "1 فان جديدة", positive: true }}
@@ -115,7 +115,7 @@ export function ManagerDashboard({ onNavigate }: { onNavigate: (page: string) =>
 
         {/* Van Status Donut Summary */}
         <div className="bg-white rounded-xl border border-slate-100 shadow-sm p-5">
-          <h2 className="text-slate-700 text-base mb-4">حالة الأسطول</h2>
+          <h2 className="text-slate-700 text-base mb-4">حالة المركبات</h2>
           <div className="space-y-3">
             {[
               { label: "نشطة", count: vans.filter(v => v.status === "نشطة").length, color: "bg-emerald-500", textColor: "text-emerald-700", barColor: "bg-emerald-100" },
@@ -140,7 +140,7 @@ export function ManagerDashboard({ onNavigate }: { onNavigate: (page: string) =>
             </div>
             <div className="text-center">
               <p className="text-2xl text-emerald-600">94%</p>
-              <p className="text-xs text-slate-400 mt-0.5">كفاءة الأسطول</p>
+              <p className="text-xs text-slate-400 mt-0.5">كفاءة المركبات</p>
             </div>
           </div>
         </div>

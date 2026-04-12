@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Plus, RefreshCw, Clock, CheckCircle, XCircle, Package, Send } from "lucide-react";
+import { Plus, RefreshCw, Clock, CheckCircle, XCircle, Package, Send, Pencil, Trash2 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import { vanInventory, products, restockRequests as initialRequests, RestockRequest } from "../../data/mockData";
 
@@ -13,10 +13,27 @@ export function RestockRequestPage() {
     );
 
     const [showForm, setShowForm] = useState(false);
+    const [editingRequestId, setEditingRequestId] = useState<string | null>(null);
     const [selectedProduct, setSelectedProduct] = useState("");
     const [quantity, setQuantity] = useState("");
     const [notes, setNotes] = useState("");
     const [loading, setLoading] = useState(false);
+
+    const handleOpenForm = () => {
+        setEditingRequestId(null);
+        setSelectedProduct("");
+        setQuantity("");
+        setNotes("");
+        setShowForm(true);
+    };
+
+    const handleCloseForm = () => {
+        setShowForm(false);
+        setEditingRequestId(null);
+        setSelectedProduct("");
+        setQuantity("");
+        setNotes("");
+    };
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -26,30 +43,58 @@ export function RestockRequestPage() {
         const product = products.find(p => p.id === selectedProduct);
 
         setTimeout(() => {
-            const newRequest: RestockRequest = {
-                id: `REQ-${String(initialRequests.length + requests.length + 1).padStart(3, "0")}`,
-                vanId: assignedVanId,
-                representativeId: user?.id || "TEMP",
-                representativeName: user?.name || "المندوب",
-                items: [
-                    {
-                        productId: selectedProduct,
-                        productName: product?.name || "غير معروف",
-                        requestedQty: parseInt(quantity)
-                    }
-                ],
-                requestDate: new Date().toISOString(),
-                notes: notes,
-                status: "معلق"
-            };
-
-            setRequests([newRequest, ...requests]);
+            if (editingRequestId) {
+                // Update existing request
+                setRequests(requests.map(r => r.id === editingRequestId ? {
+                    ...r,
+                    items: [
+                        {
+                            productId: selectedProduct,
+                            productName: product?.name || "غير معروف",
+                            requestedQty: parseInt(quantity)
+                        }
+                    ],
+                    notes: notes,
+                } : r));
+            } else {
+                // Create new request
+                const newRequest: RestockRequest = {
+                    id: `REQ-${String(initialRequests.length + requests.length + 1).padStart(3, "0")}`,
+                    vanId: assignedVanId,
+                    representativeId: user?.id || "TEMP",
+                    representativeName: user?.name || "المندوب",
+                    items: [
+                        {
+                            productId: selectedProduct,
+                            productName: product?.name || "غير معروف",
+                            requestedQty: parseInt(quantity)
+                        }
+                    ],
+                    requestDate: new Date().toISOString(),
+                    notes: notes,
+                    status: "معلق"
+                };
+                setRequests([newRequest, ...requests]);
+            }
+            
             setLoading(false);
-            setShowForm(false);
-            setSelectedProduct("");
-            setQuantity("");
-            setNotes("");
+            handleCloseForm();
         }, 800);
+    };
+
+    const handleEdit = (req: RestockRequest) => {
+        setEditingRequestId(req.id);
+        setSelectedProduct(req.items[0]?.productId || "");
+        setQuantity(req.items[0]?.requestedQty.toString() || "");
+        setNotes(req.notes || "");
+        setShowForm(true);
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    };
+
+    const handleDelete = (id: string) => {
+        if (confirm("هل أنت متأكد من حذف هذا الطلب؟")) {
+            setRequests(requests.filter(r => r.id !== id));
+        }
     };
 
     const getStatusBadge = (status: RestockRequest["status"]) => {
@@ -79,7 +124,7 @@ export function RestockRequestPage() {
                 </div>
                 {!showForm && (
                     <button
-                        onClick={() => setShowForm(true)}
+                        onClick={handleOpenForm}
                         className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-xl text-sm font-medium transition-colors flex items-center gap-2 shadow-sm"
                     >
                         <Plus size={18} />
@@ -91,8 +136,10 @@ export function RestockRequestPage() {
             {showForm && (
                 <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden animate-in fade-in slide-in-from-top-4 duration-300">
                     <div className="px-6 py-4 border-b border-slate-100 bg-slate-50/50 flex items-center justify-between">
-                        <h3 className="text-slate-700 font-medium">إنشاء طلب تعبئة جديد</h3>
-                        <button onClick={() => setShowForm(false)} className="text-slate-400 hover:text-slate-600 transition-colors">
+                        <h3 className="text-slate-700 font-medium">
+                            {editingRequestId ? "تعديل طلب تعبئة" : "إنشاء طلب تعبئة جديد"}
+                        </h3>
+                        <button onClick={handleCloseForm} className="text-slate-400 hover:text-slate-600 transition-colors">
                             <XCircle size={20} />
                         </button>
                     </div>
@@ -143,7 +190,7 @@ export function RestockRequestPage() {
                         <div className="flex justify-end gap-3 pt-2">
                             <button
                                 type="button"
-                                onClick={() => setShowForm(false)}
+                                onClick={handleCloseForm}
                                 className="px-6 py-2.5 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-100 transition-colors"
                             >
                                 إلغاء
@@ -153,8 +200,8 @@ export function RestockRequestPage() {
                                 disabled={loading}
                                 className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-2.5 rounded-xl text-sm font-medium transition-colors flex items-center gap-2 shadow-sm disabled:opacity-50"
                             >
-                                {loading ? "جاري الإرسال..." : "إرسال الطلب"}
-                                {!loading && <Send size={16} />}
+                                {loading ? "جاري الحفظ..." : (editingRequestId ? "حفظ التعديلات" : "إرسال الطلب")}
+                                {!loading && (editingRequestId ? <CheckCircle size={16} /> : <Send size={16} />)}
                             </button>
                         </div>
                     </form>
@@ -174,12 +221,13 @@ export function RestockRequestPage() {
                                 <th className="px-6 py-4 text-xs font-semibold text-slate-500">المنتجات</th>
                                 <th className="px-6 py-4 text-xs font-semibold text-slate-500">الحالة</th>
                                 <th className="px-6 py-4 text-xs font-semibold text-slate-500">ملاحظات الإدارة</th>
+                                <th className="px-6 py-4 text-xs font-semibold text-slate-500 text-center">إجراءات</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-100">
                             {requests.length > 0 ? (
                                 requests.map((req) => (
-                                    <tr key={req.id} className="hover:bg-slate-50/50 transition-colors">
+                                    <tr key={req.id} className="hover:bg-slate-50/50 transition-colors group">
                                         <td className="px-6 py-4">
                                             <span className="text-xs font-medium text-slate-500 bg-slate-100 px-2.5 py-1 rounded-md">
                                                 {req.id}
@@ -202,11 +250,29 @@ export function RestockRequestPage() {
                                         <td className="px-6 py-4 text-sm text-slate-400 italic">
                                             {req.notes || "—"}
                                         </td>
+                                        <td className="px-6 py-4">
+                                            <div className="flex items-center justify-center gap-2">
+                                                <button
+                                                    onClick={() => handleEdit(req)}
+                                                    title="تعديل طلب التعبئة"
+                                                    className="p-2 rounded-lg text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-all opacity-60 group-hover:opacity-100"
+                                                >
+                                                    <Pencil size={15} />
+                                                </button>
+                                                <button
+                                                    onClick={() => handleDelete(req.id)}
+                                                    title="حذف طلب التعبئة"
+                                                    className="p-2 rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50 transition-all opacity-60 group-hover:opacity-100"
+                                                >
+                                                    <Trash2 size={15} />
+                                                </button>
+                                            </div>
+                                        </td>
                                     </tr>
                                 ))
                             ) : (
                                 <tr>
-                                    <td colSpan={5} className="px-6 py-12 text-center text-slate-500 text-sm font-medium">
+                                    <td colSpan={6} className="px-6 py-12 text-center text-slate-500 text-sm font-medium">
                                         لا توجد طلبات سابقة.
                                     </td>
                                 </tr>
