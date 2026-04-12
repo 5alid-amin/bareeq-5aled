@@ -48,28 +48,6 @@ export function RepresentativeDashboard({ onNavigate }: Props) {
 
     return (
         <div className="space-y-6">
-            {/* Low Stock Alert Banner */}
-            {lowStockItems.length > 0 && (
-                <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 flex items-center justify-between gap-4 shadow-sm animate-pulse">
-                    <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center text-amber-600 flex-shrink-0">
-                            <AlertTriangle size={20} />
-                        </div>
-                        <div>
-                            <h4 className="text-amber-800 font-medium text-sm">تنبيه: مخزون منخفض</h4>
-                            <p className="text-amber-600 text-xs mt-0.5">لديك {lowStockItems.length} أصناف أوشكت على النفاذ في المركبة.</p>
-                        </div>
-                    </div>
-                    <button
-                        onClick={() => onNavigate("rep-restock")}
-                        className="bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 rounded-xl text-xs font-medium transition-colors flex items-center gap-2 flex-shrink-0"
-                    >
-                        <RefreshCw size={14} />
-                        طلب تعبئة الآن
-                    </button>
-                </div>
-            )}
-
             {/* Top section: Welcome & Vehicle Info */}
             <div className="bg-gradient-to-l from-cyan-600 to-blue-700 rounded-2xl p-6 text-white shadow-lg relative overflow-hidden">
                 <div className="absolute top-0 right-0 w-64 h-64 bg-white opacity-5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3" />
@@ -94,7 +72,7 @@ export function RepresentativeDashboard({ onNavigate }: Props) {
             </div>
 
             {/* KPIs */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 <KPICard
                     title="مبيعات اليوم"
                     value={`ج.م ${todaySalesValue.toLocaleString()}`}
@@ -107,12 +85,6 @@ export function RepresentativeDashboard({ onNavigate }: Props) {
                     value={totalItemsInVan.toLocaleString()}
                     icon={<Package size={20} />}
                     color="blue"
-                />
-                <KPICard
-                    title="عهدتي (نقود)"
-                    value={`ج.م ${myVan.openingBalance.toLocaleString()}`}
-                    icon={<DollarSign size={20} />}
-                    color="orange"
                 />
                 <KPICard
                     title="عمليات البيع اليوم"
