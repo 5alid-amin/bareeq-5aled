@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { ArrowDownToLine, Search, Plus, CheckCircle, X, Edit2, Trash2, ChevronRight, ChevronLeft } from "lucide-react"; 
-import { fakeReceiptsData, fakeReceiptsLookups } from "../../data/mockData";
 
 // تأكد من صحة مسار الـ API الخاص بك
 const API_BASE_URL = "https://localhost:7280/api";
@@ -43,10 +42,12 @@ export function AccountsReceivablePage() {
 
   const fetchLookupData = async () => {
     try {
-      setTimeout(() => {
-        setRepresentatives(fakeReceiptsLookups.employees || []);
-        setCars(fakeReceiptsLookups.vehicles || []);
-      }, 500);
+      const response = await fetch(`${API_BASE_URL}/Revenue/GetLookupData`);
+      if (response.ok) {
+        const data = await response.json();
+        setRepresentatives(data.employees);
+        setCars(data.vehicles);
+      }
     } catch (error) {
       console.error("Error fetching lookup data:", error);
     }
@@ -55,27 +56,28 @@ export function AccountsReceivablePage() {
   const fetchReceipts = async () => {
     setIsLoading(true);
     try {
-      setTimeout(() => {
-        let filteredData = fakeReceiptsData;
-        if (searchTerm) {
-          filteredData = filteredData.filter(d => 
-            d.employeeName.includes(searchTerm) || d.statement.includes(searchTerm) || d.vehiclePlate.includes(searchTerm)
-          );
-        }
-        
-        // Basic pagination logic
-        const start = (currentPage - 1) * pageSize;
-        const pagedData = filteredData.slice(start, start + pageSize);
+      const queryParams = new URLSearchParams();
+      if (filterDay) queryParams.append('day', filterDay);
+      if (filterMonth) queryParams.append('month', filterMonth);
+      if (filterYear) queryParams.append('year', filterYear);
+      if (searchTerm) queryParams.append('search', searchTerm);
+      
+      // إرسال معلومات الصفحة
+      queryParams.append('pageNumber', currentPage.toString());
+      queryParams.append('pageSize', pageSize.toString());
 
-        setReceipts(pagedData); 
+      const response = await fetch(`${API_BASE_URL}/Revenue/GetAll?${queryParams.toString()}`);
+      if (response.ok) {
+        const result = await response.json();
+        setReceipts(result.data || []); 
         
-        // Update pagination info
-        setTotalRecords(filteredData.length);
-        setTotalPages(Math.ceil((filteredData.length) / pageSize) || 1);
-        setIsLoading(false);
-      }, 500);
+        // تحديث معلومات الصفحات من الـ API
+        setTotalRecords(result.totalRecords || 0);
+        setTotalPages(Math.ceil((result.totalRecords || 0) / pageSize));
+      }
     } catch (error) {
       console.error("Error fetching data:", error);
+    } finally {
       setIsLoading(false);
     }
   };
@@ -89,21 +91,47 @@ export function AccountsReceivablePage() {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
     
-    // Fake save
-    setTimeout(() => {
-        alert(editingReceipt ? "تم التحديث بنجاح (وهمي)" : "تم الحفظ بنجاح (وهمي)");
+    const payload = {
+      employeeId: parseInt(formData.get("employeeId") as string),
+      vehicleId: parseInt(formData.get("vehicleId") as string),
+      amount: parseFloat(formData.get("amount") as string),
+      date: formData.get("date"),
+      statement: formData.get("notes") 
+    };
+
+    try {
+      const url = editingReceipt 
+        ? `${API_BASE_URL}/Revenue/Update?id=${editingReceipt.receiptId}` 
+        : `${API_BASE_URL}/Revenue/Create`;
+      
+      const method = editingReceipt ? 'PUT' : 'POST';
+
+      const response = await fetch(url, {
+        method: method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      if (response.ok) {
         setShowModal(false);
         setEditingReceipt(null);
         fetchReceipts();
-    }, 500);
+      } else {
+        const errorData = await response.json();
+        alert("فشل الحفظ: " + (errorData.title || "خطأ غير معروف"));
+      }
+    } catch (error) {
+      console.error("Error saving:", error);
+    }
   };
 
   const handleDelete = async (id: number) => {
     if (window.confirm("هل أنت متأكد من حذف هذا السجل؟")) {
       try {
-        // Fake Delete
-        alert("تم الحذف بنجاح (وهمي)");
-        fetchReceipts();
+        const response = await fetch(`${API_BASE_URL}/Revenue/Delete?id=${id}`, { method: 'DELETE' });
+        if (response.ok) {
+          fetchReceipts();
+        }
       } catch (error) {
         console.error("Error deleting:", error);
       }
@@ -225,7 +253,7 @@ export function AccountsReceivablePage() {
                           <td className="px-6 py-4">
                             <div className="flex items-center justify-center gap-2">
                               <button onClick={() => handleEdit(receipt)} className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg"><Edit2 size={18} /></button>
-                              <button onClick={() => handleDelete(receipt.receiptId)} className="p-2 text-red-600 hover:bg-red-50 rounded-lg"><Trash2 size={18} /></button>
+                              <button onClick={() => handleDelete(receipt.receiptId)} className="p-2 text-teal-600 hover:bg-teal-50 rounded-lg"><Trash2 size={18} /></button>
                             </div>
                           </td>
                       </tr>

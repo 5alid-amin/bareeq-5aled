@@ -58,7 +58,7 @@ const repNav: NavItem[] = [
 const accountantNav: NavItem[] = [
   { id: "accountant/ledger", label: "الرئيسيه", icon: <BookOpen size={18} /> },
   { id: "accountant/receivable", label: "الواردات", icon: <ArrowDownToLine size={18} /> },
-  { id: "accountant/payable", label: "الصادرات", icon: <ArrowUpFromLine size={18} /> },
+  { id: "accountant/payable", label: "المصروفات", icon: <ArrowUpFromLine size={18} /> },
   { id: "accountant/payroll", label: "المرتبات", icon: <Wallet size={18} /> },
   { id: "accountant/employees", label: "العاملين  ", icon: <Users size={18} /> },
 ];
