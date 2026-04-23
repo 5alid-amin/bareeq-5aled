@@ -7,8 +7,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { KPICard } from '../../components/KPICard';
 
 // الإعدادات الأساسية لـ Axios
+// baseURL: import.meta.env.VITE_API_URL
 const api = axios.create({
     baseURL: 'https://localhost:7280/api' // تأكد من المنفذ (Port) الخاص بك
+    // baseURL: import.meta.env.VITE_API_URL
 });
 
 export default function EmployeesPage() {

@@ -10,7 +10,7 @@ export function GeneralLedgerPage() {
   
   // الحالات لتخزين بيانات الـ API (مع قيم افتراضية عشان الكود ما يضربش)
   const [summary, setSummary] = useState({ totalRevenue: 0, totalExpenses: 0, netProfit: 0 });
-  const [expenseData, setExpenseData] = useState({ total: 0, details: [], percentages: [] });
+  const [expenseData, setExpenseData] = useState<{ total: number; details: Array<{ name: string; value: number }>; percentages: number[] }>({ total: 0, details: [], percentages: [] });
   const [topVehicle, setTopVehicle] = useState({ vehicleName: "---", totalRevenue: 0 });
   const [loading, setLoading] = useState(false);
 
@@ -19,7 +19,7 @@ export function GeneralLedgerPage() {
     setLoading(true);
     try {
       const now = new Date();
-      const params = {};
+      const params: { day?: number; month?: number; year?: number } = {};
       
       // تجهيز البارامترز حسب اختيارك
       if (filter === 'day') params.day = now.getDate();
@@ -33,6 +33,12 @@ export function GeneralLedgerPage() {
         axios.get("https://localhost:7280/api/Dashboard/expenses-analytics", { params }),
         axios.get("https://localhost:7280/api/Dashboard/top-performing-vehicle", { params })
       ]);
+
+      //       const [resSummary, resAnalytics, resVehicle] = await Promise.all([
+      //   axios.get("${import.meta.env.VITE_API_URL}/Dashboard/summary", { params }),
+      //   axios.get("${import.meta.env.VITE_API_URL}/Dashboard/expenses-analytics", { params }),
+      //   axios.get("${import.meta.env.VITE_API_URL}/Dashboard/top-performing-vehicle", { params })
+      // ]);
 
       setSummary(resSummary.data);
       setExpenseData(resAnalytics.data);

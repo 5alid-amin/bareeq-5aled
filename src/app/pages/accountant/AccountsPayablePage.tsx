@@ -37,6 +37,8 @@ export function AccountsPayablePage() {
   const fetchExpenses = async () => {
     setLoading(true);
     try {
+      
+      // const response = await axios.get(`${import.meta.env.VITE_API_URL}/Expense/GetAll`, {
       const response = await axios.get(`https://localhost:7280/api/Expense/GetAll`, {
         params: {
           search: searchTerm,
@@ -59,7 +61,7 @@ export function AccountsPayablePage() {
 
   const fetchLookups = async () => {
     try {
-      const response = await axios.get(`https://localhost:7280/api/Expense/GetLookupData`);
+      const response = await axios.get(`${import.meta.env.VITE_API_URL}/Expense/GetLookupData`);
       if (response.data) {
         setCategories(response.data.employees || []); 
         setVehicles(response.data.vehicles || []);
@@ -82,7 +84,7 @@ export function AccountsPayablePage() {
   const handleDelete = async (id: number) => {
     if (window.confirm("هل أنت متأكد من حذف هذا المصروف نهائياً؟")) {
       try {
-        await axios.delete(`https://localhost:7280/api/Expense/Delete?id=${id}`);
+        await axios.delete(`${import.meta.env.VITE_API_URL}/Expense/Delete?id=${id}`);
         fetchExpenses(); 
       } catch (error) {
         alert("حدث خطأ أثناء الحذف");
@@ -93,7 +95,7 @@ export function AccountsPayablePage() {
   const handleAddCategory = async () => {
     if (newCategoryName.trim()) {
       try {
-        await axios.post(`https://localhost:7280/api/Expense/CreateCategory`, {
+        await axios.post(`${import.meta.env.VITE_API_URL}/Expense/CreateCategory`, {
           categoryName: newCategoryName.trim()
         });
         await fetchLookups(); 
@@ -119,9 +121,9 @@ export function AccountsPayablePage() {
 
     try {
       if (editingExpense) {
-        await axios.put(`https://localhost:7280/api/Expense/Update?id=${editingExpense.id}`, payload);
+        await axios.put(`${import.meta.env.VITE_API_URL}/Expense/Update?id=${editingExpense.id}`, payload);
       } else {
-        await axios.post(`https://localhost:7280/api/Expense/Create`, payload);
+        await axios.post(`${import.meta.env.VITE_API_URL}/Expense/Create`, payload);
       }
       setShowModal(false);
       fetchExpenses();
