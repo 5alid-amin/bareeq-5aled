@@ -1,73 +1,94 @@
-import React, { useState } from "react";
-import { Search, Filter, ArrowLeftRight, TrendingUp, TrendingDown, ArrowUpRight, ArrowDownRight, Archive, AlertTriangle, Calendar, ChevronDown, RefreshCw } from "lucide-react";
-import { stockMovements, StockMovementType } from "../../data/mockData";
+import React, { useState, useEffect } from "react";
+import { Search, Filter, ArrowLeftRight, TrendingUp, TrendingDown, ArrowUpRight, ArrowDownRight, Archive, AlertTriangle, Calendar, ChevronDown, RefreshCw, Loader2 } from "lucide-react";
+import axios from "axios";
 
-type MovementFilterGroup = "الكل" | "وارد" | "منصرف" | StockMovementType;
+// التعريفات المطابقة لـ Response الـ API اللي في الصورة
+interface InventoryMovement {
+  transactionId: number;
+  createdDate: string;
+  transactionType: string;
+  productName: string;
+  productCode: string;
+  quantity: number;
+  balanceBefore: number;
+  balanceAfter: number;
+  reference: string;
+  notes: string;
+}
+
+type MovementFilterGroup = "الكل" | "وارد" | "منصرف" | string;
 
 export function StockMovementsPage() {
+  const [movements, setMovements] = useState<InventoryMovement[]>([]);
+  const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterType, setFilterType] = useState<MovementFilterGroup>("الكل");
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
 
-  const filteredMovements = stockMovements.filter((mov) => {
-    const matchesSearch = 
-        mov.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        mov.productName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        (mov.referenceId && mov.referenceId.toLowerCase().includes(searchTerm.toLowerCase())) ||
-        (mov.vanName && mov.vanName.toLowerCase().includes(searchTerm.toLowerCase()));
-    
-    let matchesType = true;
-    if (filterType === "وارد") {
-        matchesType = mov.type === "تزويد" || mov.type === "مرتجع";
-    } else if (filterType === "منصرف") {
-        matchesType = mov.type === "صرف لسيارة" || mov.type === "هالك";
-    } else if (filterType !== "الكل") {
-        matchesType = mov.type === filterType;
+  // الرابط من واقع صورة الـ Swagger
+  const API_URL = "https://localhost:7280/api/InventoryTransactions/GetTransactionsHistory";
+
+  const fetchMovements = async () => {
+    setLoading(true);
+    try {
+      const response = await axios.get(API_URL, {
+        params: {
+          searchTerm: searchTerm || undefined,
+          type: filterType === "الكل" ? undefined : filterType,
+          fromDate: dateFrom || undefined,
+          toDate: dateTo || undefined
+        }
+      });
+      setMovements(response.data);
+    } catch (error) {
+      console.error("Error fetching data from Bareeq API:", error);
+    } finally {
+      setLoading(false);
     }
+  };
 
-    let matchesDateRange = true;
-    const movDate = mov.date.split("T")[0];
-    if (dateFrom && movDate < dateFrom) matchesDateRange = false;
-    if (dateTo && movDate > dateTo) matchesDateRange = false;
+  useEffect(() => {
+    const delayDebounce = setTimeout(() => {
+      fetchMovements();
+    }, 400); 
+    return () => clearTimeout(delayDebounce);
+  }, [searchTerm, filterType, dateFrom, dateTo]);
 
-    return matchesSearch && matchesType && matchesDateRange;
-  });
-
-  const getMovementIcon = (type: StockMovementType) => {
+  const getMovementIcon = (type: string) => {
     switch (type) {
       case "تزويد": return <ArrowUpRight size={16} />;
       case "صرف لسيارة": return <ArrowDownRight size={16} />;
       case "مرتجع": return <Archive size={16} />;
       case "هالك": return <AlertTriangle size={16} />;
+      default: return <ArrowLeftRight size={16} />;
     }
   };
 
-  const getMovementColor = (type: StockMovementType) => {
+  const getMovementColor = (type: string) => {
     switch (type) {
       case "تزويد": return "text-emerald-600 bg-emerald-50 border-emerald-100";
       case "صرف لسيارة": return "text-blue-600 bg-blue-50 border-blue-100";
       case "مرتجع": return "text-amber-600 bg-amber-50 border-amber-100";
       case "هالك": return "text-rose-600 bg-rose-50 border-rose-100";
+      default: return "text-slate-500 bg-slate-50 border-slate-100";
     }
   };
 
-  // Stats
-  const totalCount = stockMovements.length;
-  const inCount = stockMovements.filter(m => m.type === "تزويد" || m.type === "مرتجع").length;
-  const outCount = stockMovements.filter(m => m.type === "صرف لسيارة" || m.type === "هالك").length;
-
-  const hasActiveFilters = filterType !== "الكل" || dateFrom || dateTo || searchTerm;
+  // Stats (Calculated from fetched data)
+  const totalCount = movements.length;
+  const inCount = movements.filter(m => m.transactionType === "تزويد" || m.transactionType === "مرتجع").length;
+  const outCount = movements.filter(m => m.transactionType === "صرف لسيارة" || m.transactionType === "هالك").length;
 
   const clearFilters = () => {
-      setFilterType("الكل");
-      setDateFrom("");
-      setDateTo("");
-      setSearchTerm("");
+    setFilterType("الكل");
+    setDateFrom("");
+    setDateTo("");
+    setSearchTerm("");
   };
 
   return (
-    <div className="space-y-6 pb-10">
+    <div className="space-y-6 pb-10" dir="rtl">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-slate-800 flex items-center gap-2">
@@ -78,7 +99,7 @@ export function StockMovementsPage() {
             سجل شامل لكل حركات (الوارد والمنصرف) على أرصدة المخزن المركزي
           </p>
         </div>
-        {hasActiveFilters && (
+        {(filterType !== "الكل" || dateFrom || dateTo || searchTerm) && (
             <button 
                 onClick={clearFilters}
                 className="flex items-center gap-1.5 text-slate-500 hover:text-slate-700 bg-white border border-slate-200 px-3 py-2 rounded-lg text-sm font-medium transition-colors shadow-sm"
@@ -154,34 +175,21 @@ export function StockMovementsPage() {
         </div>
 
         <div className="flex flex-wrap items-center gap-3">
-           <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 focus-within:ring-2 focus-within:ring-blue-500 transition-shadow">
-             <span className="text-xs font-medium text-slate-500 w-6">من</span>
-             <input 
-                type="date" 
-                value={dateFrom} 
-                onChange={e => setDateFrom(e.target.value)} 
-                className="bg-transparent text-sm text-slate-700 outline-none w-[115px]" 
-                dir="rtl"
-             />
-           </div>
-           
-           <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 focus-within:ring-2 focus-within:ring-blue-500 transition-shadow">
-             <span className="text-xs font-medium text-slate-500 w-6">إلى</span>
-             <input 
-                type="date" 
-                value={dateTo} 
-                onChange={e => setDateTo(e.target.value)} 
-                className="bg-transparent text-sm text-slate-700 outline-none w-[115px]" 
-                dir="rtl"
-             />
-           </div>
+            <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 focus-within:ring-2 focus-within:ring-blue-500 transition-shadow">
+              <span className="text-xs font-medium text-slate-500 w-6">من</span>
+              <input type="date" value={dateFrom} onChange={e => setDateFrom(e.target.value)} className="bg-transparent text-sm text-slate-700 outline-none w-[115px]" dir="rtl"/>
+            </div>
+            <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 focus-within:ring-2 focus-within:ring-blue-500 transition-shadow">
+              <span className="text-xs font-medium text-slate-500 w-6">إلى</span>
+              <input type="date" value={dateTo} onChange={e => setDateTo(e.target.value)} className="bg-transparent text-sm text-slate-700 outline-none w-[115px]" dir="rtl"/>
+            </div>
 
-           <div className="w-px h-8 bg-slate-200 mx-1 hidden sm:block"></div>
+            <div className="w-px h-8 bg-slate-200 mx-1 hidden sm:block"></div>
 
-           <div className="relative">
+            <div className="relative">
               <select
                  value={filterType}
-                 onChange={(e) => setFilterType(e.target.value as MovementFilterGroup)}
+                 onChange={(e) => setFilterType(e.target.value)}
                  className="appearance-none bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 pr-10 text-sm font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 min-w-[160px] pl-4 transition-colors"
               >
                   <option value="الكل">كل الحركات</option>
@@ -196,104 +204,96 @@ export function StockMovementsPage() {
               </select>
               <Filter size={16} className="absolute top-1/2 -translate-y-1/2 right-3 text-slate-500 pointer-events-none" />
               <ChevronDown size={14} className="absolute top-1/2 -translate-y-1/2 left-3 text-slate-400 pointer-events-none" />
-           </div>
+            </div>
         </div>
       </div>
 
       {/* Movements Table */}
       <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
         <div className="overflow-x-auto min-h-[400px]">
-          <table className="w-full text-right">
-             <thead className="bg-slate-50 border-b border-slate-100">
-               <tr>
-                 <th className="px-5 py-4 text-xs font-semibold text-slate-500 w-[10%]">رقم الحركة</th>
-                 <th className="px-5 py-4 text-xs font-semibold text-slate-500 w-[12%]">التاريخ</th>
-                 <th className="px-5 py-4 text-xs font-semibold text-slate-500 w-[12%]">النوع</th>
-                 <th className="px-5 py-4 text-xs font-semibold text-slate-500 w-[20%]">المنتج</th>
-                 <th className="px-5 py-4 text-center text-xs font-semibold text-slate-500 w-[10%]">الكمية</th>
-                 <th className="px-5 py-4 text-center text-xs font-semibold text-slate-500 w-[10%]">تغير الرصيد</th>
-                 <th className="px-5 py-4 text-xs font-semibold text-slate-500 w-[14%]">المرجع / السيارة</th>
-                 <th className="px-5 py-4 text-xs font-semibold text-slate-500">ملاحظات</th>
-               </tr>
-             </thead>
-             <tbody className="divide-y divide-slate-100">
-                {filteredMovements.length === 0 ? (
-                    <tr>
-                        <td colSpan={8} className="px-6 py-20 text-center">
-                            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-slate-50 mb-4 text-slate-400">
-                                <Search size={32} />
-                            </div>
-                            <h3 className="text-slate-800 text-lg font-bold mb-1">لا توجد حركات</h3>
-                            <p className="text-slate-500 text-sm">راجع معايير البحث والفلترة المختارة</p>
-                        </td>
-                    </tr>
-                ) : (
-                    filteredMovements.map((mov) => {
-                        const isPositive = mov.type === "تزويد" || mov.type === "مرتجع";
-                        
-                        return (
-                            <tr key={mov.id} className="hover:bg-slate-50/70 transition-colors">
-                                <td className="px-5 py-4 align-top">
-                                    <div className="font-bold text-slate-700 text-sm">{mov.id}</div>
-                                </td>
-                                <td className="px-5 py-4 align-top">
-                                    <div className="text-sm text-slate-600 flex items-center gap-1.5 whitespace-nowrap">
-                                        <Calendar size={14} className="text-slate-400" />
-                                        {new Date(mov.date).toLocaleDateString('ar-EG')}
-                                    </div>
-                                    <div className="text-[10px] text-slate-400 mt-1.5 mr-5 whitespace-nowrap" dir="ltr">
-                                        {new Date(mov.date).toLocaleTimeString('en-US', {hour: '2-digit', minute:'2-digit'})}
-                                    </div>
-                                </td>
-                                <td className="px-5 py-4 align-top">
-                                    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-bold border ${getMovementColor(mov.type)}`}>
-                                        {getMovementIcon(mov.type)}
-                                        {mov.type}
-                                    </span>
-                                </td>
-                                <td className="px-5 py-4 align-top">
-                                    <div className="font-semibold text-slate-700 text-sm line-clamp-2" title={mov.productName}>{mov.productName}</div>
-                                    <div className="text-xs text-slate-500 mt-1.5 font-mono">{mov.productId}</div>
-                                </td>
-                                <td className="px-5 py-4 align-top text-center">
-                                    <div className={`font-black text-lg ${isPositive ? 'text-emerald-600' : 'text-rose-600'}`} dir="ltr">
-                                        {isPositive ? '+' : '-'}{mov.quantity}
-                                    </div>
-                                </td>
-                                <td className="px-5 py-4 align-top">
-                                    <div className="flex flex-col items-center gap-1 pb-1 w-20 mx-auto">
-                                        <span className="text-xs text-slate-400 line-through decoration-slate-300">{mov.balanceBefore}</span>
-                                        <span className={`text-sm font-bold text-slate-700 bg-slate-100 px-2 py-0.5 rounded w-full text-center border-b-2 ${isPositive ? 'border-emerald-500' : 'border-rose-500'}`}>
-                                            {mov.balanceAfter}
-                                        </span>
-                                    </div>
-                                </td>
-                                <td className="px-5 py-4 align-top">
-                                    {mov.referenceId && (
-                                        <div className="text-xs font-semibold text-slate-600 bg-slate-100 inline-block px-2 py-1 rounded mb-2 w-full text-center">
-                                            مرجع: {mov.referenceId}
-                                        </div>
-                                    )}
-                                    {mov.vanName && (
-                                        <div className="text-xs text-blue-700 bg-blue-50 px-2 py-1 rounded line-clamp-1 border border-blue-100 text-center" title={mov.vanName}>
-                                            {mov.vanName}
-                                        </div>
-                                    )}
-                                    {!mov.referenceId && !mov.vanName && (
-                                        <span className="text-slate-400 text-xs text-center block">-</span>
-                                    )}
-                                </td>
-                                <td className="px-5 py-4 align-top">
-                                    <p className="text-xs text-slate-500 leading-relaxed min-w-[120px]" title={mov.notes}>
-                                        {mov.notes || "-"}
-                                    </p>
-                                </td>
-                            </tr>
-                        );
-                    })
-                )}
-             </tbody>
-          </table>
+          {loading ? (
+            <div className="flex flex-col items-center justify-center py-24 text-slate-400">
+               <Loader2 className="animate-spin mb-4" size={40} />
+               <p className="text-sm font-medium">جاري تحديث بيانات "بريق"...</p>
+            </div>
+          ) : (
+            <table className="w-full text-right">
+                <thead className="bg-slate-50 border-b border-slate-100">
+                  <tr>
+                    <th className="px-5 py-4 text-xs font-semibold text-slate-500">رقم الحركة</th>
+                    <th className="px-5 py-4 text-xs font-semibold text-slate-500">التاريخ</th>
+                    <th className="px-5 py-4 text-xs font-semibold text-slate-500">النوع</th>
+                    <th className="px-5 py-4 text-xs font-semibold text-slate-500">المنتج</th>
+                    <th className="px-5 py-4 text-center text-xs font-semibold text-slate-500">الكمية</th>
+                    <th className="px-5 py-4 text-center text-xs font-semibold text-slate-500">تغير الرصيد</th>
+                    <th className="px-5 py-4 text-xs font-semibold text-slate-500">المرجع</th>
+                    <th className="px-5 py-4 text-xs font-semibold text-slate-500">ملاحظات</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                   {movements.length === 0 ? (
+                       <tr>
+                           <td colSpan={8} className="px-6 py-20 text-center">
+                               <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-slate-50 mb-4 text-slate-400">
+                                   <Search size={32} />
+                               </div>
+                               <h3 className="text-slate-800 text-lg font-bold mb-1">لا توجد حركات</h3>
+                               <p className="text-slate-500 text-sm">راجع معايير البحث والفلترة المختارة</p>
+                           </td>
+                       </tr>
+                   ) : (
+                       movements.map((mov) => {
+                           const isPositive = mov.transactionType === "تزويد" || mov.transactionType === "مرتجع";
+                           return (
+                               <tr key={mov.transactionId} className="hover:bg-slate-50/70 transition-colors">
+                                   <td className="px-5 py-4 align-top font-bold text-slate-700 text-sm">MOV-{mov.transactionId}</td>
+                                   <td className="px-5 py-4 align-top">
+                                       <div className="text-sm text-slate-600 flex items-center gap-1.5 whitespace-nowrap">
+                                           <Calendar size={14} className="text-slate-400" />
+                                           {new Date(mov.createdDate).toLocaleDateString('ar-EG')}
+                                       </div>
+                                       <div className="text-[10px] text-slate-400 mt-1.5 mr-5" dir="ltr">
+                                           {new Date(mov.createdDate).toLocaleTimeString('en-US', {hour: '2-digit', minute:'2-digit'})}
+                                       </div>
+                                   </td>
+                                   <td className="px-5 py-4 align-top">
+                                       <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-bold border ${getMovementColor(mov.transactionType)}`}>
+                                           {getMovementIcon(mov.transactionType)}
+                                           {mov.transactionType}
+                                       </span>
+                                   </td>
+                                   <td className="px-5 py-4 align-top">
+                                       <div className="font-semibold text-slate-700 text-sm">{mov.productName}</div>
+                                       <div className="text-xs text-slate-500 mt-1.5 font-mono">{mov.productCode}</div>
+                                   </td>
+                                   <td className="px-5 py-4 align-top text-center">
+                                       <div className={`font-black text-lg ${isPositive ? 'text-emerald-600' : 'text-rose-600'}`} dir="ltr">
+                                           {isPositive ? '+' : '-'}{mov.quantity}
+                                       </div>
+                                   </td>
+                                   <td className="px-5 py-4 align-top">
+                                       <div className="flex flex-col items-center gap-1 pb-1 w-20 mx-auto">
+                                           <span className="text-xs text-slate-400 line-through decoration-slate-300">{mov.balanceBefore}</span>
+                                           <span className={`text-sm font-bold text-slate-700 bg-slate-100 px-2 py-0.5 rounded w-full text-center border-b-2 ${isPositive ? 'border-emerald-500' : 'border-rose-500'}`}>
+                                               {mov.balanceAfter}
+                                           </span>
+                                       </div>
+                                   </td>
+                                   <td className="px-5 py-4 align-top text-xs font-semibold text-slate-600">
+                                       {mov.reference || "-"}
+                                   </td>
+                                   <td className="px-5 py-4 align-top">
+                                       <p className="text-xs text-slate-500 leading-relaxed min-w-[120px]" title={mov.notes}>
+                                           {mov.notes || "-"}
+                                       </p>
+                                   </td>
+                               </tr>
+                           );
+                       })
+                   )}
+                </tbody>
+            </table>
+          )}
         </div>
       </div>
     </div>
