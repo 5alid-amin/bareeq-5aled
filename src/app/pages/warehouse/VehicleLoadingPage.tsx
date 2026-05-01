@@ -325,36 +325,54 @@ export function VehicleLoadingPage() {
               <thead>
                 <tr className="bg-slate-50 text-right text-slate-500 text-xs font-medium">
                   <th className="px-5 py-3">المنتج</th>
-                  <th className="px-5 py-3">الكمية</th>
-                  <th className="px-5 py-3">الحد الأدنى</th>
+                  <th className="px-5 py-3 text-center">الكمية</th>
                   <th className="px-5 py-3">السعر</th>
                   <th className="px-5 py-3">القيمة</th>
                   <th className="px-5 py-3">الحالة</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-50">
-                {inventoryPage.items.map(item => (
-                  <tr key={item.productId} className="hover:bg-slate-50/50 transition-colors">
-                    <td className="px-5 py-3.5">
-                      <div className="flex items-center gap-2">
-                        <Package size={13} className="text-blue-500" />
-                        <div>
-                          <p className="text-sm text-slate-700">{item.productName}</p>
-                          <p className="text-[10px] text-slate-400">{item.productBarcode}</p>
+                {inventoryPage.items.map(item => {
+                  const isLow = item.currentQuantity <= item.minThreshold;
+                  return (
+                    <tr key={item.productId} className="hover:bg-slate-50/50 transition-colors">
+                      <td className="px-5 py-3.5">
+                        <div className="flex items-center gap-2">
+                          <Package size={13} className="text-blue-500" />
+                          <div>
+                            <p className="text-sm text-slate-700">{item.productName}</p>
+                            <p className="text-[10px] text-slate-400">{item.productBarcode}</p>
+                          </div>
                         </div>
-                      </div>
-                    </td>
-                    <td className="px-5 py-3.5 text-sm font-medium">{item.currentQuantity}</td>
-                    <td className="px-5 py-3.5 text-slate-500 text-sm">{item.minThreshold}</td>
-                    <td className="px-5 py-3.5 text-emerald-600 text-sm">{item.salePrice} ج.م</td>
-                    <td className="px-5 py-3.5 text-slate-600 text-sm">{item.totalLineValue.toLocaleString("ar-EG")} ج.م</td>
-                    <td className="px-5 py-3.5">
-                      <span className={`inline-flex items-center gap-1 text-xs px-2 py-1 rounded-full ${item.status === "جيد" ? "bg-emerald-100 text-emerald-600" : "bg-red-100 text-red-600"}`}>
-                        {item.status === "جيد" ? <TrendingUp size={11} /> : <TrendingDown size={11} />} {item.status}
-                      </span>
-                    </td>
-                  </tr>
-                ))}
+                      </td>
+                      <td className="px-5 py-3.5 text-center">
+                        <div className="flex flex-col items-center">
+                          <span className={`text-base font-bold ${isLow ? "text-red-600" : "text-emerald-600"}`}>
+                            {item.currentQuantity}
+                          </span>
+                          <span className="text-[10px] text-slate-400">
+                            / حد: {item.minThreshold}
+                          </span>
+                        </div>
+                      </td>
+                      <td className="px-5 py-3.5 text-emerald-600 text-sm font-medium">{item.salePrice} ج.م</td>
+                      <td className="px-5 py-3.5 text-slate-600 text-sm font-medium">{item.totalLineValue.toLocaleString("ar-EG")} ج.م</td>
+                      <td className="px-5 py-3.5">
+                        <span className={`inline-flex items-center gap-1 text-xs px-2.5 py-1 rounded-md font-medium ${isLow ? "bg-red-50 text-red-600 border border-red-100" : "bg-emerald-50 text-emerald-600 border border-emerald-100"}`}>
+                          {isLow ? (
+                            <>
+                              <TrendingDown size={12} /> منخفض
+                            </>
+                          ) : (
+                            <>
+                              <TrendingUp size={12} /> جيد
+                            </>
+                          )}
+                        </span>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>

@@ -1,23 +1,44 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
+import axios from "axios";
 import { ClipboardCheck, ArrowDownRight, Truck, Info, CheckCircle, X } from "lucide-react";
-import { vans, vanInventory } from "../../data/mockData";
 
+// --- التغيير هنا: الـ DTO اللي الباك إند مستنيه ---
 interface SendQtyModalProps {
   item: {
-    productId: string;
+    productId: number;
     productName: string;
-    difference: number;
-    quantity: number;
-    standard: number;
+    currentQuantity: number;
+    minThreshold: number;
   };
+  vehicleId: number;
   onClose: () => void;
-  onConfirm: (qty: number) => void;
+  onRefresh: () => void; // عشان نحدث الجدول بعد الشحن
 }
 
-function SendQtyModal({ item, onClose, onConfirm }: SendQtyModalProps) {
-  const [qty, setQty] = useState(item.difference.toString());
+function SendQtyModal({ item, vehicleId, onClose, onRefresh }: SendQtyModalProps) {
+  const difference = item.minThreshold - item.currentQuantity;
+  const [qty, setQty] = useState(difference.toString());
+  const [loading, setLoading] = useState(false);
   const parsed = parseInt(qty);
   const isValid = parsed > 0;
+
+  const handleConfirm = async () => {
+    setLoading(true);
+    try {
+      // نداء الـ API بتاع التحميل اللي عملناه (POST)
+      await axios.post("/api/CarLoad/load-vehicle", {
+        vehicleId: vehicleId,
+        items: [{ productId: item.productId, quantity: parsed }]
+      });
+      onRefresh();
+      onClose();
+    } catch (error) {
+      console.error("Error loading item:", error);
+      alert("حدث خطأ أثناء تحميل البضاعة");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4" onClick={onClose}>
@@ -35,43 +56,34 @@ function SendQtyModal({ item, onClose, onConfirm }: SendQtyModalProps) {
           <div className="bg-slate-50 rounded-xl p-3.5 border border-slate-100">
             <p className="text-slate-700 text-sm font-medium">{item.productName}</p>
             <div className="flex items-center gap-3 mt-2 text-xs text-slate-500">
-              <span>الكمية الحالية: <strong className="text-slate-700">{item.quantity}</strong></span>
+              <span>الكمية الحالية: <strong className="text-slate-700">{item.currentQuantity}</strong></span>
               <span>•</span>
-              <span>المعدل القياسي: <strong className="text-slate-700">{item.standard}</strong></span>
+              <span>المعدل القياسي: <strong className="text-slate-700">{item.minThreshold}</strong></span>
               <span>•</span>
-              <span>الفرق الناقص: <strong className="text-red-600">{item.difference}</strong></span>
+              <span>الفرق الناقص: <strong className="text-red-600">{difference}</strong></span>
             </div>
           </div>
 
           <div>
-            <label className="block text-slate-600 text-sm mb-1.5">
-              الكمية المرسلة
-              <span className="text-slate-400 text-xs mr-2">(اختياري — الافتراضي هو الفرق الكامل)</span>
-            </label>
+            <label className="block text-slate-600 text-sm mb-1.5">الكمية المرسلة</label>
             <input
               type="number"
               value={qty}
               onChange={e => setQty(e.target.value)}
-              min="1"
-              max={item.difference}
               className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               dir="ltr"
               autoFocus
             />
-            {parsed > item.difference && (
-              <p className="text-xs text-orange-500 mt-1">الكمية أكبر من الفرق الناقص ({item.difference} وحدة)</p>
-            )}
           </div>
 
           <div className="flex gap-3 pt-1">
             <button onClick={onClose} className="flex-1 border border-slate-200 text-slate-600 py-2.5 rounded-xl text-sm hover:bg-slate-50">إلغاء</button>
             <button
-              onClick={() => isValid && onConfirm(parsed)}
-              disabled={!isValid}
+              onClick={handleConfirm}
+              disabled={!isValid || loading}
               className="flex-1 bg-blue-600 text-white py-2.5 rounded-xl text-sm hover:bg-blue-700 disabled:opacity-50 flex items-center justify-center gap-2"
             >
-              <Truck size={15} />
-              تأكيد الإرسال
+              {loading ? "جاري الإرسال..." : "تأكيد الإرسال"}
             </button>
           </div>
         </div>
@@ -81,25 +93,41 @@ function SendQtyModal({ item, onClose, onConfirm }: SendQtyModalProps) {
 }
 
 export function VehicleDiscrepancyPage() {
-  const [selectedVan, setSelectedVan] = useState<string>("VAN-001");
+  const [vehicles, setVehicles] = useState<any[]>([]); // قائمة السيارات من الباك
+  const [selectedVan, setSelectedVan] = useState<number | null>(null);
+  const [inventory, setInventory] = useState<any[]>([]); // مخزون السيارة المختارة
   const [actionSuccess, setActionSuccess] = useState<string | null>(null);
   const [sendModal, setSendModal] = useState<any | null>(null);
 
-  const currentVanInventory = vanInventory[selectedVan] || [];
+  // 1. جلب قائمة السيارات عند فتح الصفحة
+  useEffect(() => {
+    axios.get("/api/CarLoad/vehicles-summary")
+      .then(res => {
+        setVehicles(res.data);
+        if (res.data.length > 0) setSelectedVan(res.data[0].vehicleId);
+      });
+  }, []);
 
+  // 2. جلب مخزون السيارة عند تغيير السيارة المختارة
+  const fetchInventory = () => {
+    if (selectedVan) {
+      axios.get(`/api/CarLoad/vehicle-inventory/${selectedVan}`)
+        .then(res => setInventory(res.data.items));
+    }
+  };
+
+  useEffect(() => {
+    fetchInventory();
+  }, [selectedVan]);
+
+  // 3. فلترة النواقص بناءً على الحسبة اللي اتفقنا عليها
   const discrepancies = useMemo(() => {
-    return currentVanInventory
-      .filter(item => item.quantity < item.minQuantity)
-      .map(item => ({
-        ...item,
-        difference: item.minQuantity - item.quantity,
-        standard: item.minQuantity,
-      }));
-  }, [currentVanInventory]);
+    return inventory.filter(item => item.currentQuantity < item.minThreshold);
+  }, [inventory]);
 
-  const handleConfirmSend = (productId: string, productName: string, qty: number) => {
-    setSendModal(null);
-    setActionSuccess(`تم إرسال ${qty} وحدة من "${productName}" إلى السيارة بنجاح`);
+  const handleRefresh = () => {
+    fetchInventory();
+    setActionSuccess(`تم تحديث المخزن وتحميل البضاعة بنجاح`);
     setTimeout(() => setActionSuccess(null), 3500);
   };
 
@@ -108,8 +136,9 @@ export function VehicleDiscrepancyPage() {
       {sendModal && (
         <SendQtyModal
           item={sendModal}
+          vehicleId={selectedVan!}
           onClose={() => setSendModal(null)}
-          onConfirm={(qty) => handleConfirmSend(sendModal.productId, sendModal.productName, qty)}
+          onRefresh={handleRefresh}
         />
       )}
 
@@ -128,12 +157,12 @@ export function VehicleDiscrepancyPage() {
         <div className="flex items-center gap-2">
           <label className="text-sm text-slate-500">السيارة:</label>
           <select
-            value={selectedVan}
-            onChange={(e) => setSelectedVan(e.target.value)}
+            value={selectedVan || ""}
+            onChange={(e) => setSelectedVan(Number(e.target.value))}
             className="appearance-none bg-slate-50 border border-slate-200 rounded-lg px-4 py-2 pr-8 text-sm text-slate-700 min-w-[200px] focus:outline-none focus:ring-2 focus:ring-indigo-500"
           >
-            {vans.map(v => (
-              <option key={v.id} value={v.id}>{v.id} - {v.driverName}</option>
+            {vehicles.map(v => (
+              <option key={v.vehicleId} value={v.vehicleId}>{v.plateNumber} - {v.driverName}</option>
             ))}
           </select>
         </div>
@@ -171,18 +200,18 @@ export function VehicleDiscrepancyPage() {
               <tr key={item.productId} className="hover:bg-slate-50/50 transition-colors">
                 <td className="px-5 py-4">
                   <p className="text-sm text-slate-700 font-medium">{item.productName}</p>
-                  <p className="text-xs text-slate-400 mt-0.5">{item.productId}</p>
+                  <p className="text-xs text-slate-400 mt-0.5">{item.productBarcode}</p>
                 </td>
                 <td className="px-5 py-4">
                   <span className="inline-flex items-center justify-center min-w-[36px] h-6 rounded-md bg-red-50 text-red-600 text-xs font-medium border border-red-100">
-                    {item.quantity}
+                    {item.currentQuantity}
                   </span>
                 </td>
-                <td className="px-5 py-4 text-sm text-slate-500">{item.standard} وحدة</td>
+                <td className="px-5 py-4 text-sm text-slate-500">{item.minThreshold} وحدة</td>
                 <td className="px-5 py-4">
                   <span className="inline-flex items-center gap-1 text-red-600 text-sm font-medium bg-red-50 px-2 py-1 rounded-lg border border-red-100">
                     <ArrowDownRight size={14} />
-                    {item.difference} وحدة
+                    {item.minThreshold - item.currentQuantity} وحدة
                   </span>
                 </td>
                 <td className="px-5 py-4">

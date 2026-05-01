@@ -1,126 +1,133 @@
-import React, { useState } from "react";
-import { Plus, RefreshCw, Clock, CheckCircle, XCircle, Package, Send, Pencil, Trash2 } from "lucide-react";
-import { useAuth } from "../../context/AuthContext";
-import { vanInventory, products, restockRequests as initialRequests, RestockRequest } from "../../data/mockData";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import { Plus, RefreshCw, Clock, CheckCircle, XCircle, Send, Pencil, Trash2, AlertCircle } from "lucide-react";
+
+// الإعدادات الأساسية للـ API
+const BASE_URL = "https://localhost:7280/api/CarInventory";
+
+// تعريف الأنواع (Interfaces) بناءً على الـ DTOs في الباك اند
+interface ProductLookup {
+    productId: number;
+    productName: string;
+}
+
+interface PendingRequest {
+    requestId: number;
+    productName: string;
+    requestedQuantity: number;
+    requestDate: string;
+    status: number;
+    adminNotes?: string;
+}
 
 export function RestockRequestPage() {
-    const { user } = useAuth();
-    const assignedVanId = user?.assignedVanId || "VAN-001";
-    const myInventory = vanInventory[assignedVanId] || [];
+    // رقم المركبة (ثابت بناءً على طلبك السابق)
+    const vehicleId = 1; 
 
-    const [requests, setRequests] = useState<RestockRequest[]>(
-        initialRequests.filter(r => r.representativeId === user?.id || r.vanId === assignedVanId)
-    );
-
+    // States
+    const [requests, setRequests] = useState<PendingRequest[]>([]);
+    const [products, setProducts] = useState<ProductLookup[]>([]);
     const [showForm, setShowForm] = useState(false);
-    const [editingRequestId, setEditingRequestId] = useState<string | null>(null);
-    const [selectedProduct, setSelectedProduct] = useState("");
+    const [editingRequestId, setEditingRequestId] = useState<number | null>(null);
+    const [selectedProductId, setSelectedProductId] = useState<number | "">("");
     const [quantity, setQuantity] = useState("");
-    const [notes, setNotes] = useState("");
     const [loading, setLoading] = useState(false);
+    const [fetching, setFetching] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+
+    // 1. جلب المنتجات (Lookup) والطلبات المعلقة عند التحميل
+    useEffect(() => {
+        fetchInitialData();
+    }, []);
+
+    const fetchInitialData = async () => {
+        setFetching(true);
+        try {
+            const [productsRes, requestsRes] = await Promise.all([
+                axios.get(`${BASE_URL}/products-lookup`),
+                axios.get(`${BASE_URL}/pending-requests/${vehicleId}`)
+            ]);
+            setProducts(productsRes.data);
+            setRequests(requestsRes.data);
+            setError(null);
+        } catch (err) {
+            setError("حدث خطأ أثناء جلب البيانات من الخادم");
+            console.error(err);
+        } finally {
+            setFetching(false);
+        }
+    };
 
     const handleOpenForm = () => {
         setEditingRequestId(null);
-        setSelectedProduct("");
+        setSelectedProductId("");
         setQuantity("");
-        setNotes("");
         setShowForm(true);
     };
 
     const handleCloseForm = () => {
         setShowForm(false);
         setEditingRequestId(null);
-        setSelectedProduct("");
-        setQuantity("");
-        setNotes("");
+        setError(null);
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
+    // 2. إرسال طلب جديد أو تحديث طلب قائم
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!selectedProduct || !quantity || parseInt(quantity) <= 0) return;
+        if (!selectedProductId || !quantity) return;
 
         setLoading(true);
-        const product = products.find(p => p.id === selectedProduct);
-
-        setTimeout(() => {
+        try {
             if (editingRequestId) {
-                // Update existing request
-                setRequests(requests.map(r => r.id === editingRequestId ? {
-                    ...r,
-                    items: [
-                        {
-                            productId: selectedProduct,
-                            productName: product?.name || "غير معروف",
-                            requestedQty: parseInt(quantity)
-                        }
-                    ],
-                    notes: notes,
-                } : r));
+                // تحديث (PUT)
+                await axios.put(`${BASE_URL}/update-request/${editingRequestId}`, {
+                    productId: Number(selectedProductId),
+                    requestedQuantity: Number(quantity)
+                });
             } else {
-                // Create new request
-                const newRequest: RestockRequest = {
-                    id: `REQ-${String(initialRequests.length + requests.length + 1).padStart(3, "0")}`,
-                    vanId: assignedVanId,
-                    representativeId: user?.id || "TEMP",
-                    representativeName: user?.name || "المندوب",
-                    items: [
-                        {
-                            productId: selectedProduct,
-                            productName: product?.name || "غير معروف",
-                            requestedQty: parseInt(quantity)
-                        }
-                    ],
-                    requestDate: new Date().toISOString(),
-                    notes: notes,
-                    status: "معلق"
-                };
-                setRequests([newRequest, ...requests]);
+                // إنشاء جديد (POST)
+                await axios.post(`${BASE_URL}/refill-request`, {
+                    vehicleId: vehicleId,
+                    productId: Number(selectedProductId),
+                    requestedQuantity: Number(quantity)
+                });
             }
             
-            setLoading(false);
+            await fetchInitialData(); // إعادة تحديث القائمة
             handleCloseForm();
-        }, 800);
+        } catch (err: any) {
+            setError(err.response?.data?.message || "فشل في حفظ الطلب");
+        } finally {
+            setLoading(false);
+        }
     };
 
-    const handleEdit = (req: RestockRequest) => {
-        setEditingRequestId(req.id);
-        setSelectedProduct(req.items[0]?.productId || "");
-        setQuantity(req.items[0]?.requestedQty.toString() || "");
-        setNotes(req.notes || "");
+    // 3. تحضير التعديل
+    const handleEdit = (req: PendingRequest) => {
+        // نجد الـ ID الخاص بالمنتج من القائمة بناءً على الاسم (أو يفضل لو الـ API يرجع الـ ID)
+        // ملاحظة: الـ DTO بتاعك يرجع الاسم، هحاول أعمل Match بسيط هنا
+        const product = products.find(p => p.productName === req.productName);
+        
+        setEditingRequestId(req.requestId);
+        setSelectedProductId(product?.productId || "");
+        setQuantity(req.requestedQuantity.toString());
         setShowForm(true);
         window.scrollTo({ top: 0, behavior: "smooth" });
     };
 
-    const handleDelete = (id: string) => {
-        if (confirm("هل أنت متأكد من حذف هذا الطلب؟")) {
-            setRequests(requests.filter(r => r.id !== id));
-        }
-    };
-
-    const getStatusBadge = (status: RestockRequest["status"]) => {
-        switch (status) {
-            case "معلق":
-                return <span className="bg-amber-100 text-amber-700 px-2.5 py-1 rounded-full text-xs flex items-center gap-1.5"><Clock size={12} /> معلق</span>;
-            case "موافق":
-                return <span className="bg-emerald-100 text-emerald-700 px-2.5 py-1 rounded-full text-xs flex items-center gap-1.5"><CheckCircle size={12} /> تمت الموافقة</span>;
-            case "مرفوض":
-                return <span className="bg-rose-100 text-rose-700 px-2.5 py-1 rounded-full text-xs flex items-center gap-1.5"><XCircle size={12} /> مرفوض</span>;
-            case "تم التسليم":
-                return <span className="bg-blue-100 text-blue-700 px-2.5 py-1 rounded-full text-xs flex items-center gap-1.5"><Package size={12} /> تم التسليم</span>;
-            default:
-                return null;
-        }
+    const getStatusText = (status: number) => {
+        return status === 0 ? "قيد الانتظار" : "تم المعالجة";
     };
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-6 p-4">
+            {/* Header */}
             <div className="flex items-center justify-between">
                 <div>
                     <h2 className="text-xl font-bold text-slate-800 flex items-center gap-2">
                         <RefreshCw size={24} className="text-blue-600" />
-                        طلبات إعادة التعبئة
+                        طلبات إعادة التعبئة (مركبة #{vehicleId})
                     </h2>
-                    <p className="text-slate-500 text-sm mt-1">طلب بضاعة إضافية للمركبة من المخزن الرئيسي</p>
                 </div>
                 {!showForm && (
                     <button
@@ -133,13 +140,22 @@ export function RestockRequestPage() {
                 )}
             </div>
 
+            {/* Error Message */}
+            {error && (
+                <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl flex items-center gap-2">
+                    <AlertCircle size={18} />
+                    <span className="text-sm">{error}</span>
+                </div>
+            )}
+
+            {/* Form */}
             {showForm && (
                 <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden animate-in fade-in slide-in-from-top-4 duration-300">
                     <div className="px-6 py-4 border-b border-slate-100 bg-slate-50/50 flex items-center justify-between">
                         <h3 className="text-slate-700 font-medium">
-                            {editingRequestId ? "تعديل طلب تعبئة" : "إنشاء طلب تعبئة جديد"}
+                            {editingRequestId ? "تعديل الطلب" : "إنشاء طلب جديد"}
                         </h3>
-                        <button onClick={handleCloseForm} className="text-slate-400 hover:text-slate-600 transition-colors">
+                        <button onClick={handleCloseForm} className="text-slate-400 hover:text-slate-600">
                             <XCircle size={20} />
                         </button>
                     </div>
@@ -148,20 +164,15 @@ export function RestockRequestPage() {
                             <div>
                                 <label className="block text-slate-600 text-sm mb-1.5">المنتج</label>
                                 <select
-                                    value={selectedProduct}
-                                    onChange={(e) => setSelectedProduct(e.target.value)}
-                                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none"
+                                    value={selectedProductId}
+                                    onChange={(e) => setSelectedProductId(Number(e.target.value))}
+                                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
                                     required
                                 >
-                                    <option value="">-- اختر المنتج --</option>
-                                    {products.map(p => {
-                                        const inVan = myInventory.find(item => item.productId === p.id);
-                                        return (
-                                            <option key={p.id} value={p.id}>
-                                                {p.name} (المتوفر بالفان: {inVan?.quantity || 0})
-                                            </option>
-                                        );
-                                    })}
+                                    <option value="">-- اختر المنتج من المخزن --</option>
+                                    {products.map(p => (
+                                        <option key={p.productId} value={p.productId}>{p.productName}</option>
+                                    ))}
                                 </select>
                             </div>
                             <div>
@@ -170,110 +181,72 @@ export function RestockRequestPage() {
                                     type="number"
                                     value={quantity}
                                     onChange={(e) => setQuantity(e.target.value)}
-                                    placeholder="أدخل الكمية"
-                                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
                                     min="1"
                                     required
-                                    dir="ltr"
                                 />
                             </div>
                         </div>
-                        <div>
-                            <label className="block text-slate-600 text-sm mb-1.5">ملاحظات (اختياري)</label>
-                            <textarea
-                                value={notes}
-                                onChange={(e) => setNotes(e.target.value)}
-                                placeholder="أي تفاصيل إضافية..."
-                                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 h-20 resize-none"
-                            ></textarea>
-                        </div>
-                        <div className="flex justify-end gap-3 pt-2">
-                            <button
-                                type="button"
-                                onClick={handleCloseForm}
-                                className="px-6 py-2.5 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-100 transition-colors"
-                            >
-                                إلغاء
-                            </button>
+                        <div className="flex justify-end gap-3">
+                            <button type="button" onClick={handleCloseForm} className="px-4 py-2 text-slate-600">إلغاء</button>
                             <button
                                 type="submit"
                                 disabled={loading}
-                                className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-2.5 rounded-xl text-sm font-medium transition-colors flex items-center gap-2 shadow-sm disabled:opacity-50"
+                                className="bg-blue-600 text-white px-6 py-2 rounded-xl text-sm flex items-center gap-2 disabled:opacity-50"
                             >
-                                {loading ? "جاري الحفظ..." : (editingRequestId ? "حفظ التعديلات" : "إرسال الطلب")}
-                                {!loading && (editingRequestId ? <CheckCircle size={16} /> : <Send size={16} />)}
+                                {loading ? "جاري الحفظ..." : "إرسال الطلب"}
+                                <Send size={16} />
                             </button>
                         </div>
                     </form>
                 </div>
             )}
 
+            {/* Table */}
             <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
-                <div className="px-6 py-4 border-b border-slate-100">
-                    <h3 className="text-slate-800 font-medium">سجل الطلبات السابقة</h3>
+                <div className="px-6 py-4 border-b border-slate-100 flex justify-between items-center">
+                    <h3 className="text-slate-800 font-medium">الطلبات المعلقة الحالية</h3>
+                    {fetching && <RefreshCw size={16} className="animate-spin text-blue-500" />}
                 </div>
                 <div className="overflow-x-auto">
-                    <table className="w-full text-right whitespace-nowrap">
+                    <table className="w-full text-right">
                         <thead>
                             <tr className="bg-slate-50 border-b border-slate-200">
-                                <th className="px-6 py-4 text-xs font-semibold text-slate-500">رقم الطلب</th>
+                                <th className="px-6 py-4 text-xs font-semibold text-slate-500">المنتج</th>
+                                <th className="px-6 py-4 text-xs font-semibold text-slate-500">الكمية</th>
                                 <th className="px-6 py-4 text-xs font-semibold text-slate-500">التاريخ</th>
-                                <th className="px-6 py-4 text-xs font-semibold text-slate-500">المنتجات</th>
                                 <th className="px-6 py-4 text-xs font-semibold text-slate-500">الحالة</th>
-                                <th className="px-6 py-4 text-xs font-semibold text-slate-500">ملاحظات الإدارة</th>
-                                <th className="px-6 py-4 text-xs font-semibold text-slate-500 text-center">إجراءات</th>
+                                <th className="px-6 py-4 text-xs font-semibold text-slate-500 text-center">إجراء</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-100">
                             {requests.length > 0 ? (
                                 requests.map((req) => (
-                                    <tr key={req.id} className="hover:bg-slate-50/50 transition-colors group">
+                                    <tr key={req.requestId} className="hover:bg-slate-50 transition-colors">
+                                        <td className="px-6 py-4 text-sm font-medium text-slate-700">{req.productName}</td>
+                                        <td className="px-6 py-4 text-sm text-blue-600 font-bold">{req.requestedQuantity}</td>
+                                        <td className="px-6 py-4 text-xs text-slate-500">
+                                            {new Date(req.requestDate).toLocaleString("ar-EG")}
+                                        </td>
                                         <td className="px-6 py-4">
-                                            <span className="text-xs font-medium text-slate-500 bg-slate-100 px-2.5 py-1 rounded-md">
-                                                {req.id}
+                                            <span className="bg-amber-100 text-amber-700 px-2.5 py-1 rounded-full text-xs flex items-center gap-1 w-fit">
+                                                <Clock size={12} /> {getStatusText(req.status)}
                                             </span>
                                         </td>
-                                        <td className="px-6 py-4 text-sm text-slate-600">
-                                            {new Date(req.requestDate).toLocaleDateString("ar-EG")}
-                                        </td>
-                                        <td className="px-6 py-4">
-                                            {req.items.map((item, idx) => (
-                                                <div key={idx} className="text-sm">
-                                                    <span className="text-slate-700 font-medium">{item.productName}</span>
-                                                    <span className="text-blue-600 font-bold mr-2">({item.requestedQty} وحدة)</span>
-                                                </div>
-                                            ))}
-                                        </td>
-                                        <td className="px-6 py-4">
-                                            {getStatusBadge(req.status)}
-                                        </td>
-                                        <td className="px-6 py-4 text-sm text-slate-400 italic">
-                                            {req.notes || "—"}
-                                        </td>
-                                        <td className="px-6 py-4">
-                                            <div className="flex items-center justify-center gap-2">
-                                                <button
-                                                    onClick={() => handleEdit(req)}
-                                                    title="تعديل طلب التعبئة"
-                                                    className="p-2 rounded-lg text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-all opacity-60 group-hover:opacity-100"
-                                                >
-                                                    <Pencil size={15} />
-                                                </button>
-                                                <button
-                                                    onClick={() => handleDelete(req.id)}
-                                                    title="حذف طلب التعبئة"
-                                                    className="p-2 rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50 transition-all opacity-60 group-hover:opacity-100"
-                                                >
-                                                    <Trash2 size={15} />
-                                                </button>
-                                            </div>
+                                        <td className="px-6 py-4 text-center">
+                                            <button
+                                                onClick={() => handleEdit(req)}
+                                                className="p-2 text-slate-400 hover:text-blue-600 transition-colors"
+                                            >
+                                                <Pencil size={16} />
+                                            </button>
                                         </td>
                                     </tr>
                                 ))
                             ) : (
                                 <tr>
-                                    <td colSpan={6} className="px-6 py-12 text-center text-slate-500 text-sm font-medium">
-                                        لا توجد طلبات سابقة.
+                                    <td colSpan={5} className="px-6 py-10 text-center text-slate-400 text-sm">
+                                        {fetching ? "جاري التحميل..." : "لا توجد طلبات معلقة حالياً"}
                                     </td>
                                 </tr>
                             )}

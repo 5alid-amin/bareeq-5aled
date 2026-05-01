@@ -381,6 +381,8 @@ export default function EmployeesPage() {
                                         <option value="مدير مخزن">مدير مخزن</option>
                                         <option value="محاسب">محاسب</option>
                                         <option value="مدير">مدير</option>
+                                        <option value="سواق">سواق</option>
+
                                     </select>
                                 </div>
                                 <div>

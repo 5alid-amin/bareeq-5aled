@@ -1,81 +1,49 @@
-import React, { useState } from "react";
-import { Download, TrendingUp, Package, Calendar } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { Download, TrendingUp, Package, Calendar, Loader2 } from "lucide-react";
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell, Legend
 } from "recharts";
-import { dailySalesData, monthlySalesData, products, vans } from "../../data/mockData";
+import axios from "axios";
 
 const PIE_COLORS = ["#3b82f6", "#10b981", "#f59e0b", "#8b5cf6", "#ef4444", "#06b6d4"];
-
-const categoryData = [
-  { name: "منظفات سائلة", value: 35 },
-  { name: "مساحيق الغسيل", value: 28 },
-  { name: "منظفات عامة", value: 18 },
-  { name: "معطرات", value: 10 },
-  { name: "أخرى", value: 9 },
-];
-
-const profitDataMonthly = monthlySalesData.map((m) => ({
-  label: m.label,
-  revenue: m.sales,
-  profit: m.profit,
-  loss: Math.round(m.sales * 0.1), // Mocked loss for visualization
-}));
-
-const profitDataWeekly = [
-  { label: "الأسبوع الأول", revenue: 85000, profit: 24000, loss: 8000 },
-  { label: "الأسبوع الثاني", revenue: 92000, profit: 27500, loss: 8500 },
-  { label: "الأسبوع الثالث", revenue: 78000, profit: 21500, loss: 7200 },
-  { label: "الأسبوع الرابع", revenue: 105000, profit: 32000, loss: 9500 },
-];
-
-const profitDataYearly = [
-  { label: "يناير", revenue: 425000, profit: 142000, loss: 42500 },
-  { label: "فبراير", revenue: 398000, profit: 131000, loss: 39800 },
-  { label: "مارس", revenue: 142000, profit: 48000, loss: 14200 },
-  { label: "أبريل", revenue: 160000, profit: 54000, loss: 16000 },
-  { label: "مايو", revenue: 210000, profit: 70000, loss: 21000 },
-  { label: "يونيو", revenue: 250000, profit: 82000, loss: 25000 },
-  { label: "يوليو", revenue: 290000, profit: 94000, loss: 29000 },
-  { label: "أغسطس", revenue: 320000, profit: 98000, loss: 32000 },
-  { label: "سبتمبر", revenue: 285000, profit: 85000, loss: 28500 },
-  { label: "أكتوبر", revenue: 350000, profit: 112000, loss: 35000 },
-  { label: "نوفمبر", revenue: 410000, profit: 138000, loss: 41000 },
-  { label: "ديسمبر", revenue: 390000, profit: 125000, loss: 39000 },
-];
-
-const profitDataDaily = dailySalesData.map((d) => ({
-  label: d.label,
-  revenue: d.sales,
-  profit: d.profit,
-  loss: Math.round(d.sales * 0.08), // Mocked loss
-}));
 
 export function Reports() {
   const [activeTab, setActiveTab] = useState<"sales" | "inventory">("sales");
   const [timeFilter, setTimeFilter] = useState<"today" | "week" | "month" | "year">("week");
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
+  
+  // States للبيانات القادمة من الباك أند
+  const [salesData, setSalesData] = useState<any>(null);
+  const [inventoryData, setInventoryData] = useState<any>(null);
+  const [loading, setLoading] = useState(false);
 
-  // Determine which data to show based on filter
-  let chartData;
-  switch (timeFilter) {
-    case "today":
-      chartData = [profitDataDaily[profitDataDaily.length - 1]];
-      break;
-    case "week":
-      chartData = profitDataDaily; // Daily data for the week
-      break;
-    case "month":
-      chartData = profitDataWeekly; // 4 weeks of the month
-      break;
-    case "year":
-    default:
-      chartData = profitDataYearly; // 12 months of the year
-  }
+  const BASE_URL = "https://localhost:7280/api/Reports";
 
-  const currentTotalSales = chartData.reduce((acc, curr) => acc + curr.revenue, 0);
+  // دالة جلب البيانات
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      if (activeTab === "sales") {
+        const response = await axios.get(`${BASE_URL}/sales-summary`, {
+          params: { timeFilter, dateFrom, dateTo }
+        });
+        setSalesData(response.data);
+      } else {
+        const response = await axios.get(`${BASE_URL}/inventory-summary`);
+        setInventoryData(response.data);
+      }
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, [activeTab, timeFilter, dateFrom, dateTo]);
 
   return (
     <div className="space-y-6">
@@ -116,19 +84,23 @@ export function Reports() {
         </button>
       </div>
 
+      {loading && (
+        <div className="flex justify-center items-center py-10">
+          <Loader2 className="animate-spin text-blue-600" size={32} />
+          <span className="mr-3 text-slate-600">جاري تحديث البيانات...</span>
+        </div>
+      )}
+
       {/* 1. SALES REPORT */}
-      {activeTab === "sales" && (
+      {!loading && activeTab === "sales" && salesData && (
         <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
           
-          {/* Main KPI & Filters Row */}
           <div className="flex flex-col xl:flex-row gap-4 items-stretch">
-            {/* KPI Card */}
             <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 flex-1 min-w-[300px]">
               <p className="text-slate-500 text-sm font-medium mb-2">إجمالي قيمة المبيعات (للفترة المحددة)</p>
-              <p className="text-4xl font-bold text-blue-600">{currentTotalSales.toLocaleString("ar-EG")} <span className="text-lg text-slate-400 font-normal">ج.م</span></p>
+              <p className="text-4xl font-bold text-blue-600">{(salesData.totalSales || 0).toLocaleString("ar-EG")} <span className="text-lg text-slate-400 font-normal">ج.م</span></p>
             </div>
 
-            {/* Filters */}
             <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4 flex-[2] flex flex-col gap-4">
               <div className="flex items-center gap-2 border-b border-slate-100 pb-4">
                  {["today", "week", "month", "year"].map((filter) => {
@@ -165,7 +137,6 @@ export function Reports() {
             </div>
           </div>
 
-          {/* Profit/Loss Chart */}
           <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 line-chart-container">
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-slate-800 font-bold text-lg">مقارنة الأرباح والخسائر</h3>
@@ -176,17 +147,13 @@ export function Reports() {
             </div>
             <div className="h-80 w-full">
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+                <BarChart data={salesData.chartData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
                   <XAxis dataKey="label" axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 13 }} dy={10} />
                   <YAxis axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 13 }} tickFormatter={(value) => `${(value / 1000)}k`} dx={-10} />
                   <Tooltip 
                     cursor={{ fill: '#f8fafc' }}
                     contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
-                    formatter={(value: number, name: string) => [
-                      `${value.toLocaleString('ar-EG')} ج.م`,
-                      name === 'الأرباح' ? 'الأرباح' : 'الخسائر'
-                    ]}
                   />
                   <Legend wrapperStyle={{ paddingTop: '20px' }} iconType="circle" />
                   <Bar dataKey="profit" name="الأرباح" fill="#10b981" radius={[6, 6, 0, 0]} maxBarSize={50} />
@@ -196,7 +163,6 @@ export function Reports() {
             </div>
           </div>
 
-          {/* Van Sales Table */}
           <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
             <div className="px-6 py-5 border-b border-slate-100">
               <h3 className="text-slate-800 font-bold text-lg">مبيعات السيارات (للفترة المحددة)</h3>
@@ -212,31 +178,28 @@ export function Reports() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
-                  {vans.map((van) => {
-                    const percentage = currentTotalSales > 0 ? (van.totalSalesToday / currentTotalSales) * 100 : 0;
-                    return (
-                      <tr key={van.id} className="hover:bg-slate-50/50 transition-colors">
-                        <td className="px-6 py-4">
-                          <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600">
-                              <TrendingUp size={18} />
-                            </div>
-                            <span className="font-bold text-slate-700">{van.id}</span>
+                  {salesData.vanSales?.map((van: any) => (
+                    <tr key={van.vanId} className="hover:bg-slate-50/50 transition-colors">
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600">
+                            <TrendingUp size={18} />
                           </div>
-                        </td>
-                        <td className="px-6 py-4 text-slate-600">{van.representativeName || van.driverName}</td>
-                        <td className="px-6 py-4 font-bold text-emerald-600">{van.totalSalesToday.toLocaleString("ar-EG")} ج.م</td>
-                        <td className="px-6 py-4">
-                          <div className="flex items-center gap-3">
-                            <div className="w-32 h-2.5 bg-slate-100 rounded-full overflow-hidden">
-                              <div className="h-full bg-blue-500 rounded-full" style={{ width: `${percentage}%` }}></div>
-                            </div>
-                            <span className="text-sm font-medium text-slate-500 w-10">{percentage.toFixed(1)}%</span>
+                          <span className="font-bold text-slate-700">{van.vanId}</span>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 text-slate-600">{van.representativeName}</td>
+                      <td className="px-6 py-4 font-bold text-emerald-600">{van.totalSalesToday.toLocaleString("ar-EG")} ج.م</td>
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-3">
+                          <div className="w-32 h-2.5 bg-slate-100 rounded-full overflow-hidden">
+                            <div className="h-full bg-blue-500 rounded-full" style={{ width: `${van.percentage}%` }}></div>
                           </div>
-                        </td>
-                      </tr>
-                    );
-                  })}
+                          <span className="text-sm font-medium text-slate-500 w-10">{van.percentage.toFixed(1)}%</span>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
                 </tbody>
               </table>
             </div>
@@ -245,28 +208,16 @@ export function Reports() {
       )}
 
       {/* 2. INVENTORY REPORT */}
-      {activeTab === "inventory" && (
+      {!loading && activeTab === "inventory" && inventoryData && (
         <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-          
           <div className="flex flex-col xl:flex-row gap-6">
-            {/* Pie Chart */}
             <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 flex-1 min-w-[320px]">
                <h3 className="text-slate-800 font-bold text-lg mb-6">توزيع المنتجات حسب الفئة</h3>
                <div className="h-72 w-full">
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
-                    <Pie data={categoryData} cx="50%" cy="50%" innerRadius={70} outerRadius={110} dataKey="value" stroke="none" labelLine={false} label={({ cx, cy, midAngle, innerRadius, outerRadius, value, name }) => {
-                      const RADIAN = Math.PI / 180;
-                      const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
-                      const x = cx + radius * Math.cos(-midAngle * RADIAN);
-                      const y = cy + radius * Math.sin(-midAngle * RADIAN);
-                      return (
-                        <text x={x} y={y} fill="white" textAnchor={x > cx ? 'start' : 'end'} dominantBaseline="central" fontSize={14} fontWeight={600}>
-                          {`${value}%`}
-                        </text>
-                      );
-                    }}>
-                      {categoryData.map((_, index) => (
+                    <Pie data={inventoryData.categoryData} cx="50%" cy="50%" innerRadius={70} outerRadius={110} dataKey="value" stroke="none">
+                      {inventoryData.categoryData.map((_: any, index: number) => (
                         <Cell key={`cell-${index}`} fill={PIE_COLORS[index % PIE_COLORS.length]} />
                       ))}
                     </Pie>
@@ -277,7 +228,6 @@ export function Reports() {
                </div>
             </div>
 
-            {/* Inventory Table */}
             <div className="bg-white rounded-2xl border border-slate-100 shadow-sm flex-[2] overflow-hidden flex flex-col">
               <div className="px-6 py-5 border-b border-slate-100 flex items-center justify-between">
                 <h3 className="text-slate-800 font-bold text-lg">كل الأصناف بالمخزن الرئيسي حالياً</h3>
@@ -298,7 +248,7 @@ export function Reports() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100">
-                    {products.map((product) => {
+                    {inventoryData.products?.map((product: any) => {
                       const isLow = product.quantity < product.minQuantity;
                       const isMedium = product.quantity < product.minQuantity * 2 && !isLow;
                       const statusColor = isLow ? "bg-red-50 text-red-600 border-red-200" : isMedium ? "bg-yellow-50 text-yellow-600 border-yellow-200" : "bg-emerald-50 text-emerald-600 border-emerald-200";
