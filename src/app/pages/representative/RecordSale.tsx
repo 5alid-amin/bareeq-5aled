@@ -50,8 +50,8 @@ function printInvoice(invoice: any) {
 
 export function RecordSale() {
     const { user } = useAuth();
-    // تحويل الـ AssignedVanId لرقم عشان يتوافق مع الـ Backend (int vehicleId)
-    const vehicleId = user?.assignedVanId ? parseInt(user.assignedVanId.replace(/\D/g, "")) : 1;
+    // مأخوذ من الـ JWT Token مباشرة
+    const vehicleId = user?.vehicleId ?? 1;
 
     const [inventory, setInventory] = useState<VehicleInventoryDto[]>([]);
     const [cart, setCart] = useState<CartItem[]>([]);

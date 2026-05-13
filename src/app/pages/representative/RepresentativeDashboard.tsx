@@ -32,7 +32,7 @@ export function RepresentativeDashboard({ onNavigate }: { onNavigate: (page: str
     const [data, setData] = useState<DashboardData | null>(null);
     const [loading, setLoading] = useState(true);
 
-    const vehicleId = 1; // ID افتراضي
+    const vehicleId = user?.vehicleId ?? 1; // مأخوذ من الـ JWT Token
 
     useEffect(() => {
         const fetchDashboardData = async () => {
@@ -74,10 +74,11 @@ export function RepresentativeDashboard({ onNavigate }: { onNavigate: (page: str
                 <div className="absolute top-0 right-0 w-64 h-64 bg-white opacity-5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3" />
                 <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div>
-                        <h2 className="text-2xl font-bold mb-1">مرحباً، {displayData.representativeName}</h2>
+                        <h2 className="text-2xl font-bold mb-1">مرحباً، {user?.name || displayData.representativeName}</h2>
                         <p className="text-cyan-100/80 text-sm flex items-center gap-2">
                             <Truck size={16} />
-                            مركبة: {displayData.vehicleName} — لوحة: {displayData.plateNumber}
+                            مركبة: {user?.vehicleName || displayData.vehicleName}
+                            {displayData.plateNumber && ` — لوحة: ${displayData.plateNumber}`}
                         </p>
                     </div>
                     <button
@@ -96,9 +97,9 @@ export function RepresentativeDashboard({ onNavigate }: { onNavigate: (page: str
                     title="مبيعات اليوم"
                     value={`ج.م ${displayData.todaySales.toLocaleString()}`}
                     icon={<DollarSign size={20} />}
-                    trend={{ 
-                        value: `${Math.abs(displayData.salesGrowthPercentage)}%`, 
-                        positive: displayData.salesGrowthPercentage >= 0 
+                    trend={{
+                        value: `${Math.abs(displayData.salesGrowthPercentage)}%`,
+                        positive: displayData.salesGrowthPercentage >= 0
                     }}
                     color="green"
                 />
@@ -147,26 +148,26 @@ export function RepresentativeDashboard({ onNavigate }: { onNavigate: (page: str
                 <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
                     <h3 className="text-slate-800 font-medium mb-6">إجراءات سريعة</h3>
                     <div className="space-y-3">
-                        <ActionBtn 
-                            icon={<Package size={20} />} 
-                            title="مخزون المركبة" 
-                            sub="الأصناف المحملة" 
-                            color="blue" 
-                            onClick={() => onNavigate("rep-inventory")} 
+                        <ActionBtn
+                            icon={<Package size={20} />}
+                            title="مخزون المركبة"
+                            sub="الأصناف المحملة"
+                            color="blue"
+                            onClick={() => onNavigate("rep-inventory")}
                         />
-                        <ActionBtn 
-                            icon={<ShoppingCart size={20} />} 
-                            title="فاتورة بيع" 
-                            sub="تسجيل عملية جديدة" 
-                            color="emerald" 
-                            onClick={() => onNavigate("rep-sale")} 
+                        <ActionBtn
+                            icon={<ShoppingCart size={20} />}
+                            title="فاتورة بيع"
+                            sub="تسجيل عملية جديدة"
+                            color="emerald"
+                            onClick={() => onNavigate("rep-sale")}
                         />
-                        <ActionBtn 
-                            icon={<List size={20} />} 
-                            title="سجل المبيعات" 
-                            sub="مراجعة الفواتير" 
-                            color="purple" 
-                            onClick={() => onNavigate("rep-history")} 
+                        <ActionBtn
+                            icon={<List size={20} />}
+                            title="سجل المبيعات"
+                            sub="مراجعة الفواتير"
+                            color="purple"
+                            onClick={() => onNavigate("rep-history")}
                         />
                     </div>
                 </div>

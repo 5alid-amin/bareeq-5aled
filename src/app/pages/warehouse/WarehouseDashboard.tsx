@@ -70,7 +70,7 @@ export function WarehouseDashboard({ onNavigate }) {
 
       {/* Main Content Composition */}
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-5">
-        
+
         {/* Low Stock Alert (Takes 2/3 of width) */}
         <div className="xl:col-span-2 bg-white rounded-xl border border-slate-100 shadow-sm flex flex-col">
           <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100">
@@ -121,12 +121,11 @@ export function WarehouseDashboard({ onNavigate }) {
             {mostRequestedProducts.map((item, index) => (
               <div key={index} className="relative flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-100 overflow-hidden">
                 <span className="absolute -left-2 -bottom-2 text-5xl font-bold text-slate-200 opacity-20">#{index + 1}</span>
-                
+
                 <div className="flex items-center gap-3 relative z-10">
-                  <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                    index === 0 ? "bg-amber-100 text-amber-600" : 
-                    index === 1 ? "bg-slate-200 text-slate-600" : "bg-orange-100 text-orange-600"
-                  }`}>
+                  <div className={`w-10 h-10 rounded-full flex items-center justify-center ${index === 0 ? "bg-amber-100 text-amber-600" :
+                      index === 1 ? "bg-slate-200 text-slate-600" : "bg-orange-100 text-orange-600"
+                    }`}>
                     <BarChart3 size={18} />
                   </div>
                   <div>
@@ -134,14 +133,14 @@ export function WarehouseDashboard({ onNavigate }) {
                     <p className="text-slate-400 text-xs">{item.statusTag}</p>
                   </div>
                 </div>
-                
+
                 <div className="text-right relative z-10">
                   <p className="text-blue-600 font-bold text-lg">{item.requestCount}</p>
                   <p className="text-slate-400 text-[10px]">مرة تحميل</p>
                 </div>
               </div>
             ))}
-            
+
             <div className="mt-2 p-3 bg-blue-50 rounded-lg border border-blue-100">
               <p className="text-blue-700 text-[11px] text-center leading-relaxed">
                 تعتمد هذه البيانات على إجمالي حركات التحويل للفانات خلال الـ 7 أيام الماضية.

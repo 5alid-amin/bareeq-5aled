@@ -18,7 +18,7 @@ interface SalaryRecord {
 
 export function AccountantPayrollPage() {
   const [records, setRecords] = useState<SalaryRecord[]>([]);
-  
+
   // الـ State دي دلوقتي بتحدث نفسها "ديناميكياً" من داتا الجداول
   const [summary, setSummary] = useState({
     totalSalaries: 0,
@@ -45,11 +45,11 @@ export function AccountantPayrollPage() {
       else if (activeTab === "deductions") endpoint = "details/deductions";
       else if (activeTab === "loans") endpoint = "details/loans";
       // const response = await axios.get(`${import.meta.env.VITE_API_URL}/Payroll/${endpoint}`, {
-        const response = await axios.get(`https://localhost:7280/api/Payroll/${endpoint}`, {
-        params: { 
-          month: parseInt(selectedMonth), 
+      const response = await axios.get(`https://localhost:7280/api/Payroll/${endpoint}`, {
+        params: {
+          month: parseInt(selectedMonth),
           year: parseInt(selectedYear),
-          search: searchQuery 
+          search: searchQuery
         }
       });
 
@@ -59,9 +59,9 @@ export function AccountantPayrollPage() {
       // تحديث رقم الكارت المختار فقط في الـ summary state
       setSummary(prev => ({
         ...prev,
-        [activeTab === "overview" ? "totalSalaries" : 
-         activeTab === "bonuses" ? "totalBonuses" : 
-         activeTab === "deductions" ? "totalDeductions" : "totalLoans"]: total
+        [activeTab === "overview" ? "totalSalaries" :
+          activeTab === "bonuses" ? "totalBonuses" :
+            activeTab === "deductions" ? "totalDeductions" : "totalLoans"]: total
       }));
 
       // تحويل البيانات لتناسب شكل الجدول (Mapping)
@@ -135,52 +135,52 @@ export function AccountantPayrollPage() {
 
       {/* الكروت العلوية (بالتنسيق الموحد والتوسط الذي طلبته) */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-stretch">
-        
-        <div 
-          onClick={() => setActiveTab("overview")} 
+
+        <div
+          onClick={() => setActiveTab("overview")}
           className={`cursor-pointer transition-all rounded-2xl flex flex-col justify-center ${activeTab === "overview" ? "ring-2 ring-purple-600 shadow-md scale-[1.01]" : ""}`}
         >
-          <KPICard 
-            title={activeTab === "overview" ? "إجمالي الرواتب" : ""} 
-            value={activeTab === "overview" ? `${summary.totalSalaries.toLocaleString()} ج.م` : "إجمالي الرواتب"} 
-            icon={<Wallet size={24} />} 
-            color="blue" 
+          <KPICard
+            title={activeTab === "overview" ? "إجمالي الرواتب" : ""}
+            value={activeTab === "overview" ? `${summary.totalSalaries.toLocaleString()} ج.م` : "إجمالي الرواتب"}
+            icon={<Wallet size={24} />}
+            color="blue"
           />
         </div>
-        
-        <div 
-          onClick={() => setActiveTab("bonuses")} 
+
+        <div
+          onClick={() => setActiveTab("bonuses")}
           className={`cursor-pointer transition-all rounded-2xl flex flex-col justify-center ${activeTab === "bonuses" ? "ring-2 ring-emerald-600 shadow-md scale-[1.01]" : ""}`}
         >
-          <KPICard 
-            title={activeTab === "bonuses" ? "إجمالي المكافآت" : ""} 
-            value={activeTab === "bonuses" ? `${summary.totalBonuses.toLocaleString()} ج.م` : "إجمالي المكافآت"} 
-            icon={<DollarSign size={24} />} 
-            color="green" 
+          <KPICard
+            title={activeTab === "bonuses" ? "إجمالي المكافآت" : ""}
+            value={activeTab === "bonuses" ? `${summary.totalBonuses.toLocaleString()} ج.م` : "إجمالي المكافآت"}
+            icon={<DollarSign size={24} />}
+            color="green"
           />
         </div>
 
-        <div 
-          onClick={() => setActiveTab("deductions")} 
+        <div
+          onClick={() => setActiveTab("deductions")}
           className={`cursor-pointer transition-all rounded-2xl flex flex-col justify-center ${activeTab === "deductions" ? "ring-2 ring-red-600 shadow-md scale-[1.01]" : ""}`}
         >
-          <KPICard 
-            title={activeTab === "deductions" ? "إجمالي الخصومات" : ""} 
-            value={activeTab === "deductions" ? `${summary.totalDeductions.toLocaleString()} ج.م` : "إجمالي الخصومات"} 
-            icon={<FileText size={24} />} 
-            color="red" 
+          <KPICard
+            title={activeTab === "deductions" ? "إجمالي الخصومات" : ""}
+            value={activeTab === "deductions" ? `${summary.totalDeductions.toLocaleString()} ج.م` : "إجمالي الخصومات"}
+            icon={<FileText size={24} />}
+            color="red"
           />
         </div>
 
-        <div 
-          onClick={() => setActiveTab("loans")} 
+        <div
+          onClick={() => setActiveTab("loans")}
           className={`cursor-pointer transition-all rounded-2xl flex flex-col justify-center ${activeTab === "loans" ? "ring-2 ring-orange-600 shadow-md scale-[1.01]" : ""}`}
         >
-          <KPICard 
-            title={activeTab === "loans" ? "إجمالي السلف" : ""} 
-            value={activeTab === "loans" ? `${summary.totalLoans.toLocaleString()} ج.م` : "إجمالي السلف"} 
-            icon={<Landmark size={24} />} 
-            color="orange" 
+          <KPICard
+            title={activeTab === "loans" ? "إجمالي السلف" : ""}
+            value={activeTab === "loans" ? `${summary.totalLoans.toLocaleString()} ج.م` : "إجمالي السلف"}
+            icon={<Landmark size={24} />}
+            color="orange"
           />
         </div>
       </div>
@@ -189,7 +189,7 @@ export function AccountantPayrollPage() {
       <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden flex flex-col">
         <div className="px-6 py-5 border-b border-slate-100 flex flex-col md:flex-row items-center justify-between gap-4 bg-white">
           <h3 className="font-bold text-slate-800 text-lg">{getActiveTabTitle()}</h3>
-          
+
           <div className="relative w-full md:w-64">
             <Search className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
             <input

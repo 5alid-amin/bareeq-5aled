@@ -26,9 +26,9 @@ export function RestockManagementPage() {
         try {
             const statusNumber = STATUS_MAP[statusFilter];
             const response = await axios.get(API_BASE_URL, {
-                params: { 
+                params: {
                     status: statusNumber,
-                    search: searchTerm 
+                    search: searchTerm
                 }
             });
             setRequests(response.data);
@@ -61,10 +61,10 @@ export function RestockManagementPage() {
                 newStatus: newStatus,
                 adminNotes: "تم التحديث من لوحة التحكم"
             });
-            
+
             // نجاح العملية: إعادة تحميل البيانات
             await fetchRequests();
-            alert(response.data); 
+            alert(response.data);
         } catch (error: any) {
             alert(error.response?.data || "حدث خطأ أثناء التحديث");
         } finally {
@@ -86,9 +86,9 @@ export function RestockManagementPage() {
 
             {/* Filter Cards */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <button 
-                  onClick={() => setStatusFilter("معلق")}
-                  className={`p-4 rounded-2xl text-right transition-all border ${statusFilter === "معلق" ? "bg-amber-500 border-amber-600 shadow-md transform -translate-y-1" : "bg-white border-slate-200"}`}
+                <button
+                    onClick={() => setStatusFilter("معلق")}
+                    className={`p-4 rounded-2xl text-right transition-all border ${statusFilter === "معلق" ? "bg-amber-500 border-amber-600 shadow-md transform -translate-y-1" : "bg-white border-slate-200"}`}
                 >
                     <div className={`flex items-center gap-3 mb-2 ${statusFilter === "معلق" ? "text-white" : "text-amber-600"}`}>
                         <Clock size={16} />
@@ -99,9 +99,9 @@ export function RestockManagementPage() {
                     </div>
                 </button>
 
-                <button 
-                  onClick={() => setStatusFilter("موافق")}
-                  className={`p-4 rounded-2xl text-right transition-all border ${statusFilter === "موافق" ? "bg-emerald-500 border-emerald-600 shadow-md transform -translate-y-1" : "bg-white border-slate-200"}`}
+                <button
+                    onClick={() => setStatusFilter("موافق")}
+                    className={`p-4 rounded-2xl text-right transition-all border ${statusFilter === "موافق" ? "bg-emerald-500 border-emerald-600 shadow-md transform -translate-y-1" : "bg-white border-slate-200"}`}
                 >
                     <div className={`flex items-center gap-3 mb-2 ${statusFilter === "موافق" ? "text-white" : "text-emerald-600"}`}>
                         <CheckCircle size={16} />
@@ -112,9 +112,9 @@ export function RestockManagementPage() {
                     </div>
                 </button>
 
-                <button 
-                  onClick={() => setStatusFilter("تم التسليم")}
-                  className={`p-4 rounded-2xl text-right transition-all border ${statusFilter === "تم التسليم" ? "bg-blue-500 border-blue-600 shadow-md transform -translate-y-1" : "bg-white border-slate-200"}`}
+                <button
+                    onClick={() => setStatusFilter("تم التسليم")}
+                    className={`p-4 rounded-2xl text-right transition-all border ${statusFilter === "تم التسليم" ? "bg-blue-500 border-blue-600 shadow-md transform -translate-y-1" : "bg-white border-slate-200"}`}
                 >
                     <div className={`flex items-center gap-3 mb-2 ${statusFilter === "تم التسليم" ? "text-white" : "text-blue-600"}`}>
                         <Package size={16} />
@@ -175,18 +175,18 @@ export function RestockManagementPage() {
                                             <div className="flex items-center gap-2">
                                                 {req.status === 0 && (
                                                     <>
-                                                        <button 
+                                                        <button
                                                             onClick={() => handleAction(req.requestId, 1)}
                                                             className="bg-emerald-50 text-emerald-600 px-3 py-1.5 rounded-lg text-xs hover:bg-emerald-600 hover:text-white"
                                                         >موافقة</button>
-                                                        <button 
+                                                        <button
                                                             onClick={() => handleAction(req.requestId, 3)}
                                                             className="bg-rose-50 text-rose-600 px-3 py-1.5 rounded-lg text-xs hover:bg-rose-600 hover:text-white"
                                                         >رفض</button>
                                                     </>
                                                 )}
                                                 {req.status === 1 && (
-                                                    <button 
+                                                    <button
                                                         disabled={loadingAction === req.requestId}
                                                         onClick={() => handleAction(req.requestId, 2)}
                                                         className="bg-blue-600 text-white px-4 py-2 rounded-lg text-xs flex items-center gap-2"

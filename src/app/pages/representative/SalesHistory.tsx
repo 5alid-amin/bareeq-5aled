@@ -42,7 +42,7 @@ function ViewInvoiceModal({ invoiceId, vehicleId, onClose }: { invoiceId: number
                     </div>
                     <button onClick={onClose} className="p-2 hover:bg-white/10 rounded-full transition-colors"><X size={20} /></button>
                 </div>
-                
+
                 <div className="p-6 space-y-6">
                     <div className="grid grid-cols-2 gap-4 text-sm text-slate-600">
                         <div className="bg-slate-50 p-3 rounded-xl border border-slate-100">
@@ -106,7 +106,7 @@ function EditInvoiceModal({ invoiceId, vehicleId, onClose, onSave }: { invoiceId
     useEffect(() => {
         axios.get(`${BASE_URL}/${invoiceId}/vehicle/${vehicleId}`).then(res => {
             // هنا تم الاعتماد على productId القادم من الـ DTO الجديد مباشرة
-            setItems(res.data.items.map((i: any) => ({ ...i }))); 
+            setItems(res.data.items.map((i: any) => ({ ...i })));
             setPaymentMethod(res.data.paymentMethod);
             setLoading(false);
         });
@@ -165,13 +165,13 @@ function EditInvoiceModal({ invoiceId, vehicleId, onClose, onSave }: { invoiceId
 // ─── Main Component ─────────────────────────────────────────────────────
 export function SalesHistory() {
     const { user } = useAuth();
-    const vehicleId = user?.vehicleId || 1; 
+    const vehicleId = user?.vehicleId ?? 1; // مأخوذ من الـ JWT Token
 
     const [invoices, setInvoices] = useState<any[]>([]);
     const [summary, setSummary] = useState({ totalSales: 0, totalInvoices: 0, totalItemsCount: 0 });
     const [searchTerm, setSearchTerm] = useState("");
     const [selectedDate, setSelectedDate] = useState("");
-    
+
     const [viewId, setViewId] = useState<number | null>(null);
     const [editId, setEditId] = useState<number | null>(null);
     const [deleteId, setDeleteId] = useState<number | null>(null);
@@ -181,7 +181,7 @@ export function SalesHistory() {
         try {
             let url = `${BASE_URL}/vehicle/${vehicleId}?searchTerm=${searchTerm}`;
             if (selectedDate) url += `&date=${selectedDate}`;
-            
+
             const res = await axios.get(url);
             setInvoices(res.data.invoices);
             setSummary(res.data.summary);
@@ -212,22 +212,22 @@ export function SalesHistory() {
                     <div className="relative">
                         <Search size={16} className="absolute top-1/2 -translate-y-1/2 right-3 text-slate-400" />
                         <input type="text" placeholder="بحث برقم الفاتورة..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)}
-                               className="w-full md:w-64 bg-white border border-slate-200 rounded-xl pr-10 pl-4 py-2.5 text-sm" />
+                            className="w-full md:w-64 bg-white border border-slate-200 rounded-xl pr-10 pl-4 py-2.5 text-sm" />
                     </div>
                 </div>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div className="bg-white border-2 border-purple-500 rounded-2xl p-5 shadow-sm group">
-                    <div className="flex justify-between mb-2 text-purple-600 text-xs font-bold uppercase tracking-wider"><span>إجمالي المبيعات</span><DollarSign size={18}/></div>
+                    <div className="flex justify-between mb-2 text-purple-600 text-xs font-bold uppercase tracking-wider"><span>إجمالي المبيعات</span><DollarSign size={18} /></div>
                     <div className="text-2xl font-black text-purple-700">ج.م {summary.totalSales.toFixed(2)}</div>
                 </div>
                 <div className="bg-white border-2 border-blue-500 rounded-2xl p-5 shadow-sm group">
-                    <div className="flex justify-between mb-2 text-blue-600 text-xs font-bold uppercase tracking-wider"><span>عدد الفواتير</span><FileText size={18}/></div>
+                    <div className="flex justify-between mb-2 text-blue-600 text-xs font-bold uppercase tracking-wider"><span>عدد الفواتير</span><FileText size={18} /></div>
                     <div className="text-2xl font-black text-blue-700">{summary.totalInvoices}</div>
                 </div>
                 <div className="bg-white border-2 border-emerald-500 rounded-2xl p-5 shadow-sm group">
-                    <div className="flex justify-between mb-2 text-emerald-600 text-xs font-bold uppercase tracking-wider"><span>إجمالي القطع</span><TrendingUp size={18}/></div>
+                    <div className="flex justify-between mb-2 text-emerald-600 text-xs font-bold uppercase tracking-wider"><span>إجمالي القطع</span><TrendingUp size={18} /></div>
                     <div className="text-2xl font-black text-emerald-700">{summary.totalItemsCount}</div>
                 </div>
             </div>

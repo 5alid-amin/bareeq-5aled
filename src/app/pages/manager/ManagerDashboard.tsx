@@ -11,7 +11,7 @@ const API_BASE = "https://localhost:7280/api/manager/ManagerDashborad";
 export function ManagerDashboard({ onNavigate }: { onNavigate: (page: string) => void }) {
   const [chartMode, setChartMode] = useState<"daily" | "monthly">("daily");
   const [timeFilter, setTimeFilter] = useState("اليوم");
-  
+
   // States لتخزين البيانات الحقيقية
   const [summary, setSummary] = useState<any>(null);
   const [chartData, setChartData] = useState([]);

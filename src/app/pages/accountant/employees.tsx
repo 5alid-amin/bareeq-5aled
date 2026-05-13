@@ -19,16 +19,16 @@ export default function EmployeesPage() {
     const [selectedEmployee, setSelectedEmployee] = useState<string | null>(null);
     const [selectedPeriod, setSelectedPeriod] = useState(new Date().toISOString().slice(0, 7));
     const [selectedKPI, setSelectedKPI] = useState<'salary' | 'deductions' | 'bonuses' | 'advances'>('salary');
-    
+
     // التعديل هنا: إضافة قيم ابتدائية صريحة لمنع الشاشة البيضاء
-    const [statementData, setStatementData] = useState<any>({ 
-        totalBaseSalary: 0, 
-        totalBonuses: 0, 
-        totalDeductions: 0, 
-        totalLoans: 0, 
-        details: [] 
+    const [statementData, setStatementData] = useState<any>({
+        totalBaseSalary: 0,
+        totalBonuses: 0,
+        totalDeductions: 0,
+        totalLoans: 0,
+        details: []
     });
-    
+
     const [addModalType, setAddModalType] = useState<string | null>(null);
     const [showAddEmployeeModal, setShowAddEmployeeModal] = useState(false);
     const [isManualMode, setIsManualMode] = useState(false);
@@ -120,13 +120,13 @@ export default function EmployeesPage() {
 
     const handleUpdateRecord = async () => {
         try {
-            let type = editingRecord.type === 'advances' ? 'loan' : 
-                       editingRecord.type === 'bonuses' ? 'bonus' : 
-                       editingRecord.type === 'deductions' ? 'deduction' : 'payroll';
+            let type = editingRecord.type === 'advances' ? 'loan' :
+                editingRecord.type === 'bonuses' ? 'bonus' :
+                    editingRecord.type === 'deductions' ? 'deduction' : 'payroll';
 
             const payload = {
-              baseSalary: parseFloat(editingRecord.amount || editingRecord.baseSalary || 0),
-              paymentDate: editingRecord.date || new Date().toISOString(),
+                baseSalary: parseFloat(editingRecord.amount || editingRecord.baseSalary || 0),
+                paymentDate: editingRecord.date || new Date().toISOString(),
             };
 
             await api.put(`/Employees/${type}/${editingRecord.id}`, payload);
@@ -158,8 +158,8 @@ export default function EmployeesPage() {
                         <button onClick={() => setViewMode('grid')} className="flex items-center text-gray-500 hover:text-gray-800 font-medium">
                             <ArrowLeft className="w-4 h-4 ml-2" /> العودة للقائمة
                         </button>
-                        
-                        <button 
+
+                        <button
                             onClick={() => handleDeleteEmployee(selectedEmployee, employee?.fullName || '')}
                             className="flex items-center gap-2 px-4 py-2 rounded-xl bg-red-50 text-red-500 hover:bg-red-100 transition-colors text-sm font-bold"
                         >
@@ -173,11 +173,11 @@ export default function EmployeesPage() {
                                 <h1 className="text-3xl font-bold text-slate-900">{employee?.fullName}</h1>
                                 <p className="text-slate-500 mt-1">{employee?.jobTitle} | {employee?.phone || 'بدون رقم'}</p>
                             </div>
-                            
+
                             {selectedKPI === 'salary' && (
                                 <div className="flex items-center gap-3 bg-white px-4 py-2 rounded-2xl border shadow-sm self-center">
                                     <span className="text-sm font-bold text-slate-600">إضافة يدوية</span>
-                                    <button 
+                                    <button
                                         onClick={() => setIsManualMode(!isManualMode)}
                                         className={`w-12 h-6 rounded-full transition-colors relative ${isManualMode ? 'bg-blue-600' : 'bg-slate-300'}`}
                                     >
@@ -217,14 +217,14 @@ export default function EmployeesPage() {
                     <div className="bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-sm">
                         <div className="p-5 border-b bg-slate-50/50 flex justify-between items-center">
                             <h2 className="font-bold text-slate-800 text-lg">
-                                {selectedKPI === 'salary' &&'المرتب الأساسي'}
+                                {selectedKPI === 'salary' && 'المرتب الأساسي'}
                                 {selectedKPI === 'bonuses' && 'سجل المكافآت والبدلات'}
                                 {selectedKPI === 'deductions' && 'سجل الخصومات'}
                                 {selectedKPI === 'advances' && 'سجل السلف المستلمة'}
                             </h2>
-                            
+
                             {(selectedKPI !== 'salary' || (selectedKPI === 'salary' && isManualMode)) && (
-                                <button 
+                                <button
                                     onClick={() => { setFormData({ ...formData, amount: 0, notes: '' }); setAddModalType(selectedKPI); }}
                                     className="bg-slate-900 text-white px-4 py-2 rounded-xl flex items-center gap-2 text-sm font-bold hover:bg-slate-800 transition-all shadow-md"
                                 >
@@ -250,14 +250,14 @@ export default function EmployeesPage() {
                                         <td className="px-6 py-4 text-slate-500">{new Date(r.date).toLocaleDateString('ar-EG')}</td>
                                         <td className="px-6 py-4">
                                             <div className="flex items-center justify-center gap-2">
-                                                <button 
+                                                <button
                                                     onClick={() => setEditingRecord({ ...r, type: selectedKPI })}
                                                     className="p-2 text-blue-500 hover:bg-blue-50 rounded-lg transition-colors"
                                                     title="تعديل"
                                                 >
                                                     <Edit2 size={16} />
                                                 </button>
-                                                <button 
+                                                <button
                                                     onClick={() => handleDeleteRecord(r.id)}
                                                     className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
                                                     title="حذف"
@@ -284,25 +284,25 @@ export default function EmployeesPage() {
                                 <h3 className="text-xl font-bold">
                                     إضافة {addModalType === 'salary' ? 'مرتب يدوي' : addModalType === 'bonuses' ? 'مكافأة' : addModalType === 'deductions' ? 'خصم' : 'سلفة'}
                                 </h3>
-                                <button onClick={() => setAddModalType(null)} className="p-1 hover:bg-slate-100 rounded-lg"><X size={20}/></button>
+                                <button onClick={() => setAddModalType(null)} className="p-1 hover:bg-slate-100 rounded-lg"><X size={20} /></button>
                             </div>
                             <div className="space-y-4">
                                 <div>
                                     <label className="block text-sm font-bold text-slate-700 mb-1">المبلغ</label>
-                                    <input 
-                                        type="number" 
-                                        className="w-full border rounded-xl p-3 text-right focus:ring-2 focus:ring-blue-500 outline-none bg-slate-50" 
-                                        placeholder="0.00" 
-                                        onChange={(e) => setFormData({...formData, amount: parseFloat(e.target.value)})}
+                                    <input
+                                        type="number"
+                                        className="w-full border rounded-xl p-3 text-right focus:ring-2 focus:ring-blue-500 outline-none bg-slate-50"
+                                        placeholder="0.00"
+                                        onChange={(e) => setFormData({ ...formData, amount: parseFloat(e.target.value) })}
                                     />
                                 </div>
                                 {addModalType !== 'salary' && (
                                     <div>
                                         <label className="block text-sm font-bold text-slate-700 mb-1">الملاحظة</label>
-                                        <textarea 
-                                            className="w-full border rounded-xl p-3 text-right focus:ring-2 focus:ring-blue-500 outline-none bg-slate-50 min-h-[80px]" 
-                                            placeholder="اكتب الملاحظة هنا..." 
-                                            onChange={(e) => setFormData({...formData, notes: e.target.value})}
+                                        <textarea
+                                            className="w-full border rounded-xl p-3 text-right focus:ring-2 focus:ring-blue-500 outline-none bg-slate-50 min-h-[80px]"
+                                            placeholder="اكتب الملاحظة هنا..."
+                                            onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                                         />
                                     </div>
                                 )}
@@ -318,25 +318,25 @@ export default function EmployeesPage() {
                         <div className="bg-white p-6 rounded-3xl shadow-xl max-w-sm w-full" dir="rtl">
                             <div className="flex justify-between items-center mb-6 border-b pb-3">
                                 <h3 className="text-xl font-bold text-slate-800">تعديل البيانات</h3>
-                                <button onClick={() => setEditingRecord(null)} className="p-1 hover:bg-slate-100 rounded-lg"><X size={20}/></button>
+                                <button onClick={() => setEditingRecord(null)} className="p-1 hover:bg-slate-100 rounded-lg"><X size={20} /></button>
                             </div>
                             <div className="space-y-4">
                                 <div>
                                     <label className="block text-sm font-bold text-slate-700 mb-1">المبلغ</label>
-                                    <input 
-                                        type="number" 
+                                    <input
+                                        type="number"
                                         defaultValue={editingRecord.amount}
-                                        className="w-full border rounded-xl p-3 text-right focus:ring-2 focus:ring-blue-500 outline-none bg-slate-50" 
-                                        onChange={(e) => setEditingRecord({...editingRecord, amount: parseFloat(e.target.value)})}
+                                        className="w-full border rounded-xl p-3 text-right focus:ring-2 focus:ring-blue-500 outline-none bg-slate-50"
+                                        onChange={(e) => setEditingRecord({ ...editingRecord, amount: parseFloat(e.target.value) })}
                                     />
                                 </div>
                                 {editingRecord.type !== 'salary' && (
                                     <div>
                                         <label className="block text-sm font-bold text-slate-700 mb-1">الملاحظة</label>
-                                        <textarea 
+                                        <textarea
                                             defaultValue={editingRecord.notes}
-                                            className="w-full border rounded-xl p-3 text-right focus:ring-2 focus:ring-blue-500 outline-none bg-slate-50 min-h-[80px]" 
-                                            onChange={(e) => setEditingRecord({...editingRecord, notes: e.target.value})}
+                                            className="w-full border rounded-xl p-3 text-right focus:ring-2 focus:ring-blue-500 outline-none bg-slate-50 min-h-[80px]"
+                                            onChange={(e) => setEditingRecord({ ...editingRecord, notes: e.target.value })}
                                         />
                                     </div>
                                 )}
@@ -354,7 +354,7 @@ export default function EmployeesPage() {
             <div className="max-w-7xl mx-auto">
                 <div className="flex justify-between items-center mb-8">
                     <h1 className="text-3xl font-bold text-slate-900">دليل الموظفين</h1>
-                    <button 
+                    <button
                         onClick={() => { setFormData({ ...formData, fullName: '', phone: '', baseSalary: 0 }); setShowAddEmployeeModal(true); }}
                         className="bg-blue-600 text-white px-6 py-3 rounded-2xl flex items-center gap-2 font-bold shadow-lg transition-transform active:scale-95"
                     >
@@ -372,11 +372,11 @@ export default function EmployeesPage() {
                             <div className="space-y-5">
                                 <div>
                                     <label className="block text-sm font-bold text-slate-700 mb-2">اسم الموظف</label>
-                                    <input type="text" className="w-full border-2 border-slate-100 rounded-2xl p-3.5 text-right focus:border-blue-500 outline-none bg-slate-50/50" placeholder="الاسم الكامل" onChange={(e) => setFormData({...formData, fullName: e.target.value})} />
+                                    <input type="text" className="w-full border-2 border-slate-100 rounded-2xl p-3.5 text-right focus:border-blue-500 outline-none bg-slate-50/50" placeholder="الاسم الكامل" onChange={(e) => setFormData({ ...formData, fullName: e.target.value })} />
                                 </div>
                                 <div>
                                     <label className="block text-sm font-bold text-slate-700 mb-2">الدور الوظيفي</label>
-                                    <select className="w-full border-2 border-slate-100 rounded-2xl p-3.5 text-right focus:border-blue-500 outline-none bg-slate-50/50 appearance-none" onChange={(e) => setFormData({...formData, jobTitle: e.target.value})}>
+                                    <select className="w-full border-2 border-slate-100 rounded-2xl p-3.5 text-right focus:border-blue-500 outline-none bg-slate-50/50 appearance-none" onChange={(e) => setFormData({ ...formData, jobTitle: e.target.value })}>
                                         <option value="مندوب">مندوب</option>
                                         <option value="مدير مخزن">مدير مخزن</option>
                                         <option value="محاسب">محاسب</option>
@@ -387,11 +387,11 @@ export default function EmployeesPage() {
                                 </div>
                                 <div>
                                     <label className="block text-sm font-bold text-slate-700 mb-2">رقم التليفون (11 رقم)</label>
-                                    <input type="tel" maxLength={11} className="w-full border-2 border-slate-100 rounded-2xl p-3.5 text-left focus:border-blue-500 outline-none bg-slate-50/50" placeholder="01xxxxxxxxx" onChange={(e) => setFormData({...formData, phone: e.target.value})} />
+                                    <input type="tel" maxLength={11} className="w-full border-2 border-slate-100 rounded-2xl p-3.5 text-left focus:border-blue-500 outline-none bg-slate-50/50" placeholder="01xxxxxxxxx" onChange={(e) => setFormData({ ...formData, phone: e.target.value })} />
                                 </div>
                                 <div>
                                     <label className="block text-sm font-bold text-slate-700 mb-2">المرتب الأساسي</label>
-                                    <input type="number" className="w-full border-2 border-slate-100 rounded-2xl p-3.5 text-right focus:border-blue-500 outline-none bg-slate-50/50" placeholder="0.00" onChange={(e) => setFormData({...formData, baseSalary: parseFloat(e.target.value)})} />
+                                    <input type="number" className="w-full border-2 border-slate-100 rounded-2xl p-3.5 text-right focus:border-blue-500 outline-none bg-slate-50/50" placeholder="0.00" onChange={(e) => setFormData({ ...formData, baseSalary: parseFloat(e.target.value) })} />
                                 </div>
                                 <button onClick={handleAddEmployee} className="w-full bg-blue-600 text-white py-4 rounded-2xl font-bold shadow-xl hover:bg-blue-700 transition-all">حفظ البيانات</button>
                             </div>

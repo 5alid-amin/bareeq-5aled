@@ -34,11 +34,11 @@ export function ReorderAlertsPage() {
   const [allProducts, setAllProducts] = useState<ProductSimple[]>([]);
   const [lowStockList, setLowStockList] = useState<LowStockProduct[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
-  
+
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState("");
-  
+
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCatId, setSelectedCatId] = useState<string>("all");
   const [activeRowIndex, setActiveRowIndex] = useState(0);
@@ -90,7 +90,7 @@ export function ReorderAlertsPage() {
     setError("");
 
     const payload = items.filter(i => i.productId !== "" && Number(i.addedQuantity) > 0);
-    
+
     if (payload.length === 0) {
       setError("يرجى اختيار صنف واحد على الأقل وإدخال كمية أكبر من الصفر");
       return;
@@ -223,8 +223,8 @@ export function ReorderAlertsPage() {
                   </thead>
                   <tbody className="divide-y divide-slate-100">
                     {items.map((item, index) => (
-                      <tr 
-                        key={index} 
+                      <tr
+                        key={index}
                         onClick={() => setActiveRowIndex(index)}
                         className={`cursor-pointer transition-colors ${activeRowIndex === index ? "bg-blue-50/50" : "hover:bg-slate-50/50"}`}
                       >
@@ -268,20 +268,20 @@ export function ReorderAlertsPage() {
           </h2>
           <div className="flex items-center gap-2">
             <div className="relative">
-               <Search size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400" />
-               <input 
-                  type="text" 
-                  placeholder="بحث سريع..." 
-                  className="text-xs border rounded-lg pr-8 pl-3 py-1.5 focus:ring-1 outline-none"
-                  onChange={(e) => setSearchQuery(e.target.value)}
-               />
+              <Search size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400" />
+              <input
+                type="text"
+                placeholder="بحث سريع..."
+                className="text-xs border rounded-lg pr-8 pl-3 py-1.5 focus:ring-1 outline-none"
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
             </div>
-            <select 
+            <select
               className="text-xs border rounded-lg px-2 py-1.5 outline-none"
               onChange={(e) => setSelectedCatId(e.target.value)}
             >
-               <option value="all">كل الأقسام</option>
-               {categories.map(c => <option key={c.categoryId} value={c.categoryId}>{c.categoryName}</option>)}
+              <option value="all">كل الأقسام</option>
+              {categories.map(c => <option key={c.categoryId} value={c.categoryId}>{c.categoryName}</option>)}
             </select>
           </div>
         </div>
@@ -308,9 +308,9 @@ export function ReorderAlertsPage() {
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-3 w-40">
                       <div className="flex-1 bg-slate-100 rounded-full h-1.5 overflow-hidden">
-                        <div 
-                          className={`h-full ${p.stockPercentage < 30 ? 'bg-rose-500' : 'bg-amber-500'}`} 
-                          style={{ width: `${Math.min(p.stockPercentage, 100)}%` }} 
+                        <div
+                          className={`h-full ${p.stockPercentage < 30 ? 'bg-rose-500' : 'bg-amber-500'}`}
+                          style={{ width: `${Math.min(p.stockPercentage, 100)}%` }}
                         />
                       </div>
                       <span className="text-[10px] font-bold text-slate-600">{p.stockPercentage}%</span>

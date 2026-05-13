@@ -30,7 +30,7 @@ function UserModal({ user, onClose, onSave }: UserModalProps) {
     isActive: user?.isActive ?? true,
     avatarUrl: user?.avatarUrl ?? "",
   });
-  
+
   const [loading, setLoading] = useState(false);
   const [saved, setSaved] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -86,7 +86,7 @@ function UserModal({ user, onClose, onSave }: UserModalProps) {
               <h2 className="text-slate-700 text-base font-bold">{user ? "تعديل بيانات الحساب" : "إنشاء حساب جديد"}</h2>
               <button onClick={onClose} className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-slate-500 hover:bg-slate-200 text-lg">×</button>
             </div>
-            
+
             <form onSubmit={handleSave} className="p-6 space-y-4 max-h-[80vh] overflow-y-auto">
               {!user && (
                 <div>
@@ -134,7 +134,7 @@ function UserModal({ user, onClose, onSave }: UserModalProps) {
                       dir="ltr"
                       required
                     />
-                    <button 
+                    <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
                       className="absolute top-1/2 -translate-y-1/2 left-3 text-slate-400 hover:text-blue-500 transition-colors"
@@ -329,7 +329,7 @@ export function UserManagement() {
                 <p className="text-slate-400 text-[11px] font-bold mb-1 uppercase">بيانات الدخول</p>
                 <p className="text-slate-700 text-sm font-medium" dir="ltr">{user.email}</p>
               </div>
-              
+
               <div className="flex items-center justify-between gap-2">
                 <div>
                   <p className="text-slate-400 text-[11px] font-bold mb-1 uppercase">الدور الوظيفي</p>
@@ -345,7 +345,7 @@ export function UserManagement() {
                   </div>
                 </div>
               </div>
-              
+
               <div className="grid grid-cols-2 gap-2 pt-2 border-t border-slate-50">
                 <div>
                   <p className="text-slate-400 text-[10px] font-bold mb-1">تاريخ الإنشاء</p>

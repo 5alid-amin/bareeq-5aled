@@ -7,46 +7,46 @@ const API_BASE_URL = "https://localhost:7280/api/Inventory";
 
 // ─── Types ──────────────────────────────────────────────────────────────────────
 interface Product {
-    productId: number;
-    productName: string;
-    categoryName: string;
-    barcode: string;
-    purchasePrice: number;
-    salePrice: number;
-    currentQuantity: number;
-    minThreshold: number;
-    status: string;
+  productId: number;
+  productName: string;
+  categoryName: string;
+  barcode: string;
+  purchasePrice: number;
+  salePrice: number;
+  currentQuantity: number;
+  minThreshold: number;
+  status: string;
 }
 
 interface Category {
-    categoryId?: number;
-    categoryName: string;
+  categoryId?: number;
+  categoryName: string;
 }
 
 // ─── Category Management Modal ───────────────────────────────────────────────────
-function CategoryModal({ 
-  categories, 
-  onClose, 
-  onRefresh 
-}: { 
-  categories: Category[], 
-  onClose: () => void, 
-  onRefresh: () => void 
+function CategoryModal({
+  categories,
+  onClose,
+  onRefresh
+}: {
+  categories: Category[],
+  onClose: () => void,
+  onRefresh: () => void
 }) {
   const [newCat, setNewCat] = useState("");
   const [editingCat, setEditingCat] = useState<Category | null>(null);
 
   const handleSaveCategory = async () => {
-    if(!newCat.trim()) return;
+    if (!newCat.trim()) return;
     try {
-        if (editingCat) {
-            await axios.put(`${API_BASE_URL}/categories`, { categoryId: editingCat.categoryId, categoryName: newCat });
-        } else {
-            await axios.post(`${API_BASE_URL}/categories`, { categoryName: newCat });
-        }
-        setNewCat("");
-        setEditingCat(null);
-        onRefresh();
+      if (editingCat) {
+        await axios.put(`${API_BASE_URL}/categories`, { categoryId: editingCat.categoryId, categoryName: newCat });
+      } else {
+        await axios.post(`${API_BASE_URL}/categories`, { categoryName: newCat });
+      }
+      setNewCat("");
+      setEditingCat(null);
+      onRefresh();
     } catch (err) { console.error(err); }
   };
 
@@ -61,25 +61,25 @@ function CategoryModal({
         </div>
         <div className="p-6 space-y-4">
           <div className="flex gap-2">
-            <input 
+            <input
               value={newCat}
               onChange={(e) => setNewCat(e.target.value)}
               placeholder={editingCat ? "تعديل الفئة..." : "اسم الفئة الجديدة..."}
               className="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
             />
             <button onClick={handleSaveCategory} className="bg-blue-600 text-white px-4 py-2 rounded-xl text-sm font-bold hover:bg-blue-700">
-                {editingCat ? "تعديل" : "إضافة"}
+              {editingCat ? "تعديل" : "إضافة"}
             </button>
           </div>
           <div className="max-h-60 overflow-y-auto border border-slate-100 rounded-xl divide-y divide-slate-50">
             {categories.map((cat) => (
               <div key={cat.categoryId} className="flex items-center justify-between p-3 hover:bg-slate-50">
                 <span className="text-slate-700 text-sm font-medium">{cat.categoryName}</span>
-                <button 
+                <button
                   onClick={() => { setEditingCat(cat); setNewCat(cat.categoryName); }}
                   className="p-1.5 text-blue-500 hover:bg-blue-50 rounded-lg"
                 >
-                    <Edit2 size={14} />
+                  <Edit2 size={14} />
                 </button>
               </div>
             ))}
@@ -100,9 +100,9 @@ function ProductModal({ product, onClose, onSave, categories }: { product?: Prod
     barcode: product?.barcode ?? "",
     initialQuantity: product?.currentQuantity ?? 0,
     minThresholdMainStock: product?.minThreshold ?? 20,
-    minThresholdVehicle: 5, 
+    minThresholdVehicle: 5,
   });
-  
+
   const [loading, setLoading] = useState(false);
   const [saved, setSaved] = useState(false);
 
@@ -110,15 +110,15 @@ function ProductModal({ product, onClose, onSave, categories }: { product?: Prod
     e.preventDefault();
     setLoading(true);
     try {
-        if (product) {
-            await axios.put(`${API_BASE_URL}/${product.productId}`, form);
-        } else {
-            await axios.post(API_BASE_URL, form);
-        }
-        setSaved(true);
-        onSave();
-        setTimeout(() => onClose(), 1300);
-    } catch (err) { console.error(err); } 
+      if (product) {
+        await axios.put(`${API_BASE_URL}/${product.productId}`, form);
+      } else {
+        await axios.post(API_BASE_URL, form);
+      }
+      setSaved(true);
+      onSave();
+      setTimeout(() => onClose(), 1300);
+    } catch (err) { console.error(err); }
     finally { setLoading(false); }
   };
 
@@ -144,7 +144,7 @@ function ProductModal({ product, onClose, onSave, categories }: { product?: Prod
               <div className="col-span-2">
                 <label className="block text-slate-600 text-sm mb-1.5 font-bold">الفئة</label>
                 <select value={form.categoryId} onChange={(e) => setForm({ ...form, categoryId: parseInt(e.target.value) })} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
-                    {categories.map((c) => <option key={c.categoryId} value={c.categoryId}>{c.categoryName}</option>)}
+                  {categories.map((c) => <option key={c.categoryId} value={c.categoryId}>{c.categoryName}</option>)}
                 </select>
               </div>
               <div>
@@ -174,7 +174,7 @@ function ProductModal({ product, onClose, onSave, categories }: { product?: Prod
               <div className="col-span-2 flex gap-3 pt-2">
                 <button type="button" onClick={onClose} className="flex-1 border border-slate-200 text-slate-600 py-2.5 rounded-xl text-sm font-bold">إلغاء</button>
                 <button type="submit" disabled={loading} className="flex-1 bg-blue-600 text-white py-2.5 rounded-xl text-sm font-bold flex justify-center items-center gap-2">
-                    {loading ? <Loader2 className="animate-spin" size={18} /> : "حفظ المنتج"}
+                  {loading ? <Loader2 className="animate-spin" size={18} /> : "حفظ المنتج"}
                 </button>
               </div>
             </form>
@@ -203,22 +203,22 @@ export function InventoryPage() {
   const fetchData = async () => {
     setLoading(true);
     try {
-        const params: any = {};
-        if (search) params.name = search;
-        if (filterCat !== "الكل") params.categoryId = filterCat;
-        if (filterMode) params.status = filterMode === "low" ? "منخفض" : "جيد";
+      const params: any = {};
+      if (search) params.name = search;
+      if (filterCat !== "الكل") params.categoryId = filterCat;
+      if (filterMode) params.status = filterMode === "low" ? "منخفض" : "جيد";
 
-        const res = await axios.get(API_BASE_URL, { params });
-        setProductList(res.data.data);
-        setSummary(res.data.summary);
-    } catch (err) { console.error(err); } 
+      const res = await axios.get(API_BASE_URL, { params });
+      setProductList(res.data.data);
+      setSummary(res.data.summary);
+    } catch (err) { console.error(err); }
     finally { setLoading(false); }
   };
 
   const fetchCategories = async () => {
     try {
-        const res = await axios.get(`${API_BASE_URL}/categories`);
-        setCategories(res.data);
+      const res = await axios.get(`${API_BASE_URL}/categories`);
+      setCategories(res.data);
     } catch (err) { console.error(err); }
   };
 
@@ -228,7 +228,7 @@ export function InventoryPage() {
 
   useEffect(() => {
     const delayDebounceFn = setTimeout(() => {
-        fetchData();
+      fetchData();
     }, 500);
     return () => clearTimeout(delayDebounceFn);
   }, [search, filterCat, filterMode]);
@@ -245,11 +245,11 @@ export function InventoryPage() {
       )}
 
       {showCatModal && (
-          <CategoryModal 
-            categories={categories} 
-            onClose={() => setShowCatModal(false)} 
-            onRefresh={fetchCategories} 
-          />
+        <CategoryModal
+          categories={categories}
+          onClose={() => setShowCatModal(false)}
+          onRefresh={fetchCategories}
+        />
       )}
 
       {/* Toolbar */}
@@ -276,31 +276,31 @@ export function InventoryPage() {
             <ChevronDown size={13} className="absolute top-1/2 -translate-y-1/2 left-3 text-slate-400 pointer-events-none" />
           </div>
         </div>
-        
+
         <div className="flex items-center gap-2">
-            <button onClick={() => setShowCatModal(true)} className="flex items-center gap-2 bg-slate-100 text-slate-600 px-4 py-2.5 rounded-xl text-sm font-bold hover:bg-slate-200">
-                <Settings2 size={16} /> إدارة الفئات
-            </button>
-            <button onClick={() => { setEditProduct(null); setShowModal(true); }} className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-xl text-sm font-bold">
-                <Plus size={16} /> إضافة منتج
-            </button>
+          <button onClick={() => setShowCatModal(true)} className="flex items-center gap-2 bg-slate-100 text-slate-600 px-4 py-2.5 rounded-xl text-sm font-bold hover:bg-slate-200">
+            <Settings2 size={16} /> إدارة الفئات
+          </button>
+          <button onClick={() => { setEditProduct(null); setShowModal(true); }} className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-xl text-sm font-bold">
+            <Plus size={16} /> إضافة منتج
+          </button>
         </div>
       </div>
 
       {/* Summary Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-          <button onClick={() => setFilterMode("")} className={`${filterMode === "" ? "bg-blue-100 ring-2 ring-blue-400" : "bg-blue-50"} rounded-xl p-3.5 text-right transition-all`}>
-            <p className="text-lg font-bold text-blue-600">{summary.totalProducts}</p>
-            <p className="text-slate-500 text-xs font-bold">إجمالي الأصناف</p>
-          </button>
-          <button onClick={() => setFilterMode("good")} className={`${filterMode === "good" ? "bg-emerald-100 ring-2 ring-emerald-400" : "bg-emerald-50"} rounded-xl p-3.5 text-right transition-all`}>
-            <p className="text-lg font-bold text-emerald-600">{summary.goodStockCount}</p>
-            <p className="text-slate-500 text-xs font-bold">مخزون جيد</p>
-          </button>
-          <button onClick={() => setFilterMode("low")} className={`${filterMode === "low" ? "bg-red-100 ring-2 ring-red-400" : "bg-red-50"} rounded-xl p-3.5 text-right transition-all`}>
-            <p className="text-lg font-bold text-red-600">{summary.lowStockCount}</p>
-            <p className="text-slate-500 text-xs font-bold">مخزون منخفض</p>
-          </button>
+        <button onClick={() => setFilterMode("")} className={`${filterMode === "" ? "bg-blue-100 ring-2 ring-blue-400" : "bg-blue-50"} rounded-xl p-3.5 text-right transition-all`}>
+          <p className="text-lg font-bold text-blue-600">{summary.totalProducts}</p>
+          <p className="text-slate-500 text-xs font-bold">إجمالي الأصناف</p>
+        </button>
+        <button onClick={() => setFilterMode("good")} className={`${filterMode === "good" ? "bg-emerald-100 ring-2 ring-emerald-400" : "bg-emerald-50"} rounded-xl p-3.5 text-right transition-all`}>
+          <p className="text-lg font-bold text-emerald-600">{summary.goodStockCount}</p>
+          <p className="text-slate-500 text-xs font-bold">مخزون جيد</p>
+        </button>
+        <button onClick={() => setFilterMode("low")} className={`${filterMode === "low" ? "bg-red-100 ring-2 ring-red-400" : "bg-red-50"} rounded-xl p-3.5 text-right transition-all`}>
+          <p className="text-lg font-bold text-red-600">{summary.lowStockCount}</p>
+          <p className="text-slate-500 text-xs font-bold">مخزون منخفض</p>
+        </button>
       </div>
 
       {/* Table */}
@@ -319,16 +319,16 @@ export function InventoryPage() {
             </thead>
             <tbody className="divide-y divide-slate-50">
               {loading ? (
-                  <tr><td colSpan={6} className="text-center py-10 text-slate-400">جاري تحميل البيانات...</td></tr>
+                <tr><td colSpan={6} className="text-center py-10 text-slate-400">جاري تحميل البيانات...</td></tr>
               ) : productList.map((p) => (
                 <tr key={p.productId} className="hover:bg-slate-50/50">
                   <td className="px-4 py-4">
                     <div className="flex items-center gap-2">
-                        <Package size={16} className="text-blue-500" />
-                        <div>
-                            <p className="text-slate-700 text-sm font-bold">{p.productName}</p>
-                            <p className="text-[10px] text-slate-400 font-mono">{p.barcode}</p>
-                        </div>
+                      <Package size={16} className="text-blue-500" />
+                      <div>
+                        <p className="text-slate-700 text-sm font-bold">{p.productName}</p>
+                        <p className="text-[10px] text-slate-400 font-mono">{p.barcode}</p>
+                      </div>
                     </div>
                   </td>
                   <td className="px-4 py-4 text-xs font-bold text-slate-600">{p.categoryName}</td>
@@ -339,7 +339,7 @@ export function InventoryPage() {
                   </td>
                   <td className="px-4 py-4">
                     <span className={`text-[11px] font-bold px-2 py-1 rounded-md ${p.status === "منخفض" ? "bg-red-50 text-red-600 border border-red-100" : "bg-emerald-50 text-emerald-600 border border-emerald-100"}`}>
-                        {p.status}
+                      {p.status}
                     </span>
                   </td>
                   <td className="px-4 py-4 text-center">

@@ -13,7 +13,7 @@ export function Reports() {
   const [timeFilter, setTimeFilter] = useState<"today" | "week" | "month" | "year">("week");
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
-  
+
   // States للبيانات القادمة من الباك أند
   const [salesData, setSalesData] = useState<any>(null);
   const [inventoryData, setInventoryData] = useState<any>(null);
@@ -51,11 +51,10 @@ export function Reports() {
       <div className="grid grid-cols-2 gap-4">
         <button
           onClick={() => setActiveTab("sales")}
-          className={`flex items-center gap-4 p-5 rounded-2xl border transition-all text-right shadow-sm ${
-            activeTab === "sales"
+          className={`flex items-center gap-4 p-5 rounded-2xl border transition-all text-right shadow-sm ${activeTab === "sales"
               ? "bg-blue-600 text-white border-blue-600 shadow-md transform scale-[1.01]"
               : "bg-white text-slate-700 border-slate-200 hover:bg-slate-50 hover:border-blue-300"
-          }`}
+            }`}
         >
           <div className={`w-14 h-14 rounded-xl flex items-center justify-center flex-shrink-0 ${activeTab === "sales" ? "bg-white/20" : "bg-blue-50 text-blue-600"}`}>
             <TrendingUp size={28} />
@@ -68,11 +67,10 @@ export function Reports() {
 
         <button
           onClick={() => setActiveTab("inventory")}
-          className={`flex items-center gap-4 p-5 rounded-2xl border transition-all text-right shadow-sm ${
-            activeTab === "inventory"
+          className={`flex items-center gap-4 p-5 rounded-2xl border transition-all text-right shadow-sm ${activeTab === "inventory"
               ? "bg-emerald-600 text-white border-emerald-600 shadow-md transform scale-[1.01]"
               : "bg-white text-slate-700 border-slate-200 hover:bg-slate-50 hover:border-emerald-300"
-          }`}
+            }`}
         >
           <div className={`w-14 h-14 rounded-xl flex items-center justify-center flex-shrink-0 ${activeTab === "inventory" ? "bg-white/20" : "bg-emerald-50 text-emerald-600"}`}>
             <Package size={28} />
@@ -94,7 +92,7 @@ export function Reports() {
       {/* 1. SALES REPORT */}
       {!loading && activeTab === "sales" && salesData && (
         <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-          
+
           <div className="flex flex-col xl:flex-row gap-4 items-stretch">
             <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 flex-1 min-w-[300px]">
               <p className="text-slate-500 text-sm font-medium mb-2">إجمالي قيمة المبيعات (للفترة المحددة)</p>
@@ -103,36 +101,35 @@ export function Reports() {
 
             <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4 flex-[2] flex flex-col gap-4">
               <div className="flex items-center gap-2 border-b border-slate-100 pb-4">
-                 {["today", "week", "month", "year"].map((filter) => {
-                   const labels: Record<string, string> = { today: "اليوم", week: "آخر أسبوع", month: "آخر شهر", year: "آخر سنة" };
-                   return (
-                     <button
-                        key={filter}
-                        onClick={() => setTimeFilter(filter as any)}
-                        className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${
-                          timeFilter === filter ? "bg-blue-50 text-blue-700 border border-blue-200" : "text-slate-600 bg-slate-50 border border-transparent hover:bg-slate-100"
+                {["today", "week", "month", "year"].map((filter) => {
+                  const labels: Record<string, string> = { today: "اليوم", week: "آخر أسبوع", month: "آخر شهر", year: "آخر سنة" };
+                  return (
+                    <button
+                      key={filter}
+                      onClick={() => setTimeFilter(filter as any)}
+                      className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${timeFilter === filter ? "bg-blue-50 text-blue-700 border border-blue-200" : "text-slate-600 bg-slate-50 border border-transparent hover:bg-slate-100"
                         }`}
-                     >
-                        {labels[filter]}
-                     </button>
-                   );
-                 })}
+                    >
+                      {labels[filter]}
+                    </button>
+                  );
+                })}
               </div>
               <div className="flex items-center gap-4">
-                 <div className="flex-1 flex items-center gap-2">
-                    <label className="text-slate-500 text-sm whitespace-nowrap">من:</label>
-                    <div className="relative flex-1">
-                      <Calendar size={16} className="absolute top-1/2 -translate-y-1/2 right-3 text-slate-400" />
-                      <input type="date" value={dateFrom} onChange={e => setDateFrom(e.target.value)} className="w-full pl-3 pr-10 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-blue-500 text-slate-700" />
-                    </div>
-                 </div>
-                 <div className="flex-1 flex items-center gap-2">
-                    <label className="text-slate-500 text-sm whitespace-nowrap">إلى:</label>
-                    <div className="relative flex-1">
-                      <Calendar size={16} className="absolute top-1/2 -translate-y-1/2 right-3 text-slate-400" />
-                      <input type="date" value={dateTo} onChange={e => setDateTo(e.target.value)} className="w-full pl-3 pr-10 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-blue-500 text-slate-700" />
-                    </div>
-                 </div>
+                <div className="flex-1 flex items-center gap-2">
+                  <label className="text-slate-500 text-sm whitespace-nowrap">من:</label>
+                  <div className="relative flex-1">
+                    <Calendar size={16} className="absolute top-1/2 -translate-y-1/2 right-3 text-slate-400" />
+                    <input type="date" value={dateFrom} onChange={e => setDateFrom(e.target.value)} className="w-full pl-3 pr-10 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-blue-500 text-slate-700" />
+                  </div>
+                </div>
+                <div className="flex-1 flex items-center gap-2">
+                  <label className="text-slate-500 text-sm whitespace-nowrap">إلى:</label>
+                  <div className="relative flex-1">
+                    <Calendar size={16} className="absolute top-1/2 -translate-y-1/2 right-3 text-slate-400" />
+                    <input type="date" value={dateTo} onChange={e => setDateTo(e.target.value)} className="w-full pl-3 pr-10 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-blue-500 text-slate-700" />
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -151,7 +148,7 @@ export function Reports() {
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
                   <XAxis dataKey="label" axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 13 }} dy={10} />
                   <YAxis axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 13 }} tickFormatter={(value) => `${(value / 1000)}k`} dx={-10} />
-                  <Tooltip 
+                  <Tooltip
                     cursor={{ fill: '#f8fafc' }}
                     contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
                   />
@@ -212,8 +209,8 @@ export function Reports() {
         <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
           <div className="flex flex-col xl:flex-row gap-6">
             <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 flex-1 min-w-[320px]">
-               <h3 className="text-slate-800 font-bold text-lg mb-6">توزيع المنتجات حسب الفئة</h3>
-               <div className="h-72 w-full">
+              <h3 className="text-slate-800 font-bold text-lg mb-6">توزيع المنتجات حسب الفئة</h3>
+              <div className="h-72 w-full">
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
                     <Pie data={inventoryData.categoryData} cx="50%" cy="50%" innerRadius={70} outerRadius={110} dataKey="value" stroke="none">
@@ -225,7 +222,7 @@ export function Reports() {
                     <Legend iconType="circle" layout="vertical" verticalAlign="middle" align="right" />
                   </PieChart>
                 </ResponsiveContainer>
-               </div>
+              </div>
             </div>
 
             <div className="bg-white rounded-2xl border border-slate-100 shadow-sm flex-[2] overflow-hidden flex flex-col">
@@ -262,7 +259,7 @@ export function Reports() {
                           </td>
                           <td className="px-6 py-3.5 text-slate-600 text-sm">{product.category}</td>
                           <td className="px-6 py-3.5">
-                             <span className="font-bold text-slate-700">{product.quantity}</span> <span className="text-xs text-slate-400">قطعة</span>
+                            <span className="font-bold text-slate-700">{product.quantity}</span> <span className="text-xs text-slate-400">قطعة</span>
                           </td>
                           <td className="px-6 py-3.5 font-medium text-slate-600">{product.sellingPrice} ج.م</td>
                           <td className="px-6 py-3.5">

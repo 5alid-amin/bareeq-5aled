@@ -16,13 +16,14 @@ interface Props {
 }
 
 export function VehicleInventory({ onNavigate }: Props) {
+    const { user } = useAuth();
     const BASE_URL = "https://localhost:7280/api/CarInventory";
-    const VEHICLE_ID = 1;
+    const VEHICLE_ID = user?.vehicleId ?? 1; // مأخوذ من الـ JWT Token
 
     const [inventory, setInventory] = useState<VehicleStockResponse[]>([]);
     const [searchTerm, setSearchTerm] = useState("");
     const [isLoading, setIsLoading] = useState(true);
-    
+
     // State للتحكم في النافذة المنبثقة (Modal)
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedProduct, setSelectedProduct] = useState<VehicleStockResponse | null>(null);
@@ -88,7 +89,7 @@ export function VehicleInventory({ onNavigate }: Props) {
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <h2 className="text-xl font-bold text-slate-800 flex items-center gap-2">
                     <Package size={24} className="text-blue-600" />
-                    مخزون المركبة (ID: {VEHICLE_ID})
+                    مخزون المركبة {user?.vehicleName ? `— ${user.vehicleName}` : `(#${VEHICLE_ID})`}
                 </h2>
                 <div className="relative">
                     <Search size={16} className="absolute top-1/2 -translate-y-1/2 right-3 text-slate-400" />
@@ -154,7 +155,7 @@ export function VehicleInventory({ onNavigate }: Props) {
                     <div className="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden">
                         <div className="p-6 border-b border-slate-100 flex justify-between items-center">
                             <h3 className="font-bold text-slate-800">تحديد كمية التعبئة</h3>
-                            <button onClick={() => setIsModalOpen(false)} className="text-slate-400 hover:text-slate-600"><X size={20}/></button>
+                            <button onClick={() => setIsModalOpen(false)} className="text-slate-400 hover:text-slate-600"><X size={20} /></button>
                         </div>
                         <div className="p-6 space-y-4">
                             <div className="bg-blue-50 p-3 rounded-xl">
@@ -163,8 +164,8 @@ export function VehicleInventory({ onNavigate }: Props) {
                             </div>
                             <div>
                                 <label className="block text-sm font-medium text-slate-700 mb-2">الكمية المطلوبة</label>
-                                <input 
-                                    type="number" 
+                                <input
+                                    type="number"
                                     value={requestQuantity}
                                     onChange={(e) => setRequestQuantity(parseInt(e.target.value))}
                                     className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"

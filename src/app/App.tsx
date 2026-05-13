@@ -46,12 +46,23 @@ function AppContent() {
         : "representative/dashboard";
   const currentPage = location.pathname.slice(1) || defaultPage;
 
-  // Navigate to default page if at root
+  // Navigate to role-specific default page whenever user (or their role) changes
   useEffect(() => {
-    if (location.pathname === "/" && user) {
-      navigate(`/${defaultPage}`, { replace: true });
+    if (user) {
+      // Only redirect to default if we're at root or on another role's path
+      const currentRole = location.pathname.split("/")[1]; // e.g. "manager", "warehouse", ...
+      const ownedRoles = ["manager", "warehouse", "representative", "accountant"];
+      const isOnOwnPage = ownedRoles.some(r => r === currentRole && currentRole === user.role.split("/")[0])
+        || location.pathname.startsWith(`/${user.role.split("/")[0]}`)
+        || location.pathname === "/";
+
+      if (!isOnOwnPage) {
+        navigate(`/${defaultPage}`, { replace: true });
+      } else if (location.pathname === "/") {
+        navigate(`/${defaultPage}`, { replace: true });
+      }
     }
-  }, [user?.role, navigate, location.pathname, defaultPage]);
+  }, [user?.id, navigate]); // trigger on user identity change (login/switch)
 
   if (!user) {
     return <LoginPage />;

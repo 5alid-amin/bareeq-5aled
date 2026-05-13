@@ -24,6 +24,7 @@ import {
   LogOut
 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 interface NavItem {
   id: string;
@@ -73,7 +74,13 @@ interface SidebarProps {
 
 export function Sidebar({ activePage, onNavigate }: SidebarProps) {
   const { user, logout } = useAuth();
+  const navigate = useNavigate();
   const [isCollapsed, setIsCollapsed] = useState(false);
+
+  const handleLogout = () => {
+    navigate("/", { replace: true });
+    logout();
+  };
 
   const navItems = user?.role === "manager"
     ? managerNav
@@ -154,6 +161,9 @@ export function Sidebar({ activePage, onNavigate }: SidebarProps) {
               <span className={`inline-block text-white text-xs px-2 py-0.5 rounded-full mt-0.5 ${roleBadgeColor}`}>
                 {roleLabel}
               </span>
+              {user?.role === "representative" && user.vehicleName && (
+                <p className="text-cyan-300 text-xs mt-1 truncate">🚚 {user.vehicleName}</p>
+              )}
             </div>
           )}
         </div>
@@ -180,7 +190,7 @@ export function Sidebar({ activePage, onNavigate }: SidebarProps) {
             <p className="text-slate-500 text-xs px-2 mb-2 uppercase tracking-wider">النظام</p>
           )}
           <button
-            onClick={() => logout()}
+            onClick={handleLogout}
             title={isCollapsed ? "تسجيل الخروج" : ""}
             className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-slate-400 hover:bg-red-900/20 hover:text-red-400 transition-all duration-150 ${isCollapsed ? "justify-center px-2" : "text-right"}`}
           >

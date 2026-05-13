@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Plus, RefreshCw, Clock, CheckCircle, XCircle, Send, Pencil, Trash2, AlertCircle } from "lucide-react";
+import { useAuth } from "../../context/AuthContext";
 
 // الإعدادات الأساسية للـ API
 const BASE_URL = "https://localhost:7280/api/CarInventory";
@@ -21,8 +22,9 @@ interface PendingRequest {
 }
 
 export function RestockRequestPage() {
-    // رقم المركبة (ثابت بناءً على طلبك السابق)
-    const vehicleId = 1; 
+    const { user } = useAuth();
+    // رقم المركبة مأخوذ من الـ JWT Token
+    const vehicleId = user?.vehicleId ?? 1;
 
     // States
     const [requests, setRequests] = useState<PendingRequest[]>([]);
@@ -92,7 +94,7 @@ export function RestockRequestPage() {
                     requestedQuantity: Number(quantity)
                 });
             }
-            
+
             await fetchInitialData(); // إعادة تحديث القائمة
             handleCloseForm();
         } catch (err: any) {
@@ -107,7 +109,7 @@ export function RestockRequestPage() {
         // نجد الـ ID الخاص بالمنتج من القائمة بناءً على الاسم (أو يفضل لو الـ API يرجع الـ ID)
         // ملاحظة: الـ DTO بتاعك يرجع الاسم، هحاول أعمل Match بسيط هنا
         const product = products.find(p => p.productName === req.productName);
-        
+
         setEditingRequestId(req.requestId);
         setSelectedProductId(product?.productId || "");
         setQuantity(req.requestedQuantity.toString());

@@ -7,40 +7,40 @@ const API_BASE_URL = "https://localhost:7280/api/CarLoad"; // غير البور�
 
 // --- الـ Interfaces حسب الـ DTOs اللي عملناها في الباك إند ---
 interface VehicleSummary {
-    vehicleId: number;
-    vehicleName: string;
-    plateNumber: string;
-    status: string;
-    driverName: string;
-    totalItemsCount: number;
-    lowStockItemsCount: number;
-    totalStockValue: number;
+  vehicleId: number;
+  vehicleName: string;
+  plateNumber: string;
+  status: string;
+  driverName: string;
+  totalItemsCount: number;
+  lowStockItemsCount: number;
+  totalStockValue: number;
 }
 
 interface VehicleInventoryPage {
-    totalItems: number;
-    goodStockCount: number;
-    lowStockCount: number;
-    totalStockValue: number;
-    items: VehicleInventoryItem[];
+  totalItems: number;
+  goodStockCount: number;
+  lowStockCount: number;
+  totalStockValue: number;
+  items: VehicleInventoryItem[];
 }
 
 interface VehicleInventoryItem {
-    productId: number;
-    productBarcode: string;
-    productName: string;
-    currentQuantity: number;
-    minThreshold: number;
-    salePrice: number;
-    totalLineValue: number;
-    status: string;
+  productId: number;
+  productBarcode: string;
+  productName: string;
+  currentQuantity: number;
+  minThreshold: number;
+  salePrice: number;
+  totalLineValue: number;
+  status: string;
 }
 
 interface AvailableProduct {
-    productId: number;
-    productName: string;
-    salePrice: number;
-    availableInMainStock: number;
+  productId: number;
+  productName: string;
+  salePrice: number;
+  availableInMainStock: number;
 }
 
 // ─── Vehicle Loading Modal / Drawer ──────────────────────────────────────────
@@ -186,7 +186,7 @@ function VehicleLoadingForm({ selectedVanId, onClose, onRefresh }: { selectedVan
                               </select>
                               <ChevronDown size={14} className="absolute top-1/2 -translate-y-1/2 left-3 text-slate-400 pointer-events-none" />
                             </div>
-                            
+
                             {!isEmptyRow && (
                               <div className="grid grid-cols-2 gap-3">
                                 <input
@@ -229,7 +229,7 @@ function VehicleLoadingForm({ selectedVanId, onClose, onRefresh }: { selectedVan
             </form>
           )}
         </div>
-        
+
         {!submitted && (
           <div className="p-5 border-t border-slate-100 bg-slate-50">
             <button
@@ -282,10 +282,10 @@ export function VehicleLoadingPage() {
     return (
       <div className="space-y-4 relative">
         {showLoadingModal && (
-          <VehicleLoadingForm 
-            selectedVanId={selectedVanId} 
-            onClose={() => setShowLoadingModal(false)} 
-            onRefresh={() => fetchInventory(selectedVanId)} 
+          <VehicleLoadingForm
+            selectedVanId={selectedVanId}
+            onClose={() => setShowLoadingModal(false)}
+            onRefresh={() => fetchInventory(selectedVanId)}
           />
         )}
 
@@ -413,7 +413,7 @@ export function VehicleLoadingPage() {
                   <p className="text-purple-600 font-semibold text-xs">{(van.totalStockValue).toFixed(1)}k</p>
                   <p className="text-slate-400 text-[10px]">قيمة</p>
                 </div>
-              </div>  
+              </div>
             </button>
           ))}
         </div>
