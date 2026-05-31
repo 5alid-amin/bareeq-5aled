@@ -2,6 +2,9 @@ import React, { useState, useEffect } from "react";
 import { ArrowUpFromLine, Search, Plus, CheckCircle, X, Edit2, Trash2, Loader2, ChevronRight, ChevronLeft } from "lucide-react";
 import axios from "axios";
 
+// const API_BASE_URL = import.meta.env.VITE_API_URL;
+const API_BASE_URL = "https://localhost:7280/api";
+
 export function AccountsPayablePage() {
   const [expenses, setExpenses] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -38,8 +41,7 @@ export function AccountsPayablePage() {
     setLoading(true);
     try {
 
-      // const response = await axios.get(`${import.meta.env.VITE_API_URL}/Expense/GetAll`, {
-      const response = await axios.get(`https://localhost:7280/api/Expense/GetAll`, {
+      const response = await axios.get(`${API_BASE_URL}/Expense/GetAll`, {
         params: {
           search: searchTerm,
           day: filterDay || null,
@@ -61,7 +63,7 @@ export function AccountsPayablePage() {
 
   const fetchLookups = async () => {
     try {
-      const response = await axios.get(`${import.meta.env.VITE_API_URL}/Expense/GetLookupData`);
+      const response = await axios.get(`${API_BASE_URL}/Expense/GetLookupData`);
       if (response.data) {
         setCategories(response.data.employees || []);
         setVehicles(response.data.vehicles || []);
@@ -84,7 +86,7 @@ export function AccountsPayablePage() {
   const handleDelete = async (id: number) => {
     if (window.confirm("هل أنت متأكد من حذف هذا المصروف نهائياً؟")) {
       try {
-        await axios.delete(`${import.meta.env.VITE_API_URL}/Expense/Delete?id=${id}`);
+        await axios.delete(`${API_BASE_URL}/Expense/Delete?id=${id}`);
         fetchExpenses();
       } catch (error) {
         alert("حدث خطأ أثناء الحذف");
@@ -95,7 +97,7 @@ export function AccountsPayablePage() {
   const handleAddCategory = async () => {
     if (newCategoryName.trim()) {
       try {
-        await axios.post(`${import.meta.env.VITE_API_URL}/Expense/CreateCategory`, {
+        await axios.post(`${API_BASE_URL}/Expense/CreateCategory`, {
           categoryName: newCategoryName.trim()
         });
         await fetchLookups();
@@ -121,9 +123,9 @@ export function AccountsPayablePage() {
 
     try {
       if (editingExpense) {
-        await axios.put(`${import.meta.env.VITE_API_URL}/Expense/Update?id=${editingExpense.id}`, payload);
+        await axios.put(`${API_BASE_URL}/Expense/Update?id=${editingExpense.id}`, payload);
       } else {
-        await axios.post(`${import.meta.env.VITE_API_URL}/Expense/Create`, payload);
+        await axios.post(`${API_BASE_URL}/Expense/Create`, payload);
       }
       setShowModal(false);
       fetchExpenses();
@@ -382,7 +384,7 @@ export function AccountsPayablePage() {
                   <option value="">-- اختر السيارة --</option>
                   {vehicles.map(v => (
                     <option key={v.vehicleId} value={v.vehicleId}>
-                      {v.plateNumber}
+                      {v.plateNumber || v.vehicleName}
                     </option>
                   ))}
                 </select>

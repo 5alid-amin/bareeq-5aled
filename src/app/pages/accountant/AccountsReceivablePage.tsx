@@ -26,7 +26,7 @@ export function AccountsReceivablePage() {
   const [editingReceipt, setEditingReceipt] = useState<ExtendedCashReceipt | null>(null);
 
   const [representatives, setRepresentatives] = useState<{ employeeId: number, fullName: string }[]>([]);
-  const [cars, setCars] = useState<{ vehicleId: number, plateNumber: string }[]>([]);
+  const [cars, setCars] = useState<{ vehicleId: number, vehicleName: string }[]>([]);
 
   const [filterYear, setFilterYear] = useState<string>("");
   const [filterMonth, setFilterMonth] = useState<string>("");
@@ -279,8 +279,8 @@ export function AccountsReceivablePage() {
               key={page}
               onClick={() => setCurrentPage(page)}
               className={`w-10 h-10 rounded-xl text-sm font-bold transition-all shadow-sm border ${currentPage === page
-                  ? "bg-teal-600 text-white border-teal-600"
-                  : "bg-white text-slate-600 border-slate-200 hover:bg-slate-50"
+                ? "bg-teal-600 text-white border-teal-600"
+                : "bg-white text-slate-600 border-slate-200 hover:bg-slate-50"
                 }`}
             >
               {page}
@@ -323,7 +323,7 @@ export function AccountsReceivablePage() {
                   <label className="text-xs font-bold text-slate-600 mr-1">السيارة</label>
                   <select name="vehicleId" required defaultValue={editingReceipt?.vehicleId || ""} className="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-right outline-none bg-slate-50/50">
                     <option value="">-- اختر السيارة --</option>
-                    {cars.map(car => <option key={car.vehicleId} value={car.vehicleId}>{car.plateNumber}</option>)}
+                    {cars.map(car => <option key={car.vehicleId} value={car.vehicleId}>{car.vehicleName}</option>)}
                   </select>
                 </div>
               </div>

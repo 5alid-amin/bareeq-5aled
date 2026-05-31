@@ -52,7 +52,13 @@ function AppContent() {
       // Only redirect to default if we're at root or on another role's path
       const currentRole = location.pathname.split("/")[1]; // e.g. "manager", "warehouse", ...
       const ownedRoles = ["manager", "warehouse", "representative", "accountant"];
-      const isOnOwnPage = ownedRoles.some(r => r === currentRole && currentRole === user.role.split("/")[0])
+      
+      // Allow manager to access manager, warehouse, and accountant paths
+      const allowedRolesForUser = user.role === "manager"
+        ? ["manager", "warehouse", "accountant"]
+        : [user.role.split("/")[0]];
+
+      const isOnOwnPage = (ownedRoles.includes(currentRole) && allowedRolesForUser.includes(currentRole))
         || location.pathname.startsWith(`/${user.role.split("/")[0]}`)
         || location.pathname === "/";
 
@@ -62,7 +68,7 @@ function AppContent() {
         navigate(`/${defaultPage}`, { replace: true });
       }
     }
-  }, [user?.id, navigate]); // trigger on user identity change (login/switch)
+  }, [user?.id, navigate, location.pathname, defaultPage]); // trigger on user, path, or defaultPage changes
 
   if (!user) {
     return <LoginPage />;
