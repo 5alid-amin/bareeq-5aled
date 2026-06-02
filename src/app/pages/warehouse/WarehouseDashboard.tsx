@@ -24,11 +24,27 @@ export function WarehouseDashboard({ onNavigate }) {
   }, []);
 
   if (loading) {
-    return <div className="p-10 text-center font-bold text-slate-500">جاري تحميل البيانات...</div>;
+    return (
+      <div className="flex flex-col items-center justify-center p-20 space-y-4 min-h-[400px]">
+        <div className="relative flex items-center justify-center">
+          <div className="w-12 h-12 rounded-full border-4 border-slate-100 border-t-blue-600 animate-spin"></div>
+          <Package className="absolute text-blue-600 animate-pulse" size={20} />
+        </div>
+        <p className="text-slate-500 font-medium text-sm animate-pulse">جاري تحميل البيانات...</p>
+      </div>
+    );
   }
 
   if (!data) {
-    return <div className="p-10 text-center text-red-500">حدث خطأ في تحميل البيانات</div>;
+    return (
+      <div className="flex flex-col items-center justify-center p-12 space-y-4 bg-red-50/50 rounded-2xl border border-red-100 max-w-md mx-auto mt-10">
+        <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center text-red-600">
+          <AlertTriangle size={24} />
+        </div>
+        <h3 className="text-red-800 font-semibold text-base">حدث خطأ في تحميل البيانات</h3>
+        <p className="text-red-600/80 text-sm text-center">يرجى التأكد من الاتصال بالخادم والمحاولة مرة أخرى.</p>
+      </div>
+    );
   }
 
   const { summaryCards, lowStockAlerts, mostRequestedProducts } = data;
@@ -37,42 +53,53 @@ export function WarehouseDashboard({ onNavigate }) {
     <div className="space-y-6">
       {/* KPI Cards */}
       <div className="grid grid-cols-2 xl:grid-cols-4 gap-4">
-        <KPICard
-          title="إجمالي المنتجات"
-          value={summaryCards.totalProducts}
-          subtitle={`${summaryCards.totalUnits.toLocaleString("ar-EG")} وحدة إجمالية`}
-          icon={<Package size={22} />}
-          color="blue"
-        />
-        <KPICard
-          title="قيمة رأس المال"
-          value={`${summaryCards.totalCapitalValue.toLocaleString("ar-EG")}`}
-          subtitle="إجمالي قيمة المخزن"
-          icon={<Coins size={22} />}
-          color="green"
-        />
-        <KPICard
-          title="أصناف منخفضة المخزون"
-          value={summaryCards.lowStockItemsCount}
-          subtitle="تحتاج إعادة طلب"
-          icon={<AlertTriangle size={22} />}
-          color="red"
-          trend={{ value: `${summaryCards.lowStockItemsCount} صنف`, positive: false }}
-        />
-        <KPICard
-          title="طلبات إعادة التعبئة"
-          value={summaryCards.pendingRefillRequests}
-          subtitle="في انتظار الموافقة"
-          icon={<ShoppingCart size={22} />}
-          color="orange"
-        />
+        <div className="animate-fade-in-up" style={{ animationDelay: "0ms" }}>
+          <KPICard
+            title="إجمالي المنتجات"
+            value={summaryCards.totalProducts}
+            subtitle={`${summaryCards.totalUnits.toLocaleString("ar-EG")} وحدة إجمالية`}
+            icon={<Package size={22} />}
+            color="blue"
+          />
+        </div>
+        <div className="animate-fade-in-up" style={{ animationDelay: "75ms" }}>
+          <KPICard
+            title="قيمة رأس المال"
+            value={`${summaryCards.totalCapitalValue.toLocaleString("ar-EG")}`}
+            subtitle="إجمالي قيمة المخزن"
+            icon={<Coins size={22} />}
+            color="green"
+          />
+        </div>
+        <div className="animate-fade-in-up" style={{ animationDelay: "150ms" }}>
+          <KPICard
+            title="أصناف منخفضة المخزون"
+            value={summaryCards.lowStockItemsCount}
+            subtitle="تحتاج إعادة طلب"
+            icon={<AlertTriangle size={22} />}
+            color="red"
+            trend={{ value: `${summaryCards.lowStockItemsCount} صنف`, positive: false }}
+          />
+        </div>
+        <div className="animate-fade-in-up" style={{ animationDelay: "225ms" }}>
+          <KPICard
+            title="طلبات إعادة التعبئة"
+            value={summaryCards.pendingRefillRequests}
+            subtitle="في انتظار الموافقة"
+            icon={<ShoppingCart size={22} />}
+            color="orange"
+          />
+        </div>
       </div>
 
       {/* Main Content Composition */}
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-5">
 
         {/* Low Stock Alert (Takes 2/3 of width) */}
-        <div className="xl:col-span-2 bg-white rounded-xl border border-slate-100 shadow-sm flex flex-col">
+        <div 
+          className="xl:col-span-2 bg-white rounded-xl border border-slate-100 shadow-sm flex flex-col animate-fade-in-up" 
+          style={{ animationDelay: "300ms" }}
+        >
           <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100">
             <div className="flex items-center gap-2">
               <AlertTriangle size={17} className="text-red-500" />
@@ -112,7 +139,10 @@ export function WarehouseDashboard({ onNavigate }) {
         </div>
 
         {/* Top Products (Takes 1/3 of width) */}
-        <div className="bg-white rounded-xl border border-slate-100 shadow-sm flex flex-col">
+        <div 
+          className="bg-white rounded-xl border border-slate-100 shadow-sm flex flex-col animate-fade-in-up"
+          style={{ animationDelay: "375ms" }}
+        >
           <div className="flex items-center gap-2 px-5 py-4 border-b border-slate-100">
             <Zap size={17} className="text-amber-500" />
             <h2 className="text-slate-700 text-base">الأكثر طلباً (أسبوع)</h2>

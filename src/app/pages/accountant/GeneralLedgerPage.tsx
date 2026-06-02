@@ -4,6 +4,35 @@ import { BookOpen, TrendingUp, TrendingDown, DollarSign, PieChart, Car, ArrowUpR
 import { PieChart as RechartsPieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
 import { KPICard } from "../../components/KPICard";
 
+// 💡 مكون العداد التصاعدي المخصص للأرقام والعملات
+function AnimatedNumber({ value, duration = 1000 }: { value: number; duration?: number }) {
+  const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    let startTime: number | null = null;
+    const startValue = count; // يبدأ من القيمة الحالية لمنع القفز المفاجئ عند تغيير الفلتر
+
+    const animate = (timestamp: number) => {
+      if (!startTime) startTime = timestamp;
+      const progress = Math.min((timestamp - startTime) / duration, 1);
+
+      // معادلة حركة ناعمة (Ease Out) لتبطئ السرعة عند الاقتراب من الرقم النهائي
+      const easeOutProgress = 1 - Math.pow(1 - progress, 3);
+
+      const currentValue = Math.floor(startValue + (value - startValue) * easeOutProgress);
+      setCount(currentValue);
+
+      if (progress < 1) {
+        window.requestAnimationFrame(animate);
+      }
+    };
+
+    window.requestAnimationFrame(animate);
+  }, [value, duration]);
+
+  return <>{count.toLocaleString()}</>;
+}
+
 export function GeneralLedgerPage() {
   // حالة الفلتر الحالي
   const [filter, setFilter] = useState<'day' | 'week' | 'month' | 'year'>('month');
@@ -14,9 +43,16 @@ export function GeneralLedgerPage() {
   const [topVehicle, setTopVehicle] = useState({ vehicleName: "---", totalRevenue: 0 });
   const [loading, setLoading] = useState(false);
 
+  // حالة للتحكم في أنيميشن ظهور الصفحة عند التحميل لأول مرة
+  const [isMounted, setIsMounted] = useState(false);
+
+  // حالة للتحكم في تأخير حركة البارات والمؤشرات لجعلها تبدأ من الصفر وتنمو بسلاسة
+  const [animateBars, setAnimateBars] = useState(false);
+
   // ميثود جلب البيانات من الـ API
   const fetchData = async () => {
     setLoading(true);
+    setAnimateBars(false); // إعادة تصفير حركة البارات عند تغيير الفلتر لتتحرك مجدداً
     try {
       const now = new Date();
       const params: { day?: number; month?: number; year?: number } = {};
@@ -34,15 +70,12 @@ export function GeneralLedgerPage() {
         axios.get("https://localhost:7280/api/Dashboard/top-performing-vehicle", { params })
       ]);
 
-      //       const [resSummary, resAnalytics, resVehicle] = await Promise.all([
-      //   axios.get("${import.meta.env.VITE_API_URL}/Dashboard/summary", { params }),
-      //   axios.get("${import.meta.env.VITE_API_URL}/Dashboard/expenses-analytics", { params }),
-      //   axios.get("${import.meta.env.VITE_API_URL}/Dashboard/top-performing-vehicle", { params })
-      // ]);
-
       setSummary(resSummary.data);
       setExpenseData(resAnalytics.data);
       setTopVehicle(resVehicle.data);
+
+      // تشغيل أنيميشن البارات بعد تحميل البيانات مباشرة بمهلة بسيطة جداً
+      setTimeout(() => setAnimateBars(true), 50);
     } catch (error) {
       console.error("Error fetching dashboard data:", error);
     } finally {
@@ -54,12 +87,21 @@ export function GeneralLedgerPage() {
     fetchData();
   }, [filter]);
 
+  // تفعيل أنيميشن الدخول بمجرد فتح الصفحة
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
   const COLORS = ['#6366f1', '#f59e0b', '#10b981', '#f43f5e'];
   // تأكد إن فيه قيمة عشان ما يحصلش Divide by zero
   const totalExp = expenseData.total || 0;
 
   return (
-    <div className="space-y-8 pb-10 select-none" dir="rtl">
+    <div
+      className={`space-y-8 pb-10 select-none transition-all duration-1000 ease-out transform ${isMounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
+        }`}
+      dir="rtl"
+    >
       {/* Header - Glassmorphism Effect */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-white/50 backdrop-blur-md p-6 rounded-[2.5rem] border border-white shadow-xl shadow-slate-200/50">
         <div className="flex items-center gap-5">
@@ -87,8 +129,8 @@ export function GeneralLedgerPage() {
               key={btn.id}
               onClick={() => setFilter(btn.id as any)}
               className={`px-8 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 ${filter === btn.id
-                  ? 'bg-white text-indigo-600 shadow-sm scale-105'
-                  : 'text-slate-500 hover:text-slate-800'
+                ? 'bg-white text-indigo-600 shadow-sm scale-105'
+                : 'text-slate-500 hover:text-slate-800'
                 }`}
             >
               {btn.label}
@@ -99,11 +141,11 @@ export function GeneralLedgerPage() {
 
       {/* Main KPIs - Three Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <KPICard title="إجمالي الإيرادات" value={`${(summary.totalRevenue || 0).toLocaleString()} ج.م`} icon={<TrendingUp size={24} />} color="green" />
-        <KPICard title="إجمالي المصروفات" value={`${(summary.totalExpenses || 0).toLocaleString()} ج.م`} icon={<TrendingDown size={24} />} color="red" />
+        <KPICard title="إجمالي الإيرادات" value={<><AnimatedNumber value={summary.totalRevenue || 0} /> ج.م</>} icon={<TrendingUp size={24} />} color="green" />
+        <KPICard title="إجمالي المصروفات" value={<><AnimatedNumber value={summary.totalExpenses || 0} /> ج.م</>} icon={<TrendingDown size={24} />} color="red" />
         <div className="relative overflow-hidden group">
           <div className="absolute inset-0 bg-gradient-to-r from-indigo-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
-          <KPICard title="صافي الربح" value={`${(summary.netProfit || 0).toLocaleString()} ج.م`} icon={<DollarSign size={24} />} color="blue" />
+          <KPICard title="صافي الربح" value={<><AnimatedNumber value={summary.netProfit || 0} /> ج.م</>} icon={<DollarSign size={24} />} color="blue" />
         </div>
       </div>
 
@@ -117,7 +159,20 @@ export function GeneralLedgerPage() {
           <div className="relative w-full h-64">
             <ResponsiveContainer width="100%" height="100%">
               <RechartsPieChart>
-                <Pie data={expenseData.details || []} cx="50%" cy="50%" innerRadius={70} outerRadius={95} paddingAngle={10} dataKey="value" stroke="none">
+                <Pie
+                  data={expenseData.details || []}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={70}
+                  outerRadius={95}
+                  paddingAngle={10}
+                  dataKey="value"
+                  stroke="none"
+                  isAnimationActive={true}       // تفعيل الأنيميشن للدائرة
+                  animationBegin={200}           // وقت بدء الدوران والظهور بعد فتح التابة
+                  animationDuration={1200}       // سرعة الدوران والالتفاف (1.2 ثانية)
+                  animationEasing="ease-out"     // نمط حركة انسيابي ناعم في النهاية
+                >
                   {(expenseData.details || []).map((_, index) => (
                     <Cell key={index} fill={COLORS[index % COLORS.length]} className="hover:opacity-80 transition-opacity cursor-pointer" />
                   ))}
@@ -127,7 +182,7 @@ export function GeneralLedgerPage() {
             </ResponsiveContainer>
             <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
               <span className="text-slate-400 text-xs font-bold uppercase tracking-widest">إجمالي</span>
-              <span className="text-2xl font-black text-slate-800">{(totalExp).toLocaleString()}</span>
+              <span className="text-2xl font-black text-slate-800"><AnimatedNumber value={totalExp} /></span>
             </div>
           </div>
 
@@ -141,7 +196,13 @@ export function GeneralLedgerPage() {
                 <div className="flex items-center gap-2">
                   <span className="text-xs font-black text-slate-400">{totalExp > 0 ? ((item.value / totalExp) * 100).toFixed(0) : 0}%</span>
                   <div className="w-12 h-1.5 bg-slate-100 rounded-full overflow-hidden">
-                    <div className="h-full rounded-full transition-all duration-1000" style={{ backgroundColor: COLORS[i % COLORS.length], width: `${totalExp > 0 ? (item.value / totalExp) * 100 : 0}%` }}></div>
+                    <div
+                      className="h-full rounded-full transition-all duration-1000 ease-out"
+                      style={{
+                        backgroundColor: COLORS[i % COLORS.length],
+                        width: animateBars && totalExp > 0 ? `${(item.value / totalExp) * 100}%` : '0%'
+                      }}
+                    ></div>
                   </div>
                 </div>
               </div>
@@ -164,10 +225,15 @@ export function GeneralLedgerPage() {
                 <div key={i} className="relative group/line">
                   <div className="flex justify-between items-end mb-2">
                     <span className="text-slate-400 text-sm font-medium">{item.name}</span>
-                    <span className="text-white font-black text-lg">{(item.value || 0).toLocaleString()} <small className="text-[10px] text-slate-500 font-normal">ج.م</small></span>
+                    <span className="text-white font-black text-lg"><AnimatedNumber value={item.value || 0} /> <small className="text-[10px] text-slate-500 font-normal">ج.م</small></span>
                   </div>
                   <div className="h-2 bg-slate-800 rounded-full overflow-hidden">
-                    <div className="h-full bg-gradient-to-r from-indigo-500 to-blue-400 rounded-full transition-all duration-1000 ease-out" style={{ width: `${totalExp > 0 ? (item.value / totalExp) * 100 : 0}%` }}></div>
+                    <div
+                      className="h-full bg-gradient-to-r from-indigo-500 to-blue-400 rounded-full transition-all duration-[1200ms] ease-out"
+                      style={{
+                        width: animateBars && totalExp > 0 ? `${(item.value / totalExp) * 100}%` : '0%'
+                      }}
+                    ></div>
                   </div>
                 </div>
               ))}
@@ -201,7 +267,7 @@ export function GeneralLedgerPage() {
           <div className="relative z-10 mt-10">
             <div className="text-xs font-bold text-emerald-100/80 mb-1">إجمالي الإيرادات المحققة</div>
             <div className="flex items-end gap-2">
-              <span className="text-5xl font-black tracking-tighter">{(topVehicle.totalRevenue || 0).toLocaleString()}</span>
+              <span className="text-5xl font-black tracking-tighter"><AnimatedNumber value={topVehicle.totalRevenue || 0} /></span>
               <span className="text-lg font-bold mb-1 opacity-80">ج.م</span>
             </div>
 
