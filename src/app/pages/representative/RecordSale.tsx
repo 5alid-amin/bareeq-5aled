@@ -19,7 +19,7 @@ interface CartItem {
     available: number;
 }
 
-const BASE_URL = "https://localhost:7280/api/SalesRecord";
+const BASE_URL = "http://pareeq.runasp.net/api/SalesRecord";
 
 // ─── Print Invoice Helper ────────────────────────────────────────────────
 function printInvoice(invoice: any) {

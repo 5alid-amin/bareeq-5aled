@@ -11,7 +11,7 @@ export function WarehouseDashboard({ onNavigate }) {
     // استدعاء البيانات من الـ API
     const fetchDashboardData = async () => {
       try {
-        const response = await axios.get("https://localhost:7280/api/InventoryDashboard/stats");
+        const response = await axios.get("http://pareeq.runasp.net/api/InventoryDashboard/stats");
         setData(response.data);
         setLoading(false);
       } catch (error) {

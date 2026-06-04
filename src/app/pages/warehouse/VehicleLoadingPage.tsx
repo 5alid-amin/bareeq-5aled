@@ -3,7 +3,7 @@ import axios from "axios"; // تأكد من تثبيت axios
 import { Truck, CheckCircle, ChevronDown, Trash2, Package, AlertTriangle, TrendingDown, TrendingUp, ArrowRight, X } from "lucide-react";
 
 // إعداد عنوان الـ API الرئيسي
-const API_BASE_URL = "https://localhost:7280/api/CarLoad"; // غير البورت حسب مشروعك
+const API_BASE_URL = "http://pareeq.runasp.net/api/CarLoad"; // غير البورت حسب مشروعك
 
 // --- الـ Interfaces حسب الـ DTOs اللي عملناها في الباك إند ---
 interface VehicleSummary {

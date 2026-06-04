@@ -45,7 +45,7 @@ export function AccountantPayrollPage() {
       else if (activeTab === "deductions") endpoint = "details/deductions";
       else if (activeTab === "loans") endpoint = "details/loans";
       // const response = await axios.get(`${import.meta.env.VITE_API_URL}/Payroll/${endpoint}`, {
-      const response = await axios.get(`https://localhost:7280/api/Payroll/${endpoint}`, {
+      const response = await axios.get(`http://pareeq.runasp.net/api/Payroll/${endpoint}`, {
         params: {
           month: parseInt(selectedMonth),
           year: parseInt(selectedYear),

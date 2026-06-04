@@ -37,7 +37,7 @@ export function RepresentativeDashboard({ onNavigate }: { onNavigate: (page: str
     useEffect(() => {
         const fetchDashboardData = async () => {
             try {
-                const response = await axios.get(`https://localhost:7280/api/RepresentativeDashboard/${vehicleId}`);
+                const response = await axios.get(`http://pareeq.runasp.net/api/RepresentativeDashboard/${vehicleId}`);
                 setData(response.data);
             } catch (err) {
                 console.error("Error fetching data:", err);

@@ -17,7 +17,7 @@ interface Props {
 
 export function VehicleInventory({ onNavigate }: Props) {
     const { user } = useAuth();
-    const BASE_URL = "https://localhost:7280/api/CarInventory";
+    const BASE_URL = "http://pareeq.runasp.net/api/CarInventory";
     const VEHICLE_ID = user?.vehicleId ?? 1; // مأخوذ من الـ JWT Token
 
     const [inventory, setInventory] = useState<VehicleStockResponse[]>([]);

@@ -44,7 +44,7 @@ export function ReorderAlertsPage() {
   const [activeRowIndex, setActiveRowIndex] = useState(0);
 
   // تأكد من تغيير اللينك حسب الدومين بتاعك (Somee / MonsterASP)
-  const API_BASE = "https://localhost:7280/api/InventoryLoad";
+  const API_BASE = "http://pareeq.runasp.net/api/InventoryLoad";
 
   // --- Functions: Fetch Data ---
   const fetchData = async () => {

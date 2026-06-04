@@ -6,7 +6,7 @@ import {
 import { KPICard } from "../../components/KPICard";
 
 // الـ Base URL الخاص بالباك إند بتاعك
-const API_BASE = "https://localhost:7280/api/manager/ManagerDashborad";
+const API_BASE = "http://pareeq.runasp.net/api/manager/ManagerDashborad";
 
 export function ManagerDashboard({ onNavigate }: { onNavigate: (page: string) => void }) {
   const [chartMode, setChartMode] = useState<"daily" | "monthly">("daily");

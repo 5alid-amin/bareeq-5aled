@@ -20,7 +20,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'https://localhost:7280',
+        target: 'http://pareeq.runasp.net',
         changeOrigin: true,
         secure: false,
       },

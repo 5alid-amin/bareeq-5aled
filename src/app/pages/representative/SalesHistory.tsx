@@ -7,7 +7,7 @@ import {
 import { useAuth } from "../../context/AuthContext";
 
 // --- الإعدادات الأساسية ---
-const BASE_URL = "https://localhost:7280/api/SalesHistory";
+const BASE_URL = "http://pareeq.runasp.net/api/SalesHistory";
 
 // --- التحويلات (Mapping) لتطابق الـ Backend ---
 const MAP_PAYMENT_TEXT: Record<number, string> = { 1: "كاش", 2: "فيزا", 3: "محفظة" };

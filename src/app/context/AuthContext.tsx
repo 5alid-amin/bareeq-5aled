@@ -23,7 +23,7 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | null>(null);
 
 const STORAGE_KEY = "bareeq_auth_user";
-const API_BASE = "https://localhost:7280";
+const API_BASE = "http://pareeq.runasp.net";
 
 // ─── JWT Decoder (no external lib needed) ───────────────────────────────────
 function parseJwt(token: string): Record<string, any> | null {

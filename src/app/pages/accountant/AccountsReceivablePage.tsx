@@ -3,7 +3,7 @@ import { ArrowDownToLine, Search, Plus, CheckCircle, X, Edit2, Trash2, ChevronRi
 
 // تأكد من صحة مسار الـ API الخاص بك
 // const API_BASE_URL = "${import.meta.env.VITE_API_URL}";
-const API_BASE_URL = "https://localhost:7280/api";
+const API_BASE_URL = "http://pareeq.runasp.net/api";
 
 
 interface ExtendedCashReceipt {

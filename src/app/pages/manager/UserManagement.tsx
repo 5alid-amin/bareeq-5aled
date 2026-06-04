@@ -3,7 +3,7 @@ import { Plus, Edit2, Search, UserCheck, UserX, ChevronDown, Trash2, Camera, Loc
 import axios from "axios";
 
 // البيز URL
-const API_URL = "https://localhost:7280/api/Users";
+const API_URL = "http://pareeq.runasp.net/api/Users";
 
 // ألوان الأدوار الوظيفية
 const ROLE_COLORS: Record<string, string> = {
