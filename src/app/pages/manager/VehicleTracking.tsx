@@ -41,17 +41,17 @@ export function VehicleTracking() {
   return (
     <div className="relative isolate min-h-[800px]">
       {/* Blurred Overlay for "Coming Soon" */}
-      <div className="absolute inset-0 z-50 flex items-center justify-center backdrop-blur-md bg-white/30 rounded-2xl">
-        <div className="bg-white/90 px-12 py-8 rounded-3xl shadow-2xl border border-white/50 animate-pulse flex flex-col items-center gap-4">
+      <div className="absolute inset-0 z-50 flex items-center justify-center backdrop-blur-md bg-white/30 rounded-2xl p-4">
+        <div className="bg-white/90 px-6 sm:px-12 py-8 rounded-3xl shadow-2xl border border-white/50 animate-pulse flex flex-col items-center gap-4 text-center w-full max-w-sm sm:max-w-none">
           <Navigation size={48} className="text-blue-500" />
-          <h2 className="text-4xl font-black text-slate-800 tracking-wider">قريباً</h2>
-          <p className="text-slate-500 font-medium">جاري العمل على ميزة تتبع المركبات المباشر...</p>
+          <h2 className="text-3xl sm:text-4xl font-black text-slate-800 tracking-wider">قريباً</h2>
+          <p className="text-slate-500 font-medium text-sm sm:text-base">جاري العمل على ميزة تتبع المركبات المباشر...</p>
         </div>
       </div>
 
       <div className="space-y-4 opacity-50 pointer-events-none select-none filter blur-[2px]">
         {/* Stats row */}
-        <div className="grid grid-cols-4 gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
           {[
             { label: "إجمالي الفانات", value: vans.length, color: "text-blue-600", bg: "bg-blue-50" },
             { label: "نشطة الآن", value: vans.filter(v => v.status === "نشطة").length, color: "text-emerald-600", bg: "bg-emerald-50" },
@@ -189,7 +189,7 @@ export function VehicleTracking() {
 
             {/* Selected Van Info */}
             <div className="px-5 py-4 bg-gradient-to-l from-blue-50 to-slate-50 border-t border-slate-100">
-              <div className="flex items-start justify-between gap-4 flex-wrap">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 flex-wrap">
                 <div>
                   <div className="flex items-center gap-2 mb-1">
                     <span className={`w-2.5 h-2.5 rounded-full ${STATUS_DOT[selectedVan.status]}`}></span>

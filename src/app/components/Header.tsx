@@ -1,5 +1,5 @@
 import React from "react";
-import { Bell, Search, ChevronLeft, Moon, Sun } from "lucide-react";
+import { Bell, Search, ChevronLeft, Moon, Sun, Menu } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 
 const PAGE_TITLES: Record<string, string> = {
@@ -24,9 +24,10 @@ const PAGE_TITLES: Record<string, string> = {
 interface HeaderProps {
   activePage: string;
   onNavigate: (page: string, vanId?: string) => void;
+  onToggleMobileMenu?: () => void;
 }
 
-export function Header({ activePage, onNavigate }: HeaderProps) {
+export function Header({ activePage, onNavigate, onToggleMobileMenu }: HeaderProps) {
   const { user } = useAuth();
   const today = new Date().toLocaleDateString("ar-EG", {
     weekday: "long",
@@ -55,6 +56,14 @@ export function Header({ activePage, onNavigate }: HeaderProps) {
     <header className="bg-white border-b border-slate-200 px-6 py-3.5 flex items-center justify-between flex-shrink-0 shadow-sm">
       {/* Left side: page title */}
       <div className="flex items-center gap-3">
+        {onToggleMobileMenu && (
+          <button 
+            onClick={onToggleMobileMenu} 
+            className="md:hidden p-2 -ml-2 text-slate-600 hover:bg-slate-100 rounded-lg transition-colors"
+          >
+            <Menu size={24} />
+          </button>
+        )}
         {showBack && (
           <button
             onClick={() => onNavigate("fleet")}

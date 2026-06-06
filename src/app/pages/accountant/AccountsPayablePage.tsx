@@ -154,17 +154,17 @@ export function AccountsPayablePage() {
           </div>
         </div>
 
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2 bg-white p-1.5 rounded-xl border border-slate-200 shadow-sm font-sans">
-            <select value={filterDay} onChange={(e) => { setFilterDay(e.target.value); setPageNumber(1); }} className="text-xs border-none bg-slate-50 rounded-lg px-2 py-1.5 focus:ring-0 cursor-pointer outline-none">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full md:w-auto">
+          <div className="flex items-center justify-between sm:justify-start gap-2 bg-white p-1.5 rounded-xl border border-slate-200 shadow-sm font-sans flex-wrap">
+            <select value={filterDay} onChange={(e) => { setFilterDay(e.target.value); setPageNumber(1); }} className="text-xs border-none bg-slate-50 rounded-lg px-2 py-1.5 focus:ring-0 cursor-pointer outline-none flex-1 sm:flex-none">
               <option value="">اليوم</option>
               {days.map(d => <option key={d} value={d}>{d}</option>)}
             </select>
-            <select value={filterMonth} onChange={(e) => { setFilterMonth(e.target.value); setPageNumber(1); }} className="text-xs border-none bg-slate-50 rounded-lg px-2 py-1.5 focus:ring-0 cursor-pointer outline-none">
+            <select value={filterMonth} onChange={(e) => { setFilterMonth(e.target.value); setPageNumber(1); }} className="text-xs border-none bg-slate-50 rounded-lg px-2 py-1.5 focus:ring-0 cursor-pointer outline-none flex-1 sm:flex-none">
               <option value="">الشهر</option>
               {months.map((m, i) => <option key={m} value={i + 1}>{m}</option>)}
             </select>
-            <select value={filterYear} onChange={(e) => { setFilterYear(e.target.value); setPageNumber(1); }} className="text-xs border-none bg-slate-50 rounded-lg px-2 py-1.5 focus:ring-0 cursor-pointer outline-none">
+            <select value={filterYear} onChange={(e) => { setFilterYear(e.target.value); setPageNumber(1); }} className="text-xs border-none bg-slate-50 rounded-lg px-2 py-1.5 focus:ring-0 cursor-pointer outline-none flex-1 sm:flex-none">
               <option value="">السنة</option>
               {years.map(y => <option key={y} value={y}>{y}</option>)}
             </select>
@@ -172,7 +172,7 @@ export function AccountsPayablePage() {
 
           <button
             onClick={() => { setEditingExpense(null); setIsVehicleLinked(false); setShowModal(true); }}
-            className="bg-red-600 hover:bg-red-700 text-white px-5 py-2.5 rounded-xl text-sm font-bold transition-all shadow-md flex items-center gap-2 whitespace-nowrap"
+            className="bg-red-600 hover:bg-red-700 text-white px-5 py-2.5 rounded-xl text-sm font-bold transition-all shadow-md flex items-center justify-center gap-2 whitespace-nowrap w-full sm:w-auto"
           >
             <Plus size={18} />
             مصروف جديد
@@ -182,19 +182,19 @@ export function AccountsPayablePage() {
 
       {/* البانر الإجمالي */}
       <div className="bg-gradient-to-r from-red-500 to-rose-600 rounded-3xl p-6 text-white shadow-lg relative overflow-hidden">
-        <div className="relative z-10 flex items-center justify-between px-4">
+        <div className="relative z-10 flex flex-col sm:flex-row items-center justify-between gap-6 sm:gap-4 px-4 text-center sm:text-right">
           <div className="flex flex-col">
-            <p className="text-red-100 text-sm font-medium mb-1">إجمالي المصروفات الصادرة</p>
-            <h3 className="text-5xl font-black">
+            <p className="text-red-100 text-sm font-medium mb-1 text-center sm:text-right">إجمالي المصروفات الصادرة</p>
+            <h3 className="text-4xl sm:text-5xl font-black break-all">
               {totalAmount.toLocaleString()}
-              <span className="text-xl font-normal opacity-80 mr-2">ج.م</span>
+              <span className="text-lg sm:text-xl font-normal opacity-80 mr-2">ج.م</span>
             </h3>
           </div>
-          <div className="bg-white/20 backdrop-blur-md px-6 py-3 rounded-2xl flex items-center gap-3 border border-white/10">
-            <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+          <div className="bg-white/20 backdrop-blur-md px-6 py-3 rounded-2xl flex items-center justify-center gap-3 border border-white/10 w-full sm:w-auto">
+            <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center shrink-0">
               <CheckCircle size={20} />
             </div>
-            <div className="flex flex-col">
+            <div className="flex flex-col text-right">
               <span className="text-2xl font-bold leading-tight">{totalRecords}</span>
               <span className="text-[10px] uppercase tracking-wider opacity-80">عملية مسجلة حالياً</span>
             </div>
@@ -390,7 +390,7 @@ export function AccountsPayablePage() {
                 </select>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-1.5">
                   <label className="text-xs font-bold text-slate-600 mr-1">المبلغ (ج.م)</label>
                   <input
@@ -425,7 +425,7 @@ export function AccountsPayablePage() {
                 />
               </div>
 
-              <div className="flex gap-3 pt-2">
+              <div className="flex flex-col sm:flex-row gap-3 pt-2">
                 <button type="submit" className="flex-1 bg-red-600 text-white py-3 rounded-xl font-bold shadow-lg shadow-red-200 hover:bg-red-700 transition-colors">
                   {editingExpense ? "تحديث المصروف" : "حفظ المصروف"}
                 </button>
@@ -449,7 +449,7 @@ export function AccountsPayablePage() {
               onChange={(e) => setNewCategoryName(e.target.value)}
               className="w-full border border-slate-200 rounded-xl px-4 py-2 text-sm focus:ring-2 focus:ring-red-500 outline-none mb-4"
             />
-            <div className="flex gap-2">
+            <div className="flex flex-col sm:flex-row gap-2">
               <button
                 onClick={handleAddCategory}
                 className="flex-1 bg-slate-800 text-white py-2 rounded-lg text-sm font-bold hover:bg-slate-900 transition-colors"

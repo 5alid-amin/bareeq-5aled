@@ -70,9 +70,11 @@ const accountantNav: NavItem[] = [
 interface SidebarProps {
   activePage: string;
   onNavigate: (page: string, vanId?: string) => void;
+  isMobileMenuOpen?: boolean;
+  setIsMobileMenuOpen?: (isOpen: boolean) => void;
 }
 
-export function Sidebar({ activePage, onNavigate }: SidebarProps) {
+export function Sidebar({ activePage, onNavigate, isMobileMenuOpen, setIsMobileMenuOpen }: SidebarProps) {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -106,7 +108,10 @@ export function Sidebar({ activePage, onNavigate }: SidebarProps) {
           return (
             <li key={item.id}>
               <button
-                onClick={() => onNavigate(item.id)}
+                onClick={() => {
+                  onNavigate(item.id);
+                  if (setIsMobileMenuOpen) setIsMobileMenuOpen(false);
+                }}
                 title={isCollapsed ? item.label : ""}
                 className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all duration-150 text-right ${isActive
                   ? "bg-blue-600 text-white shadow-sm"
@@ -124,13 +129,28 @@ export function Sidebar({ activePage, onNavigate }: SidebarProps) {
   );
 
   return (
-    <aside className={`${isCollapsed ? "w-20" : "w-64"} bg-slate-900 flex flex-col h-full shadow-xl flex-shrink-0 transition-all duration-300 relative`}>
+    <>
+      {/* Mobile Overlay */}
+      {isMobileMenuOpen && (
+        <div 
+          className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-40 md:hidden"
+          onClick={() => setIsMobileMenuOpen?.(false)}
+        />
+      )}
       
-      {/* Toggle Button */}
-      <button
-        onClick={() => setIsCollapsed(!isCollapsed)}
-        className="absolute -left-3 top-10 bg-blue-600 text-white rounded-full p-1 shadow-lg border-2 border-slate-900 hover:bg-blue-500 transition-colors z-50"
+      <aside 
+        className={`${
+          isCollapsed ? "w-20" : "w-64"
+        } bg-slate-900 flex flex-col h-full shadow-xl flex-shrink-0 transition-all duration-300 fixed inset-y-0 right-0 z-50 md:relative ${
+          isMobileMenuOpen ? "translate-x-0" : "translate-x-full md:translate-x-0"
+        }`}
       >
+        
+        {/* Toggle Button */}
+        <button
+          onClick={() => setIsCollapsed(!isCollapsed)}
+          className="hidden md:flex absolute -left-3 top-10 bg-blue-600 text-white rounded-full p-1 shadow-lg border-2 border-slate-900 hover:bg-blue-500 transition-colors z-50"
+        >
         {isCollapsed ? <ChevronLeft size={16} /> : <ChevronRight size={16} />}
       </button>
 
@@ -207,5 +227,6 @@ export function Sidebar({ activePage, onNavigate }: SidebarProps) {
         </div>
       )}
     </aside>
+    </>
   );
 }
