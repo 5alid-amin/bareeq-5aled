@@ -20,10 +20,10 @@ interface Stats {
   inactive: number;
 }
 
-const API_BASE = "/api/VehicleManagement";
+const API_BASE = "https://pareeq.runasp.net/api/VehicleManagement";
 
 const STATUS_COLORS: Record<string, string> = {
-  "نشطة": "bg-green-500 text-white border-green-400 shadow-[0_0_10px_rgba(34,197,94,0.6)]", 
+  "نشطة": "bg-green-500 text-white border-green-400 shadow-[0_0_10px_rgba(34,197,94,0.6)]",
   "متوقفة": "bg-slate-100 text-slate-600 border-slate-200",
 };
 
@@ -41,9 +41,9 @@ function VanDetailsModal({ van, onClose, onRefresh }: VanDetailsModalProps) {
 
   useEffect(() => {
     if (van) {
-        setFormData(van);
-        fetch(`${API_BASE}/helpers/representatives`).then(res => res.json()).then(data => setReps(data));
-        fetch(`${API_BASE}/helpers/Drivers`).then(res => res.json()).then(data => setDrivers(data));
+      setFormData(van);
+      fetch(`${API_BASE}/helpers/representatives`).then(res => res.json()).then(data => setReps(data));
+      fetch(`${API_BASE}/helpers/Drivers`).then(res => res.json()).then(data => setDrivers(data));
     }
   }, [van]);
 
@@ -53,17 +53,17 @@ function VanDetailsModal({ van, onClose, onRefresh }: VanDetailsModalProps) {
     try {
       const method = formData.id === 0 ? "POST" : "PUT";
       const url = formData.id === 0 ? API_BASE : `${API_BASE}/${formData.id}`;
-      
+
       const response = await fetch(url, {
         method: method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-            vehicleName: formData.vanName,
-            plateNumber: formData.plateNumber,
-            model: formData.model,
-            status: formData.status,
-            driverId: formData.driverId,             // إرسال الـ ID
-            representativeId: formData.representativeId // إرسال الـ ID
+          vehicleName: formData.vanName,
+          plateNumber: formData.plateNumber,
+          model: formData.model,
+          status: formData.status,
+          driverId: formData.driverId,             // إرسال الـ ID
+          representativeId: formData.representativeId // إرسال الـ ID
         })
       });
 
@@ -107,42 +107,41 @@ function VanDetailsModal({ van, onClose, onRefresh }: VanDetailsModalProps) {
           <div className="flex items-center gap-2">
             <Truck size={18} className="text-blue-600" />
             <h2 className="text-slate-700 text-base font-bold">
-                {formData.id === 0 ? "إضافة مركبة جديدة" : `تعديل مركبة ${formData.id}`}
+              {formData.id === 0 ? "إضافة مركبة جديدة" : `تعديل مركبة ${formData.id}`}
             </h2>
           </div>
           <button onClick={onClose} className="w-8 h-8 rounded-lg bg-white border border-slate-200 flex items-center justify-center text-slate-500 hover:bg-slate-50">×</button>
         </div>
-        
+
         <div className="p-4 space-y-1 max-h-[60vh] overflow-y-auto" dir="rtl">
           {renderField("اسم السيارة", "vanName", "vanName")}
           {renderField("رقم اللوحة", "plateNumber", "plateNumber")}
           {renderField("الموديل", "model", "model")}
           {renderField("المندوب", "representativeName", "representativeId", "select", reps)}
           {renderField("السائق", "driverName", "driverId", "select", drivers)}
-          
+
           <div className="p-3">
-             <p className="text-slate-400 text-xs mb-2">حالة المركبة</p>
-             <div className="flex gap-2">
-                {["نشطة", "متوقفة"].map(s => (
-                  <button
-                    key={s}
-                    onClick={() => setFormData({...formData, status: s})}
-                    className={`flex-1 py-2.5 rounded-xl text-xs border transition-all font-bold ${
-                        formData.status === s 
-                        ? (s === "نشطة" ? "bg-green-500 border-green-400 text-white shadow-[0_0_15px_rgba(34,197,94,0.5)]" : "bg-slate-600 border-slate-700 text-white") 
-                        : "bg-white text-slate-400 border-slate-200"
+            <p className="text-slate-400 text-xs mb-2">حالة المركبة</p>
+            <div className="flex gap-2">
+              {["نشطة", "متوقفة"].map(s => (
+                <button
+                  key={s}
+                  onClick={() => setFormData({ ...formData, status: s })}
+                  className={`flex-1 py-2.5 rounded-xl text-xs border transition-all font-bold ${formData.status === s
+                    ? (s === "نشطة" ? "bg-green-500 border-green-400 text-white shadow-[0_0_15px_rgba(34,197,94,0.5)]" : "bg-slate-600 border-slate-700 text-white")
+                    : "bg-white text-slate-400 border-slate-200"
                     }`}
-                  >
-                    {s === "نشطة" && formData.status === s && <Check size={14} className="inline ml-1" />}
-                    {s}
-                  </button>
-                ))}
-             </div>
+                >
+                  {s === "نشطة" && formData.status === s && <Check size={14} className="inline ml-1" />}
+                  {s}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
 
         <div className="p-4 bg-slate-50 border-t border-slate-100 flex gap-3">
-          <button 
+          <button
             onClick={handleSave}
             className="flex-1 flex items-center justify-center gap-2 py-3 bg-blue-600 text-white rounded-xl text-sm font-bold hover:bg-blue-700 transition-all shadow-lg shadow-blue-100"
           >
@@ -169,7 +168,7 @@ export function FleetManagement() {
       const query = filterStatus !== "الكل" ? `?status=${filterStatus}` : "";
       const response = await fetch(`${API_BASE}${query}`);
       const data = await response.json();
-      
+
       const mappedVans = data.vehicles.map((v: any) => ({
         id: v.vehicleId,
         vanName: v.vehicleName,
@@ -199,32 +198,32 @@ export function FleetManagement() {
     fetchVehicles();
   }, [filterStatus]);
 
-  const filtered = vanList.filter((v) => 
-    v.driverName.toLowerCase().includes(search.toLowerCase()) || 
+  const filtered = vanList.filter((v) =>
+    v.driverName.toLowerCase().includes(search.toLowerCase()) ||
     v.id.toString().includes(search) ||
     v.vanName.toLowerCase().includes(search.toLowerCase())
   );
 
   const handleAddNew = () => {
     setSelectedVan({
-        id: 0,
-        vanName: "",
-        plateNumber: "",
-        model: "",
-        status: "متوقفة",
-        representativeName: "",
-        driverName: "",
-        representativeId: null,
-        driverId: null
+      id: 0,
+      vanName: "",
+      plateNumber: "",
+      model: "",
+      status: "متوقفة",
+      representativeName: "",
+      driverName: "",
+      representativeId: null,
+      driverId: null
     });
   };
 
   return (
     <div className="space-y-6" dir="rtl">
       {selectedVan && (
-        <VanDetailsModal 
-          van={selectedVan} 
-          onClose={() => setSelectedVan(null)} 
+        <VanDetailsModal
+          van={selectedVan}
+          onClose={() => setSelectedVan(null)}
           onRefresh={fetchVehicles}
         />
       )}
@@ -250,7 +249,7 @@ export function FleetManagement() {
           { label: "نشطة", filter: "نشطة", value: stats.active, color: "text-green-600", bg: "bg-green-50" },
           { label: "متوقفة", filter: "متوقفة", value: stats.inactive, color: "text-slate-500", bg: "bg-slate-50" },
         ].map((item) => (
-          <button 
+          <button
             key={item.label}
             onClick={() => setFilterStatus(item.filter)}
             className={`bg-white rounded-3xl border-2 shadow-sm px-10 py-6 flex items-center gap-5 transition-all ${filterStatus === item.filter ? "border-blue-500 bg-blue-50/30 scale-105" : "border-slate-100"}`}
