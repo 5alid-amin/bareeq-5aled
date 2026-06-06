@@ -3,7 +3,7 @@ import { Plus, Edit2, Search, Package, ChevronDown, AlertTriangle, Trash2, Setti
 import axios from "axios";
 
 // المتغير اللي شايل البيز بتاع الـ URL
-const API_BASE_URL = "http://pareeq.runasp.net/api/Inventory";
+const API_BASE_URL = "https://pareeq.runasp.net/api/Inventory";
 
 // ─── Types ──────────────────────────────────────────────────────────────────────
 interface Product {

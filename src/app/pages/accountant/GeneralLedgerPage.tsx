@@ -65,9 +65,9 @@ export function GeneralLedgerPage() {
       if (filter === 'week') params.year = now.getFullYear();
 
       const [resSummary, resAnalytics, resVehicle] = await Promise.all([
-        axios.get("http://pareeq.runasp.net/api/Dashboard/summary", { params }),
-        axios.get("http://pareeq.runasp.net/api/Dashboard/expenses-analytics", { params }),
-        axios.get("http://pareeq.runasp.net/api/Dashboard/top-performing-vehicle", { params })
+        axios.get("https://pareeq.runasp.net/api/Dashboard/summary", { params }),
+        axios.get("https://pareeq.runasp.net/api/Dashboard/expenses-analytics", { params }),
+        axios.get("https://pareeq.runasp.net/api/Dashboard/top-performing-vehicle", { params })
       ]);
 
       setSummary(resSummary.data);

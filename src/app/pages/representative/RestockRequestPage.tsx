@@ -4,7 +4,7 @@ import { Plus, RefreshCw, Clock, CheckCircle, XCircle, Send, Pencil, Trash2, Ale
 import { useAuth } from "../../context/AuthContext";
 
 // الإعدادات الأساسية للـ API
-const BASE_URL = "http://pareeq.runasp.net/api/CarInventory";
+const BASE_URL = "https://pareeq.runasp.net/api/CarInventory";
 
 // تعريف الأنواع (Interfaces) بناءً على الـ DTOs في الباك اند
 interface ProductLookup {

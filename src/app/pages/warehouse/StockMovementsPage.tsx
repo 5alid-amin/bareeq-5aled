@@ -27,7 +27,7 @@ export function StockMovementsPage() {
   const [dateTo, setDateTo] = useState("");
 
   // الرابط من واقع صورة الـ Swagger
-  const API_URL = "http://pareeq.runasp.net/api/InventoryTransactions/GetTransactionsHistory";
+  const API_URL = "https://pareeq.runasp.net/api/InventoryTransactions/GetTransactionsHistory";
 
   const fetchMovements = async () => {
     setLoading(true);

@@ -19,7 +19,7 @@ export function Reports() {
   const [inventoryData, setInventoryData] = useState<any>(null);
   const [loading, setLoading] = useState(false);
 
-  const BASE_URL = "http://pareeq.runasp.net/api/Reports";
+  const BASE_URL = "https://pareeq.runasp.net/api/Reports";
 
   // دالة جلب البيانات
   const fetchData = async () => {

@@ -3,7 +3,7 @@ import { RefreshCw, Clock, CheckCircle, Package, Search, AlertCircle } from "luc
 import axios from "axios";
 
 // تعريف الـ URL بتاع الباك إند (غيره حسب السيرفر عندك)
-const API_BASE_URL = "http://pareeq.runasp.net/api/RefillRequests";
+const API_BASE_URL = "https://pareeq.runasp.net/api/RefillRequests";
 
 // خريطة لتحويل الحالات من نصوص لأرقام والأسماء
 const STATUS_MAP: Record<string, number> = {

@@ -9,7 +9,7 @@ import { KPICard } from '../../components/KPICard';
 // الإعدادات الأساسية لـ Axios
 // baseURL: import.meta.env.VITE_API_URL
 const api = axios.create({
-    baseURL: 'http://pareeq.runasp.net/api' // تأكد من المنفذ (Port) الخاص بك
+    baseURL: 'https://pareeq.runasp.net/api' // تأكد من المنفذ (Port) الخاص بك
     // baseURL: import.meta.env.VITE_API_URL
 });
 
