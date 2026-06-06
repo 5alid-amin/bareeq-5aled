@@ -1,19 +1,18 @@
 import { defineConfig } from 'vite'
-import path from 'path'
 import tailwindcss from '@tailwindcss/vite'
 import react from '@vitejs/plugin-react'
 
 export default defineConfig({
   plugins: [
     // The React and Tailwind plugins are both required for Make, even if
-    // Tailwind is not being actively used – do not remove them
+    // / Tailwind is not being actively used - do not remove them
     react(),
     tailwindcss(),
   ],
   resolve: {
     alias: {
-      // Alias @ to the src directory
-      '@': path.resolve(__dirname, './src'),
+      // Alias @ to the src directory باستخدام مسار نسبى آمن تماماً ومتوافق
+      '@': new URL('./src', import.meta.url).pathname,
     },
   },
 
@@ -23,6 +22,7 @@ export default defineConfig({
         target: 'https://pareeq.runasp.net',
         changeOrigin: true,
         secure: false,
+        rewrite: (path) => path.replace(/^\/api/, '/api')
       },
     },
   },
